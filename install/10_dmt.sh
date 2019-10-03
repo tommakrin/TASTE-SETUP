@@ -6,13 +6,17 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR/../dmt" || exit 1
 
 # Skip install if the version installed is the same and the tree is clean
-HEAD="$(grep version= setup.py  | awk -F\" '{print $2}')"
+HEAD="$(grep version= setup.py 2>/dev/null | awk -F\" '{print $2}')"
 VERSION_INSTALLED="$(dmt --version 2>/dev/null | grep ^TAST | awk '{print $NF}')"
-GIT_OUTPUT=$(git status --porcelain)
-if [ "${GIT_OUTPUT}" == "" ] ; then
-    TREE_DIRTY=0
-else
+if [ "$HEAD" == "" ] ; then
     TREE_DIRTY=1
+else
+    GIT_OUTPUT=$(git status --porcelain)
+    if [ "${GIT_OUTPUT}" == "" ] ; then
+        TREE_DIRTY=0
+    else
+        TREE_DIRTY=1
+    fi
 fi
 
 if [ ${TREE_DIRTY} -eq 0 ] && [ "${HEAD}" == "${VERSION_INSTALLED}" ] ; then
