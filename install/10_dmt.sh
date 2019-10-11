@@ -5,6 +5,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Setup the tools in ~/.local/bin
 cd "$DIR/../dmt" || exit 1
 
+./configure || exit 1
+
 # Skip install if the version installed is the same and the tree is clean
 HEAD="$(grep version= setup.py 2>/dev/null | awk -F\" '{print $2}')"
 VERSION_INSTALLED="$(dmt --version 2>/dev/null | grep ^TAST | awk '{print $NF}')"
