@@ -474,7 +474,7 @@ class PeekPoker:
 
     def on_buttonMeterSelected_clicked(self, x, defsizepos="250x250+0+0"):
         '''Calls on_buttonPlotSelected_clicked to re-use spawning funtionality'''
-        cmd = 'cat %s | speedometer.py '
+        cmd = 'cat %s | speedometer '
         self.on_buttonPlotSelected_clicked(x, cmd, defsizepos)
 
     def on_buttonUnplotSelected_clicked(self, *_):
