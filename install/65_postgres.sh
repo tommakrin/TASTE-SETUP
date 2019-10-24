@@ -30,11 +30,19 @@ else
 fi
 PGPASS="$HOME/.pgpass"
 LINE='127.0.0.1:5432:*:postgres:tastevm'
-echo "[-] Checking if 'taste' DB user credentials are stored in \$HOME/.pgpass..."
+echo "[-] Checking if 'postgres' DB user credentials are stored in \$HOME/.pgpass..."
 if ! grep "${LINE/*/\\*}" "$PGPASS" >/dev/null 2>&1 ; then
-    echo "[-] Adding the 'taste' DB user credentials to \$HOME/.pgpass ..."
+    echo "[-] Adding the 'postgres' DB user credentials to \$HOME/.pgpass ..."
     echo "$LINE" >> "$PGPASS"
     LINE='localhost:5432:*:postgres:tastevm'
+    echo "$LINE" >> "$PGPASS"
+else
+    echo '[-]     Already stored.'
+fi
+echo "[-] Checking if 'taste' DB user credentials are stored in \$HOME/.pgpass..."
+LINE='localhost:5432:*:taste:tastedb'
+if ! grep -F "${LINE}" "$PGPASS" >/dev/null 2>&1 ; then
+    echo "[-] Adding the 'taste' DB user credentials to \$HOME/.pgpass ..."
     echo "$LINE" >> "$PGPASS"
 else
     echo '[-]     Already stored.'
