@@ -29,6 +29,11 @@ cp peek-poke/PeekPoke.glade ${PREFIX}/share/peekpoke/PeekPoke.glade || exit 1
 # Helper scripts
 cp -a helper-scripts/* ${PREFIX}/bin/
 
+# GUI User-defined widgets
+TARGET=${PREFIX}/share/AutoGUI
+mkdir -p ${TARGET}
+cp -a AutoGUI/UserWidgets.py ${TARGET}
+
 # Copy AADL Libraries to Ocarina and ellidiss folders
 make -C aadl-library install
 
