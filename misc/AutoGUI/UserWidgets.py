@@ -50,6 +50,12 @@ class CustomTC_Widget(UserWidgetsCommon.TC):
     @staticmethod
     def applicable():
         ''' Return True to activate this widget '''
+        return True
+
+    @staticmethod
+    def editorIsApplicable(editor):
+        ''' Return true if this particular editor is compatible with this
+        widget'''
         return False
 
     def select(self, item):
@@ -97,7 +103,14 @@ class CustomTM_Widget(UserWidgetsCommon.TM):
     @staticmethod
     def applicable():
         ''' Return True to enable this widget '''
+        return True
+
+    @staticmethod
+    def editorIsApplicable(editor):
+        ''' Return true if this particular editor is compatible with this
+        widget'''
         return False
+
 
 if __name__ == '__main__':
     print 'This module can only be imported from the main TASTE guis'
