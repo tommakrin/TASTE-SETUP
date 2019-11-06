@@ -1,6 +1,9 @@
 #!/bin/bash -e
 
-# TASTE Dataview Editor
+# TASTE Dataview Creator / Editor
+
+# Asn1 module name based on the current folder name
+ASN1_MODULE=$(pwd | sed 's,^.*/[0-9]*,,g' | tr '[a-z]' '[A-Z]' | tr '_' '-')-DATAVIEW
 
 if [ -t 1 ] ; then
     COLORON="\e[1m\e[32m"
@@ -38,18 +41,22 @@ else
     then
         echo -e "${INFO} Creating a dummy ASN.1 file with a few type examples - feel free to add, edit, delete..."
     fi
-    echo 'TASTE-Dataview DEFINITIONS ::=
+    echo "${ASN1_MODULE} DEFINITIONS ::=
 BEGIN
 IMPORTS T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean FROM TASTE-BasicTypes;
 
-TASTE-Boolean ::= BOOLEAN
+   My-Integer ::= INTEGER (3 .. 1415)
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase
 -- Underscores are not allowed: use dash (hyphen) 
+-- For integers do not assume that small ranges will be translated to small
+-- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
+-- for the range in Ada)
 
 -- Simple types:
 
+-- TASTE-Boolean ::= BOOLEAN
 -- MyInteger   ::= INTEGER (0..255)
 -- MyReal      ::= REAL (0.0 .. 1000.0)
 -- MyBool      ::= BOOLEAN
@@ -76,17 +83,19 @@ TASTE-Boolean ::= BOOLEAN
 --  myVar       MySeqOf     ::= { hello, world }
 
 END
-' > DataView.asn
-echo 'TASTE-Dataview DEFINITIONS ::= BEGIN
+" > DataView.asn
+echo "${ASN1_MODULE} DEFINITIONS ::= BEGIN
 
     --  In this ACN model, you can specify custom binary encoding rules for
     --  your data types. For example if you require a specific memory layout
     --  for a record, or need to add padding fields, define endianness, etc.
-    --  you can do that with ACN. Refer to the ACN user manual for details.
+    --  you can do that with ACN. Refer to the TASTE wiki for documentation:
+   --   https://taste.tuxfamily.org/wiki/index.php?title=Main_Page
 
-    --  TASTE-Boolean []
+   --  Example of custom encoding:
+   --  My-Integer [encoding pos-int, endianness big, size 16]
 END
-' > DataView.acn
+" > DataView.acn
 fi
 
 if [ -z $NONINTERACTIVE ]
@@ -103,6 +112,6 @@ if [ -z $NONINTERACTIVE ]
 then
     echo -e "${INFO} Data View created"
     echo -e "${INFO} Run taste-edit-data-view to edit"
-    echo -e "${INFO}     taste-create-acn-model to specify binary encodings with ACN"
-    echo -e "${INFO}     taste-create-project to create a new TASTE project"
+    echo -e "${INFO}     taste-edit-acn-model to specify custom binary encodings with ACN"
+    echo -e "${INFO}     taste to create a new TASTE project"
 fi

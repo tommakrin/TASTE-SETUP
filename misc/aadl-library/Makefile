@@ -14,8 +14,9 @@ install:
 	   "$(shell ocarina-config --resources)/AADLv2/ocarina_components.aadl"
 	@cp TASTE*.aadl $(shell ocarina-config --resources)/AADLv2
 	@cp taste*.aadl $(shell ocarina-config --resources)/AADLv2
-	@cp TASTE*.aadl ../../ellidiss-GUI/TASTE-linux/config
-	@cp TASTE*.aadl ../../ellidiss-GUI/TASTE-linux64/config
+	@# Stop overwriting ellidiss folder, it can break the git update:
+	@#@cp TASTE*.aadl ../../ellidiss-GUI/TASTE-linux/config
+	@#@cp TASTE*.aadl ../../ellidiss-GUI/TASTE-linux64/config
 	@#cp TASTE*.aadl ../../ellidiss-GUI/TASTE-v1-linux/config
 	@mkdir -p $(shell taste-config --prefix)/share/config_ellidiss
 	@cp TASTE*.aadl $(shell taste-config --prefix)/share/config_ellidiss  # legacy

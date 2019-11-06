@@ -8,6 +8,30 @@ git submodule update air/pos/rtems5
 
 cd air || exit 1
 
+# As per request of Laura Gouveia (mail discussions at 22/10/2019):
+#
+# AIR doesn't check during 'make' for a changed target board; it depends on
+# a 'make clean' done first, if the chosen configuration changes.
+#
+# To make the final delivery use LEON4-specific functionality,
+# it is therefore not sufficient to choose a different number
+# in the second question (see below) and just commit an updated config;
+# we need to somehow trigger this 'make clean' - BUT not always!
+# We only want to do this once, otherwise 'Update-TASTE.sh' will take
+# a lot longer, because of AIR being rebuilt from scratch every time.
+#
+# So we need this hack:
+
+# Is there a previous AIR build?
+if [ -f .air_config ] ; then
+    # Yes, there is. Did the previous build target leon4?
+    OLD_TARGET=$(python3 -c 'import pickle; print(pickle.load(open(".air_config", "rb"))[1])')
+    if [ "$OLD_TARGET" != "leon4" ] ; then
+        # It didn't! Cleanup the universe, to trigger a rebuild from scratch
+        make clean
+    fi
+fi
+
 # Pass the following configuration to AIR's "configure" script:
 #
 # Select the target architecture:
