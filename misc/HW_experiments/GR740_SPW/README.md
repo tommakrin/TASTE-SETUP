@@ -10,9 +10,11 @@ HW setup
 
 4. On the GR740 side, connect a SpW cable from this port (marked with `o`)...
 
+```
     x x x
     o x x
     x x x
+```
 
    ...to the STAR Dundee brick `Link 1`.
 
@@ -20,7 +22,9 @@ HW setup
 6. Now compile this application, and launch the generated binary inside GRMON
 7. On the Windows side, go to the "Simple Test" window on the top-right, and enter this payload:
 
+```
     1 9 1 2 3
+```
 
    This payload, routing-wise, means: 
 
@@ -30,15 +34,19 @@ HW setup
 
    So when you click on "Send Packet", the application will show - on the GRMON side - this:
 
+```
     SPW0: Recevied 1 packets
      PKT of length 3 bytes, 0x01 0x02 0x03 0x00 0x00 0x00 0x00 0x00...
+```
 
 8. Now let's send from the GRMON side. Click on "Receive Packets" and enter this on the 
    GRMON prompt:
 
+```
     starting packet processing loop. enter command:
 
     x0 1 3 1 2 3 4 5 6 7 8 9
+```
 
    This means: 
 
