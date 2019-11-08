@@ -14,8 +14,14 @@ import sys
 import os
 import importlib
 
-from PySide.QtCore import (QObject, Signal, Slot, Qt, QTimer)
-import PySide.QtGui as QtGui
+try:
+    from PySide.QtCore import (QObject, Signal, Slot, Qt, QTimer)
+    from PySide.QtGui import *
+except ImportError:
+    # When using Python3/PySide2
+    from PySide2.QtCore import *
+    from PySide2.QtGui import *
+    from PySide2.QtWidgets import *
 
 from asn1_value_editor import UserWidgetsCommon
 
@@ -34,11 +40,11 @@ class CustomTC_Widget(UserWidgetsCommon.TC):
         self._asn1_typename = asn1_typename
 
         # examples of widgets
-        #self.widget = QtGui.QListWidget()
+        #self.widget = QListWidget()
         #self.widget.itemClicked.connect(self.select)
         #self.setWidget(self.widget)
 
-        #self.widget = QtGui.QPushButton(asn1_typename)
+        #self.widget = QPushButton(asn1_typename)
         #self.widget.clicked.connect(self.clicked))
         #self.setWidget(self.widget)
 
@@ -113,5 +119,5 @@ class CustomTM_Widget(UserWidgetsCommon.TM):
 
 
 if __name__ == '__main__':
-    print 'This module can only be imported from the main TASTE guis'
+    print('This module can only be imported from the main TASTE guis')
     sys.exit(-1)
