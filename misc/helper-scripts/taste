@@ -55,9 +55,9 @@ c:	work/glue_built
 	$(MAKE) -C work
 
 skeletons:
-	$(MAKE) skeletons_built
+	$(MAKE) work/skeletons_built
 
-skeletons_built:	InterfaceView.aadl DataView.aadl
+work/skeletons_built:	InterfaceView.aadl DataView.aadl
 	$(KAZOO) --gw -o work
 	$(MAKE) -C work dataview
 	touch $@
