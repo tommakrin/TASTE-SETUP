@@ -2542,6 +2542,7 @@ end arm;
 
 processor zynqzc706 extends arm
 properties
+   -- for the moment it is reusing an RTEMS/LEON ExP while the proper target RTEMS/ARM ExP is still under build and test activities (this is only temporary and very shortly will be updated)
    Deployment::Execution_Platform => LEON_RTEMS_POSIX;
 end zynqzc706;
 
@@ -2551,6 +2552,7 @@ properties
    Priority_Range => 0 .. 255;
    Cheddar_Properties::Scheduler_Quantum => 0 Ms;
    Cheddar_Properties::Preemptive_Scheduler => true;
+   -- for the moment it is reusing an RTEMS/LEON ExP while the proper target RTEMS/ARM ExP is still under build and test activities (this is only temporary and very shortly will be updated)
    EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rcc-1.3-rc5-gcc/sparc-gaisler-rtems5/gr740_smp:CFLAGS=-DCONFIGURE_SMP_APPLICATION -DCONFIGURE_MAXIMUM_PROCESSORS=4 -DGRLEON3 -DLEON3 ";
 end zynqzc706.rtems_posix;
 
