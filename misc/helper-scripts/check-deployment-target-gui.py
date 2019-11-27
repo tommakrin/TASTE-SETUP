@@ -46,7 +46,8 @@ PLATFORMS = { "crazyflie_v2_gnat"      : lambda: True,
               "gr740_rcc13rc4_posix"   :
                   check_gr740_rcc13rc4_posix,
               "x86_linux"              : lambda: True,
-              "x86_win32"              : lambda: True
+              "x86_win32"              : lambda: True,
+              "zynqzc706_rtems_posix"  : lambda: True
              }
 
 def query_user(platform):
