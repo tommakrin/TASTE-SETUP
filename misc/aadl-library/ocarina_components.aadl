@@ -2611,11 +2611,14 @@ end gumstix;
 --   end gumstix.rtems;
 
 end ocarina_processors_arm;
+property set Processor_Properties is
+   Core_Id : aadlinteger 0 .. Max_Aadlinteger applies to (virtual processor);
+end Processor_Properties;
 package ocarina_processors_leon
 public
 
 with Deployment;
-
+with Processor_Properties;
 processor leon
 end leon;
 
@@ -2656,7 +2659,21 @@ properties
    EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2019.07.25/sparc-rtems5/leon3";
 end leon3.rtems51_posix;
 
+
+-- Define cores for SMP support in n2x
+
+virtual processor n2x_core
+end n2x_core;
+
+virtual processor implementation n2x_core.generic
+end n2x_core.generic;
+
 processor implementation n2x.rtems51_posix
+subcomponents
+    Core_1 : virtual processor n2x_core.generic { Processor_Properties::Core_Id => 0;};
+    Core_2 : virtual processor n2x_core.generic { Processor_Properties::Core_Id => 1;};
+    Core_3 : virtual processor n2x_core.generic { Processor_Properties::Core_Id => 2;};
+    Core_4 : virtual processor n2x_core.generic { Processor_Properties::Core_Id => 3;};
 properties
    Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
    Priority_Range => 0 .. 255;
