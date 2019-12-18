@@ -68,6 +68,7 @@ work/glue_built:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 
 clean:
 	$(MAKE) -C work clean
+	rm -f work/glue_built
 
 .PHONY: clean skeletons c
 ' > Makefile
