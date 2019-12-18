@@ -48,6 +48,10 @@ else
         new_folder=.
     fi
     echo 'KAZOO?=kazoo
+# Here you can specify folders containing external code you want to
+# compile and link for a specific partition.
+# Use upper case for the partition name:
+# export <PARTITION_NAME>_EXTERNAL_SOURCE_PATH=/absolute/path/1:/....
 
 all:	c
 
