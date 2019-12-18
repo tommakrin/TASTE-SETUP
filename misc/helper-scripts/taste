@@ -67,8 +67,8 @@ work/glue_built:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 	touch $@
 
 clean:
-	$(MAKE) -C work clean
-	rm -f work/glue_built
+	rm -rf work/build
+	rm -f work/glue_built work/skeletons_built
 
 .PHONY: clean skeletons c
 ' > Makefile
