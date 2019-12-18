@@ -2540,6 +2540,20 @@ with Cheddar_Properties;
 processor arm
 end arm;
 
+processor zynq extends arm   -- ADD THIS
+properties
+    Deployment::Execution_Platform => ZYNQ_RTEMS;
+end zynq;
+
+processor implementation zynq.rtems_posix
+properties
+   Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+   Priority_Range => 0 .. 255;
+   Cheddar_Properties::Scheduler_Quantum => 0 Ms;
+   Cheddar_Properties::Preemptive_Scheduler => true;
+end zynq.rtems_posix;      -- UNTIL THIS
+
+
 processor crazyflie_v2 extends arm
 properties
    Deployment::Execution_Platform => GNAT_Runtime;
