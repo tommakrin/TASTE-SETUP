@@ -98,11 +98,11 @@ def main():
         tasks = {}
         for line in iter(p.stdout.readline, ''):
             lline = str(line.strip())
-            print("WORKING ON:", lline)
+            #print("WORKING ON:", lline)
             m = re.match('^INNERDATA: ([^:]*)::(.*)::(.*)$', lline)
             # group(1) = message name, (2) = param type (3) = 'fieldName value'
             if m:
-                print("Found INNERDATA")
+                #print("Found INNERDATA")
                 # Add type and value to the messageData
                 # Type is used when storing the MSC to declare messages
                 messageData.setdefault(m.group(1), []).append(
