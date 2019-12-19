@@ -1,4 +1,5 @@
 #!/bin/bash -e
+# this version of the script is compatible with kazoo, not buildsupport
 
 # Run the tracer daemon - make sure only one instance exists at a time
 exec 9>/tmp/tracerf.lck
@@ -33,12 +34,13 @@ then
     kill -INT "$tracer_pid"
 fi
 
-cp ../dataview-uniq.asn .
+# in kazoo builds, the dataview is in ../dataview
+cp ../dataview/dataview-uniq.asn .
 
 # Patch the VCD file (if any)
 if [ -f bench.vcd ]
 then
-    taste-patch-vcd.py ../GlueAndBuild/deploymentview_final/"$1"/deployment.h bench.vcd
+    taste-patch-vcd.py ../build/deploymentview_final/"$1"/deployment.h bench.vcd
 fi
 
 echo 'Trace file were generated. You may now run:
