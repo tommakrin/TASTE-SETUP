@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import os
 import sys
 import subprocess
@@ -6,7 +6,11 @@ import socket
 import re
 import signal
 import errno
-import cPickle
+try:
+    # Python2 only
+    import cPickle
+except ImportError:
+    import pickle as cPickle
 from tracerCommon import RenderParameterFields
 
 g_messageId = 512
@@ -93,11 +97,12 @@ def main():
         messageData = {}
         tasks = {}
         for line in iter(p.stdout.readline, ''):
-            lline = line.strip()
-            #print "WORKING ON:", lline
+            lline = str(line.strip())
+            print("WORKING ON:", lline)
             m = re.match('^INNERDATA: ([^:]*)::(.*)::(.*)$', lline)
             # group(1) = message name, (2) = param type (3) = 'fieldName value'
             if m:
+                print("Found INNERDATA")
                 # Add type and value to the messageData
                 # Type is used when storing the MSC to declare messages
                 messageData.setdefault(m.group(1), []).append(
@@ -118,7 +123,7 @@ def main():
                         timestamp, ri, messageData[ri], sender, receiver)
                 messageData[ri] = []
             else:
-                sys.stdout.write(line)
+                sys.stdout.write(line.decode('utf-8'))
                 sys.stdout.flush()
     except KeyboardInterrupt:
         if p:

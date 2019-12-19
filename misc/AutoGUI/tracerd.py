@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import sys
 import os
 import socket
@@ -8,7 +8,10 @@ import re
 import threading
 import errno
 import getopt
-import cPickle
+try:
+    import cPickle
+except ImportError:
+    import pickle as cPickle
 
 g_ipaddress = ""
 g_strMscFilename = ""

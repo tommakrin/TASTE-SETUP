@@ -4,7 +4,7 @@ import os
 import subprocess
 import socket
 import re
-import cPickle
+import pickle as cPickle
 import time
 from tracerCommon import RenderParameterFields
 
