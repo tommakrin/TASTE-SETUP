@@ -131,4 +131,4 @@ def RenderParameterFields(message, messageData):
 
 if __name__ == "__main__":
     # print RenderParameterFields("router_put_tc", "{intVal 0, int2Val 0, int3Val 0, intArray {0,0,0,0,0,0,0,0,0,0}, realArray {0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000}, octStrArray {'616263'H,'62'H,''H,''H,''H,''H,''H,''H,''H,''H}, boolArray {FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE}, enumArray {green,green,green,green,green,green,green,green,green,green}, enumValue green, enumValue2 truism, label ''H, bAlpha FALSE, bBeta FALSE, sString ''H, arr {}, arr2 {}}")
-    print RenderParameterFields("router_put_tc", "tm: '616263'H")
+    print(RenderParameterFields("router_put_tc", "tm: '616263'H"))

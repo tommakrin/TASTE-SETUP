@@ -67,8 +67,8 @@ def main():
         g_bNoParams = True
         sys.argv.remove("-noParams")
     if len(sys.argv) != 4:
-        print "Usage:", sys.argv[0], "[-noParams] <application>"
-        print "where ipaddress and port point to the tracerd port."
+        print("Usage:", sys.argv[0], "[-noParams] <application>")
+        print("where ipaddress and port point to the tracerd port.")
         sys.exit(1)
     try:
         #ipaddress, port = sys.argv[1:3]
@@ -79,10 +79,10 @@ def main():
         g_clientSocket2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         g_clientSocket2.connect((ipaddress, port+1))
     except:
-        print "Could not connect to tracerd..."
+        print("Could not connect to tracerd...")
         sys.exit(1)
     else:
-        print 'Connected to tracerd'
+        print('Connected to tracerd')
 
     os.putenv("TASTE_INNER_MSC", "1")
     os.putenv("ASSERT_IGNORE_GUI_ERRORS", "1")
@@ -122,16 +122,16 @@ def main():
                 sys.stdout.flush()
     except KeyboardInterrupt:
         if p:
-            print "Sending SIGINT to", sys.argv[3]
+            print("Sending SIGINT to", sys.argv[3])
             p.send_signal(signal.SIGINT)
-    except socket.error, e:
+    except socket.error as e:
         if e.args[0] == errno.EINTR:  # Ctrl-C interrupted socket system call
             if p:
-                print "Sending SIGINT to", sys.argv[3]
+                print("Sending SIGINT to", sys.argv[3])
                 p.send_signal(signal.SIGINT)
         else:
             if p:
-                print "Error while speaking to tracerd:", e.args[1]
+                print("Error while speaking to tracerd:", e.args[1])
                 p.kill()
 #   except:
 #       print "Unexpected error:", sys.exc_info()[0]
@@ -140,7 +140,7 @@ def main():
 #           p.kill()
     if p:
         p.wait()
-    print "Clean shutdown"
+    print("Clean shutdown")
 
 if __name__ == "__main__":
     main()
