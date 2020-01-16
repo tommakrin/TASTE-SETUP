@@ -2,6 +2,30 @@
 
 # Build an SQL database for the current TASTE project
 
+# Check if the project works with kazoo. If so, skip all the rest
+PRJ_FOLDER=${PWD}
+if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
+then
+    mkdir -p work
+    WORK_FOLDER=work
+else
+    WORK_FOLDER="${PRJ_FOLDER}"
+fi
+
+if [ -t 1 ] ; then
+    COLORON="\e[1m\e[32m"
+    REDCOLORON="\e[1m\e[31m"
+    COLOROFF="\e[0m"
+else
+    COLORON=""
+    REDCOLORON=""
+    COLOROFF=""
+fi
+
+INFO="${COLORON}[INFO]${COLOROFF}"
+ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
+
+
 # (1) First check if a project name is given as first argument, othewise take current directory
 if [ "$1" ]
 then
@@ -10,20 +34,20 @@ else
     DBNAME=$(pwd | sed 's,^.*/,,g' | tr '[A-Z]' '[a-z]' | tr '-' '_')
 fi
 
-echo Creating a TASTE SQL Database for project $DBNAME
+echo -e "${INFO} Creating a TASTE SQL Database for project ${DBNAME}"
 
 # (2) Create the DB output directory
-
+cd "${WORK_FOLDER}"
 mkdir -p sql_db
 
 # (3) Retrieve ASN.1 file and create a single ASN.1 file with all types inside
 
-INTERFACEVIEW=InterfaceView.aadl
+INTERFACEVIEW="${PRJ_FOLDER}"/InterfaceView.aadl
 AADL_PROPERTIES="$(taste-config --prefix)/share/config_ellidiss/TASTE_IV_Properties.aadl"
 
-if [ ! -f InterfaceView.aadl ]
+if [ ! -f "${INTERFACEVIEW}" ]
 then
-    echo 'Error: InterfaceView.aadl not found'
+    echo -e "${ERROR} InterfaceView.aadl not found: ${INTERFACEVIEW}"
     exit -1
 fi
 
@@ -39,7 +63,7 @@ asn2dataModel -toSqlalchemy $DBNAME.asn
 make -f Makefile.python 
 
 # (5) Create postgresql database
-
+echo -e "${INFO} If you are prompted for the taste password, enter 'tastedb'"
 echo "drop database if exists $DBNAME; create database $DBNAME;" | psql -h localhost -U taste postgres
 
 cat > initdb.py <<OEF
@@ -55,3 +79,5 @@ cat > db.info << OEF2
 postgresql+psycopg2://taste:tastedb@localhost/${DBNAME}
 ${DBNAME}
 OEF2
+
+cd "${PWD}"

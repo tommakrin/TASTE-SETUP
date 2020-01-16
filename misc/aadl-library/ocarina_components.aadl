@@ -2627,11 +2627,14 @@ end gumstix;
 --   end gumstix.rtems;
 
 end ocarina_processors_arm;
+property set Processor_Properties is
+   Core_Id : aadlinteger 0 .. Max_Aadlinteger applies to (virtual processor);
+end Processor_Properties;
 package ocarina_processors_leon
 public
 
 with Deployment;
-
+with Processor_Properties;
 processor leon
 end leon;
 
@@ -2652,6 +2655,16 @@ end gr740;
 
 -- RTEMS mainline targets
 
+processor implementation leon2.rtems51_posix
+properties
+   Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+   Priority_Range => 0 .. 255;
+   Scheduler_Quantum => 0 Ms;
+   Preemptive_Scheduler => true;
+   Deployment::Execution_Platform => LEON_RTEMS_POSIX;
+   EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2019.07.25/sparc-rtems5/leon2";
+end leon2.rtems51_posix;
+
 processor implementation leon3.rtems51_posix
 properties
    Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
@@ -2659,17 +2672,31 @@ properties
    Scheduler_Quantum => 0 Ms;
    Preemptive_Scheduler => true;
    Deployment::Execution_Platform => LEON_RTEMS_POSIX;
-   EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2018.03.08/sparc-rtems5/leon3";
+   EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2019.07.25/sparc-rtems5/leon3";
 end leon3.rtems51_posix;
 
+
+-- Define cores for SMP support in n2x
+
+virtual processor n2x_core
+end n2x_core;
+
+virtual processor implementation n2x_core.generic
+end n2x_core.generic;
+
 processor implementation n2x.rtems51_posix
+subcomponents
+    Core_1 : virtual processor n2x_core.generic { Processor_Properties::Core_Id => 0;};
+    Core_2 : virtual processor n2x_core.generic { Processor_Properties::Core_Id => 1;};
+    Core_3 : virtual processor n2x_core.generic { Processor_Properties::Core_Id => 2;};
+    Core_4 : virtual processor n2x_core.generic { Processor_Properties::Core_Id => 3;};
 properties
    Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
    Priority_Range => 0 .. 255;
    Scheduler_Quantum => 0 Ms;
    Preemptive_Scheduler => true;
    Deployment::Execution_Platform => LEON_RTEMS_POSIX;
-   EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2018.03.08/sparc-rtems5/leon3:CFLAGS=-DCONFIGURE_SMP_APPLICATION -DCONFIGURE_MAXIMUM_PROCESSORS=4 ";
+   EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2019.07.25/sparc-rtems5/leon3:CFLAGS=-DCONFIGURE_SMP_APPLICATION -DCONFIGURE_MAXIMUM_PROCESSORS=4 ";
 end n2x.rtems51_posix;
 
 processor implementation gr712rc.rtems51_posix
@@ -2679,7 +2706,7 @@ properties
    Scheduler_Quantum => 0 Ms;
    Preemptive_Scheduler => true;
    Deployment::Execution_Platform => LEON_RTEMS_POSIX;
-   EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2018.03.08/sparc-rtems5/gr712rc:CFLAGS=-DCONFIGURE_SMP_APPLICATION -DCONFIGURE_MAXIMUM_PROCESSORS=2 ";
+   EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2019.07.25/sparc-rtems5/gr712rc:CFLAGS=-DCONFIGURE_SMP_APPLICATION -DCONFIGURE_MAXIMUM_PROCESSORS=2 ";
 end gr712rc.rtems51_posix;
 
 processor implementation gr740.rtems51_posix
@@ -2689,7 +2716,7 @@ properties
    Scheduler_Quantum => 0 Ms;
    Preemptive_Scheduler => true;
    Deployment::Execution_Platform => LEON_RTEMS_POSIX;
-   EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2018.03.08/sparc-rtems5/gr740:CFLAGS=-DCONFIGURE_SMP_APPLICATION -DCONFIGURE_MAXIMUM_PROCESSORS=4 ";
+   EnvVars => "RTEMS_MAKEFILE_PATH_LEON=/opt/rtems-5.1-2019.07.25/sparc-rtems5/gr740:CFLAGS=-DCONFIGURE_SMP_APPLICATION -DCONFIGURE_MAXIMUM_PROCESSORS=4 ";
 end gr740.rtems51_posix;
 
 -- GAISLER targets

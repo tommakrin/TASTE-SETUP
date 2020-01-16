@@ -1,0 +1,34 @@
+#!/bin/bash
+# TASTE User Code Editor
+# Depending on the implementation language, launch the corresponding code editor
+# Supported languages: C, Ada, SDL
+# Logging with colors (only in a terminal)
+if [ -t 1 ] ; then
+    COLORON="\e[1m\e[32m"
+    REDCOLORON="\e[1m\e[31m"
+    COLOROFF="\e[0m"
+else
+    COLORON=""
+    REDCOLORON=""
+    COLOROFF=""
+fi
+INFO="${COLORON}[INFO]${COLOROFF}"
+ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
+
+
+if [ $1 != "C" && $1 != "Ada" && $1 != "SDL" && $1 != "CPP" && "$1" != "Blackbox_C" ]
+then
+    echo  -e "${ERROR} First argument must be C, CPP, Ada, SDL or Blackbox_C"
+    exit 1
+fi
+
+# Check if the project works with kazoo. If so, use the makefile rule to edit the code
+if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
+then
+    cd work/"$2"/"$1"
+    make edit
+    exit 0
+else
+    echo 'You should switch to kazoo...'
+fi
+
