@@ -7,9 +7,17 @@ cd "$DIR/../dmt" || exit 1
 
 ./configure || exit 1
 
+# Launching "dmt --version" reports the wrong (local!) version number 
+# if we are inside "dmt"... so cd outside first!
+cd .. || exit 1
+
 # Skip install if the version installed is the same and the tree is clean
-HEAD="$(grep version= setup.py 2>/dev/null | awk -F\" '{print $2}')"
+HEAD="$(grep version= dmt/setup.py 2>/dev/null | awk -F\" '{print $2}')"
 VERSION_INSTALLED="$(dmt --version 2>/dev/null | grep ^TAST | awk '{print $NF}')"
+
+# Return back inside dmt, now that we're done with "dmt --version"
+cd dmt || exit 1
+
 if [ "$HEAD" == "" ] ; then
     TREE_DIRTY=1
 else
