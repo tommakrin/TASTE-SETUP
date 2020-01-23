@@ -31,8 +31,13 @@ then
         EXTRA_CMD+=' --load-deployment-view DeploymentView.aadl '
     fi
 else
-    echo -e "${INFO} A new TASTE project folder will be created (use Ctrl-C to cancel)"
-    read -p "Please enter a name for the new project folder: " new_folder
+    if [ "$1" == "init" ]
+    then
+        new_folder="$2"
+    else
+        echo -e "${INFO} A new TASTE project folder will be created (use Ctrl-C to cancel)"
+        read -p "Please enter a name for the new project folder: " new_folder
+    fi
     if [ "$new_folder" != "" ]
     then
         if [ -d "$new_folder" ]
