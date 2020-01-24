@@ -43,3 +43,6 @@ sudo ./msp430-gcc-installer.run \
 
 rm msp430-gcc-installer.run
 
+echo "[-] Appending /opt/msp430-gcc/bin to PATH"
+echo -e "\n# MSP-430 support\nexport PATH=\$PATH:/opt/msp430-gcc/bin" >> ~/.bashrc.taste
+echo "[-] Reload terminal (or source ~/.bashrc.taste) to apply change"
