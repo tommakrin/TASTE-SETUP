@@ -1,13 +1,24 @@
+#!/bin/bash
+
 export DISABLE_TASTE_BANNER=1
-TASTE_PATHS=$HOME/.bashrc.taste
-PREFIX=$HOME/tool-inst
+TASTE_PROFILE=$HOME/.bashrc.taste
 
-[ -e $HOME/.bashrc.taste ] && . $HOME/.bashrc.taste
+# shellcheck disable=SC1090
+[ -e "${TASTE_PROFILE}" ] && . "${TASTE_PROFILE}"
 
+UpdatePROFILE() {
+    if [ -z "$1" ] ; then
+        echo You forgot to pass argument. Aborting...
+        exit 1
+    fi
+    grep "$1$" "${TASTE_PROFILE}" >/dev/null || echo "$1" >> "${TASTE_PROFILE}"
+}
+
+# kept for now for backward compatibility
 UpdatePATH() {
     if [ -z "${PATH_CMD}" ] ; then
         echo You forgot to set your PATH_CMD. Aborting...
         exit 1
     fi
-    grep "${PATH_CMD}$" ${TASTE_PATHS} >/dev/null || echo "${PATH_CMD}" >> ${TASTE_PATHS}
+    UpdatePROFILE "${PATH_CMD}"
 }

@@ -1,48 +1,37 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# shellcheck source=common.sh
 . "${DIR}/common.sh"
 
-echo "[-] Checking if Texas Instruments MSP430-GCC is already under /opt/msp430-gcc..."
-echo "[-]"
+DESCRIPTION="MSP430 GCC Toolchain"
+INSTALL_PATH="/opt/msp430-gcc"
 
-if [ -e /opt/msp430-gcc ] ; then
-    echo '[-] /opt/msp430-gcc is there already. Aborting...'
-    exit 1
-fi
+CheckTargetFolder "${DESCRIPTION}" "${INSTALL_PATH}"
 
-echo "[-] No MSP430-GCC present - installing."
-
-MACHINE_TYPE=`uname -m`
-if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-  ARCH_INFIX="-x64"
-  echo "[-] Selected 64bit version."
+MACHINE_TYPE=$(uname -m)
+if [ "${MACHINE_TYPE}" == 'x86_64' ]; then
+    ARCH_INFIX="-x64"
+    echo "[-] Selected 64bit version."
 else
-  ARCH_INFIX=""
-  echo "[-] Selected 32bit version."
+    ARCH_INFIX=""
+    echo "[-] Selected 32bit version."
 fi
 
-echo "[-]"
-echo "[-] Downloading MSP430-GCC..."
-echo "[-]"
-cd ~/Downloads || exit 1
-wget -q -O msp430-gcc-installer.run http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/8_3_1_0/export/msp430-gcc-full-linux${ARCH_INFIX}-installer-8.3.1.0.run 
-if [ $? -ne 0 ] ; then
-    echo "Downloading MSP430-GCC toolchain has failed."
-    echo Aborting...
-    exit 1
-fi
+DownloadToTemp "${DESCRIPTION}" http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/8_3_1_0/export/msp430-gcc-full-linux${ARCH_INFIX}-installer-8.3.1.0.run
 
+echo "[-]"
 echo "[-] Installing MSP430-GCC..."
 echo "[-]"
 
-chmod +x msp430-gcc-installer.run 
-sudo ./msp430-gcc-installer.run \
+chmod +x "${DOWNLOADED_FILE}"
+sudo "${DOWNLOADED_FILE}" \
        --mode unattended \
        --unattendedmodeui minimal \
        --prefix /opt/msp430-gcc
 
-rm msp430-gcc-installer.run
+rm "${DOWNLOADED_FILE}"
 
-echo "[-] Appending /opt/msp430-gcc/bin to PATH"
-echo -e "\n# MSP-430 support\nexport PATH=\$PATH:/opt/msp430-gcc/bin" >> ~/.bashrc.taste
+echo "[-] Appending ${INSTALL_PATH}/bin to PATH"
+UpdatePROFILE "export PATH=\$PATH:${INSTALL_PATH}/bin"
 echo "[-] Reload terminal (or source ~/.bashrc.taste) to apply change"
