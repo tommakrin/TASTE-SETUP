@@ -26,6 +26,26 @@ function CheckTargetFolder() {
     sudo rm -rf "${FOLDER}" 2>/dev/null
 }
 
+function DownloadAndExtract() {
+    local DESCRIPTION="$1"
+    local URL="$2"
+    local PREFIX="${3:-/opt}"
+    local COMPRESSION="${4:-j}"
+
+    echo "[-]"
+    echo "[-] Downloading and uncompressing ${DESCRIPTION}..."
+    echo "[-]"
+
+    wget -q --show-progress -O - "${URL}" | \
+        ( cd "${PREFIX}" || exit 1 ; sudo tar xv${COMPRESSION}f - )
+
+    if [ $? -ne 0 ] ; then
+        echo "Downloading ${DESCRIPTION} has failed."
+        echo Aborting...
+        exit 1
+    fi
+}
+
 function InstallBSP() {
     local DESCRIPTION="$1"
     local URL="$2"
@@ -33,9 +53,7 @@ function InstallBSP() {
     local FOLDER="${BASE}/$4"
 
     CheckTargetFolder "$DESCRIPTION" "$FOLDER"
-
-    wget -q --show-progress -O - "${URL}"  | \
-        ( cd "${BASE}" || exit 1 ; sudo tar jxvf - )
+    DownloadAndExtract "$DESCRIPTION" "$URL" "$BASE"
 }
 
 function DownloadToTemp() {
