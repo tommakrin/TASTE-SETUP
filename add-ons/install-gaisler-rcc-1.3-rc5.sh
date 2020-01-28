@@ -2,11 +2,11 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "${DIR}/common.sh"
 
-echo "[-] Checking if Gaisler's RCC1.3-rc5 is already under /opt/..."
-if [ -e /opt/rcc-1.3-rc5-gcc ] ; then
-    echo '[-] /opt/rcc-1.3-rc5-gcc is there already. All good.'
-    exit 1
-fi
+DESCRIPTION="Gaisler's RCC1.3-rc5"
+PREFIX="/opt"
+INSTALL_PATH="$PREFIX/rcc-1.3.-rc5"
+
+CheckTargetFolder "${DESCRIPTION}" "${INSTALL_PATH}"
 
 echo "[-] Downloading and uncompressing Gaisler's RCC1.3-rc5-gcc..."
 echo "[-]"

@@ -2,23 +2,13 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "${DIR}/common.sh"
 
-FREERTOS_VERSION="10.2.1"
-
 DESCRIPTION="FreeRTOS"
+FREERTOS_VERSION="10.2.1"
 
 PREFIX="/opt"
 INSTALL_PATH="$PREFIX/FreeRTOSv$FREERTOS_VERSION"
-ZIP_FILE="FreeRTOS.zip"
 
-echo "[-] Checking if FreeRTOS is already under ${INSTALL_PATH}..."
-echo "[-]"
-
-if [ -e "$INSTALL_PATH" ] ; then
-    echo '[-] ${INSTALL_PATH} is there already. Aborting...'
-    exit 1
-fi
-
-echo "[-] No FreeRTOS present - installing."
+CheckTargetFolder "${DESCRIPTION}" "${INSTALL_PATH}"
 
 DownloadToTemp "${DESCRIPTION}" "https://sourceforge.net/projects/freertos/files/FreeRTOS/V${FREERTOS_VERSION}/FreeRTOSv${FREERTOS_VERSION}.zip/download"
 
