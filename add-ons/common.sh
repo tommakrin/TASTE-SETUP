@@ -1,5 +1,7 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# shellcheck source=../install/common.sh
 . "${DIR}/../install/common.sh"
 
 function CheckTargetFolder() {
@@ -38,10 +40,9 @@ function DownloadAndExtract() {
     echo "[-] Downloading and uncompressing ${DESCRIPTION}..."
     echo "[-]"
 
-    wget -q --show-progress -O - "${URL}" | \
-        ( cd "${PREFIX}" || exit 1 ; sudo tar xv${COMPRESSION}f - )
-
-    if [ $? -ne 0 ] ; then
+    if ! wget -q --show-progress -O - "${URL}" | \
+            ( cd "${PREFIX}" || exit 1 ; sudo tar "xv${COMPRESSION}f" - )
+    then
         echo "Downloading ${DESCRIPTION} has failed."
         echo Aborting...
         exit 1
@@ -69,9 +70,8 @@ function DownloadToTemp() {
     echo "[-] Downloading ${DESCRIPTION}..."
     echo "[-]"
 
-    wget -q --show-progress -O "${DOWNLOADED_FILE}" "${URL}"
-
-    if [ $? -ne 0 ] ; then
+    if ! wget -q --show-progress -O "${DOWNLOADED_FILE}" "${URL}"
+    then
         echo "Downloading ${DESCRIPTION} has failed."
         echo "Aborting..."
         exit 1

@@ -1,5 +1,7 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# shellcheck source=common.sh
 . "${DIR}/common.sh"
 
 DESCRIPTION="Gaisler's RCC1.3-rc6"

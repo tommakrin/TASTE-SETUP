@@ -1,5 +1,7 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# shellcheck source=common.sh
 . "${DIR}/common.sh"
 
 DESCRIPTION="FreeRTOS"
@@ -20,6 +22,5 @@ sudo unzip "$DOWNLOADED_FILE" -d "$PREFIX"
 rm "$DOWNLOADED_FILE"
 
 echo "[-] Creating FREERTOS_PATH enviroment variable"
-PATH_CMD="export FREERTOS_PATH=\"$INSTALL_PATH\""
-UpdatePATH
+UpdatePROFILE "export FREERTOS_PATH=\"$INSTALL_PATH\""
 echo "[-] Reload terminal (or source ~/.bashrc.taste) to apply change"
