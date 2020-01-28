@@ -2,6 +2,8 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "${DIR}/common.sh"
 
+DESCRIPTION="MSP430 GCC Toolchain"
+
 echo "[-] Checking if Texas Instruments MSP430-GCC is already under /opt/msp430-gcc..."
 echo "[-]"
 
@@ -21,27 +23,18 @@ else
   echo "[-] Selected 32bit version."
 fi
 
-echo "[-]"
-echo "[-] Downloading MSP430-GCC..."
-echo "[-]"
-cd ~/Downloads || exit 1
-wget -q -O msp430-gcc-installer.run http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/8_3_1_0/export/msp430-gcc-full-linux${ARCH_INFIX}-installer-8.3.1.0.run 
-if [ $? -ne 0 ] ; then
-    echo "Downloading MSP430-GCC toolchain has failed."
-    echo Aborting...
-    exit 1
-fi
+DownloadToTemp "${DESCRIPTION}" http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/8_3_1_0/export/msp430-gcc-full-linux${ARCH_INFIX}-installer-8.3.1.0.run
 
 echo "[-] Installing MSP430-GCC..."
 echo "[-]"
 
-chmod +x msp430-gcc-installer.run 
-sudo ./msp430-gcc-installer.run \
+chmod +x ${DOWNLOADED_FILE}
+sudo ${DOWNLOADED_FILE} \
        --mode unattended \
        --unattendedmodeui minimal \
        --prefix /opt/msp430-gcc
 
-rm msp430-gcc-installer.run
+rm ${DOWNLOADED_FILE}
 
 echo "[-] Appending /opt/msp430-gcc/bin to PATH"
 echo -e "\n# MSP-430 support\nexport PATH=\$PATH:/opt/msp430-gcc/bin" >> ~/.bashrc.taste
