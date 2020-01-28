@@ -1,4 +1,6 @@
 #!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. "${DIR}/../install/common.sh"
 
 function CheckTargetFolder() {
     local DESCRIPTION="$1"
