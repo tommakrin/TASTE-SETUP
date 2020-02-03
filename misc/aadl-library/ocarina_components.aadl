@@ -2530,6 +2530,26 @@ subcomponents
 end driver.i;
 
 end ocarina_drivers_udp_exarm;
+
+package ocarina_processors_msp
+public
+  with Deployment;
+  with Cheddar_Properties;
+
+processor msp430
+properties
+  Deployment::Execution_Platform => MSP430_FREERTOS;
+end msp430;
+
+processor implementation msp430.freertos
+properties
+  Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+  Priority_Range => 0 .. 255;
+  Cheddar_Properties::Scheduler_Quantum => 0 Ms;
+  Cheddar_Properties::Preemptive_Scheduler => true;
+end msp430.freertos;
+end ocarina_processors_msp;
+
 package ocarina_processors_arm
 
 public
