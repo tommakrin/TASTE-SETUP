@@ -2,6 +2,7 @@
 
 export DISABLE_TASTE_BANNER=1
 TASTE_PROFILE=$HOME/.bashrc.taste
+PREFIX=$HOME/tool-inst
 
 # shellcheck disable=SC1090
 [ -e "${TASTE_PROFILE}" ] && . "${TASTE_PROFILE}"
