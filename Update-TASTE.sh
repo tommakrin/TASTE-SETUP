@@ -39,10 +39,10 @@ for INSTALL_SCRIPT in install/[0-9]*sh ; do
             echo Skipping over postgres installation in Docker container.
             continue
         fi
-        if [ "${INSTALL_SCRIPT}" == "install/92_Brave.sh" ] ; then
-            echo Skipping over Brave installation.
-            continue
-        fi
+    fi
+    if [ "${INSTALL_SCRIPT}" == "install/92_Brave.sh" ] ; then
+        echo Skipping over Brave installation.
+        continue
     fi
     MSG="executing: ${INSTALL_SCRIPT}"
     banner "$MSG"
