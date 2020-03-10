@@ -42,6 +42,9 @@ end serial;
 bus implementation serial.generic
 end serial.generic;
 
+bus implementation serial.minimal
+end serial.minimal;
+
 bus bluetooth
 end bluetooth;
 
@@ -394,6 +397,38 @@ public
     Initialize_Entrypoint         => classifier (Client_BLE::Initialize);
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::raw.i));
   end Client_BLE.pohiada;
+
+  ----------------------------------
+  -- MSP430 serial minimal driver --
+  ----------------------------------
+  device MSP430_serial
+  features
+    link : requires bus access ocarina_buses::serial.minimal;
+  end MSP430_serial;
+
+  device implementation MSP430_serial.minimal
+  properties
+    Deployment::Driver_Name       => "MSP430_serial_minimal";
+    Device_Driver                 => classifier (ocarina_drivers_serial::serial_driver.msp430_minimal);
+    Initialize_Entrypoint         => classifier (ocarina_drivers_serial::spg_serial_msp430_minimal_init);
+    Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::raw.i));
+  end MSP430_serial.minimal;
+
+----------------------------------
+-- linux serial minimal driver --
+----------------------------------
+  device linux_serial
+  features
+    link : requires bus access ocarina_buses::serial.minimal;
+  end linux_serial;
+
+  device implementation linux_serial.minimal
+  properties
+    Deployment::Driver_Name       => "linux_serial_minimal";
+    Device_Driver                 => classifier (ocarina_drivers_serial::serial_driver.linux_minimal);
+    Initialize_Entrypoint         => classifier (ocarina_drivers_serial::spg_serial_linux_minimal_init);
+    Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::raw.i));
+  end linux_serial.minimal;
 
   ---------------------------
   -- Generic serial driver --
@@ -2138,6 +2173,17 @@ properties
         Source_Name => "__po_hi_c_driver_serial_linux_poller";
 end spg_serial_poller_linux;
 
+subprogram spg_serial_msp430_minimal_poller
+properties
+  Source_Language => (C);
+  Source_Name => "spg_serial_msp430_minimal_poller";
+end spg_serial_msp430_minimal_poller;
+
+subprogram spg_serial_linux_minimal_poller
+properties
+  Source_Language => (C);
+  Source_Name => "__po_hi_c_driver_linux_serial_minimal_poller";
+end spg_serial_linux_minimal_poller;
 
 subprogram spg_serial_sender_linux
 properties
@@ -2145,6 +2191,17 @@ properties
         Source_Name => "__po_hi_c_driver_serial_linux_sender";
 end spg_serial_sender_linux;
 
+subprogram spg_serial_msp430_minimal_sender
+properties
+  Source_Language => (C);
+  Source_Name => "spg_serial_msp430_minimal_sender";
+end spg_serial_msp430_minimal_sender;
+
+subprogram spg_serial_linux_minimal_sender
+properties
+  Source_Language => (C);
+  Source_Name => "__po_hi_c_driver_linux_serial_minimal_sender";
+end spg_serial_linux_minimal_sender;
 
 subprogram spg_serial_init_linux
 properties
@@ -2164,6 +2221,18 @@ properties
         Source_Name => "__po_hi_c_driver_serial_linux_init_receiver";
 end spg_serial_init_linux_receiver;
 
+subprogram spg_serial_msp430_minimal_init
+properties
+  Source_Language => (C);
+  Source_Name => "spg_serial_msp430_minimal_init";
+end spg_serial_msp430_minimal_init;
+
+subprogram spg_serial_linux_minimal_init
+properties
+  Source_Language => (C);
+  Source_Name => "__po_hi_c_driver_linux_serial_minimal_init";
+end spg_serial_linux_minimal_init;
+
 thread serial_poller
 end serial_poller;
 
@@ -2177,6 +2246,25 @@ properties
    Dispatch_Protocol => Periodic;
 end serial_poller.linux;
 
+thread implementation serial_poller.msp430_minimal
+calls
+  mycall : {
+  pspg : subprogram spg_serial_msp430_minimal_poller;
+  };
+properties
+  Period => 1000ms;
+  Dispatch_Protocol => Periodic;
+end serial_poller.msp430_minimal;
+
+thread implementation serial_poller.linux_minimal
+calls
+  mycall : {
+  pspg : subprogram spg_serial_linux_minimal_poller;
+  };
+properties
+  Period => 1000ms;
+  Dispatch_Protocol => Periodic;
+end serial_poller.linux_minimal;
 
 abstract serial_driver
 properties
@@ -2201,6 +2289,18 @@ abstract implementation serial_driver.linux_receiver
 subcomponents
    serial_linux_receiver : thread serial_poller.linux;
 end serial_driver.linux_receiver;
+
+abstract implementation serial_driver.msp430_minimal
+subcomponents
+  receiver : thread serial_poller.msp430_minimal;
+  sender   : subprogram spg_serial_msp430_minimal_sender;
+end serial_driver.msp430_minimal;
+
+abstract implementation serial_driver.linux_minimal
+subcomponents
+  receiver : thread serial_poller.linux_minimal;
+  sender   : subprogram spg_serial_linux_minimal_sender;
+end serial_driver.linux_minimal;
 
 end ocarina_drivers_serial;
 package ocarina_drivers_ip_pohic
@@ -2795,7 +2895,7 @@ end xtratum_partition.generic;
      --  properties
      --   ARINC653::Partition_Slots => (500ms, 500ms);
      --   ARINC653::Slots_Allocation => (reference (part1), reference (part2));
-     --	ARINC653::Module_Major_Frame => 1000ms;
+     -- ARINC653::Module_Major_Frame => 1000ms;
 --   end leon3.xtratum_2partitions;
 
 end ocarina_processors_leon;
