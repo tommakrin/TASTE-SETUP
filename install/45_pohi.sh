@@ -4,6 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Setup the tools in ~/.local/bin
 cd $DIR/../polyorb-hi-c || exit 1
+make uninstall # remove anything left in tool-inst
 make distclean # ignore any errors here
 ./support/reconfig || exit 1
 PATH=${PREFIX}/bin:${PATH} ./configure || exit 1
