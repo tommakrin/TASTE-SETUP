@@ -15,12 +15,12 @@ function quit {
 except: pass")
     if [ ! -z $tailps ]
     then
-        kill $tailps || xterm -e "echo Internal Error in taste-update-data-view"
+        kill $tailps 2>&1 || xterm -e "echo Internal Error in taste-update-data-view"
     fi
     exit $1
 }
 
-# Install a trap handler to make sure Ctrl-C leads to calling the quit function (trap 2 = SINGINT)
+# Install a trap handler to make sure Ctrl-C leads to calling the quit function (trap 2 = SIGINT)
 trap 2 quit 1
 
 if [ -t 1 ] ; then

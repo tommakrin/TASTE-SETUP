@@ -1,3 +1,9 @@
 #!/bin/bash
 
-xterm -e "./build-script.sh ; read -p 'Press Enter to close'" || exit 1
+# Check if the project works with kazoo. If so, skip all the rest
+if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
+then
+    xterm -e "make ; read -p 'Press Enter to close'" || exit 1
+else
+    xterm -e "./build-script.sh ; read -p 'Press Enter to close'" || exit 1
+fi
