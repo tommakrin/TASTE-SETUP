@@ -26,6 +26,9 @@ mkdir -p ${PREFIX}/share/peekpoke
 cp peek-poke/peekpoke.py ${PREFIX}/share/peekpoke/peekpoke.py || exit 1
 cp peek-poke/PeekPoke.glade ${PREFIX}/share/peekpoke/PeekPoke.glade || exit 1
 
+# Shared function types
+cp -ru SharedTypes ${PREFIX}/share/
+
 # Helper scripts
 cp -a helper-scripts/* ${PREFIX}/bin/
 
