@@ -5,13 +5,17 @@
 -- generated code: do not edit
 ---------------------------------------------------
 
-PACKAGE sharedTypelibrary::IV::Air_Device
+PACKAGE Air_Device::IV::Air_Device
 PUBLIC
 
 WITH Taste;
 WITH DataView;
 WITH TASTE_IV_Properties;
 SUBPROGRAM PI_Write_to_Device
+FEATURES
+  stream : IN PARAMETER DataView::Data_Stream {
+    Taste::encoding => NATIVE;
+  };
 PROPERTIES
   Taste::Associated_Queue_Size => 1;
 END PI_Write_to_Device;
@@ -43,22 +47,22 @@ END RI_Received_Data.others;
 
 SYSTEM Air_Device
 FEATURES
-  PI_Write_to_Device : PROVIDES SUBPROGRAM ACCESS sharedTypelibrary::IV::Air_Device::PI_Write_to_Device.others {
-    Taste::coordinates => "93226 65116";
+  PI_Write_to_Device : PROVIDES SUBPROGRAM ACCESS Air_Device::IV::Air_Device::PI_Write_to_Device.others {
+    Taste::coordinates => "79210 66295";
     Taste::RCMoperationKind => sporadic;
     Taste::RCMperiod => 500 ms;
     Taste::Deadline => 0 ms;
     Taste::InterfaceName => "Write_to_Device";
   };
-  PI_Poll_Device : PROVIDES SUBPROGRAM ACCESS sharedTypelibrary::IV::Air_Device::PI_Poll_Device.others {
-    Taste::coordinates => "93226 74614";
+  PI_Poll_Device : PROVIDES SUBPROGRAM ACCESS Air_Device::IV::Air_Device::PI_Poll_Device.others {
+    Taste::coordinates => "79210 76793";
     Taste::RCMoperationKind => cyclic;
     Taste::RCMperiod => 500 ms;
     Taste::Deadline => 0 ms;
     Taste::InterfaceName => "Poll_Device";
   };
-  RI_Received_Data : REQUIRES SUBPROGRAM ACCESS sharedTypelibrary::IV::Air_Device::RI_Received_Data.others {
-    Taste::coordinates => "139524 67688";
+  RI_Received_Data : REQUIRES SUBPROGRAM ACCESS Air_Device::IV::Air_Device::RI_Received_Data.others {
+    Taste::coordinates => "130390 69137";
     Taste::RCMoperationKind => sporadic;
     Taste::InterfaceName => "Received_Data";
     Taste::labelInheritance => "false";
@@ -76,26 +80,26 @@ SUBCOMPONENTS
   };
 END Air_Device.others;
 
-END sharedTypelibrary::IV::Air_Device;
+END Air_Device::IV::Air_Device;
 
-PACKAGE sharedTypelibrary::IV
+PACKAGE Air_Device::IV
 PUBLIC
 
-WITH sharedTypelibrary::IV::Air_Device;
+WITH Air_Device::IV::Air_Device;
 WITH Taste;
 WITH DataView;
 WITH TASTE_IV_Properties;
-SYSTEM sharedTypelibrary
-END sharedTypelibrary;
+SYSTEM Air_Device
+END Air_Device;
 
-SYSTEM IMPLEMENTATION sharedTypelibrary.others
+SYSTEM IMPLEMENTATION Air_Device.others
 SUBCOMPONENTS
-  Air_Device : SYSTEM sharedTypelibrary::IV::Air_Device::Air_Device.others {
-    Taste::coordinates => "93226 61415 139524 100155";
+  Air_Device : SYSTEM Air_Device::IV::Air_Device::Air_Device.others {
+    Taste::coordinates => "79210 62203 130390 105028";
   };
-END sharedTypelibrary.others;
+END Air_Device.others;
 
 PROPERTIES
   Taste::version => "2.4";
-END sharedTypelibrary::IV;
+END Air_Device::IV;
 
