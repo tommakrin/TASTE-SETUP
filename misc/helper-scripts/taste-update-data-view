@@ -97,6 +97,11 @@ fi
 
 DATAVIEW+=" $(taste-config --prefix)/share/taste-types/taste-types.asn"
 
+# Make sure all parameters are unique
+DATAVIEW="$(echo ${DATAVIEW} | tr ' ' '\n' | sort | uniq | tr '\n' ' ')"
+COMMAND="asn2aadlPlus -f ${DATAVIEW} ${AADL} -aadlv2 2>&1 > >(uniq >&2)"
+echo -e "${INFO} Command:
+$COMMAND"
 # can asn2aadlPlus with a call to uniq to filter out duplicate outputs
 # due to multiple calls to the ASN.1 compiler
 #asn2aadlPlus $DATAVIEW "$AADL" -aadlv2 2>&1 | uniq >&2
