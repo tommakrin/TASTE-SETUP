@@ -2,7 +2,8 @@
 set -euo pipefail
 export DISPLAY=:0 
 export GIT_SSL_NO_VERIFY=true 
-source ~/.bashrc 
+export LD_LIBRARY_PATH=/lib
+source ~/.bashrc
 export TASTE_IN_DOCKER=1 
 /etc/init.d/postgresql start 
 cd dmt 
