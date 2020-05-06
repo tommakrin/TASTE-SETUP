@@ -8,6 +8,7 @@ export TASTE_IN_DOCKER=1
 cd dmt 
 pip3 install -r requirements.txt 
 LANG=C LC_ALL=C PATH=$PATH:$HOME/tool-inst/share/asn1scc/ make
+cd ..
 git fetch 
 git checkout -f "${CI_COMMIT_BRANCH}" 
 ./Update-TASTE.sh
