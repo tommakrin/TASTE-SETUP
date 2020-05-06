@@ -11,9 +11,9 @@ stages:
 build:
   stage: build
   script:
-    - /bin/bash -c 'apt-get install -y --force-yes xvfb ; Xvfb & export DISPLAY=:0 ; export GIT_SSL_NO_VERIFY=true ; source ~/.bashrc ; export TASTE_IN_DOCKER=1 ; /etc/init.d/postgresql start ; git fetch ; git checkout -f "${CI_COMMIT_BRANCH}" ; ./Update-TASTE.sh || exit 1 ; cd kazoo ; make test'
-  # artifacts:
-    # paths:
-    #   - 'test/logs/*.err.txt'
-    # when: on_failure
-    # expire_in: 2 weeks
+    - /bin/bash -c 'apt-get install -y --force-yes xvfb ; Xvfb & export DISPLAY=:0 ; export GIT_SSL_NO_VERIFY=true ; source ~/.bashrc ; export TASTE_IN_DOCKER=1 ; /etc/init.d/postgresql start ; git fetch ; git checkout -f "${CI_COMMIT_BRANCH}" ; ./Update-TASTE.sh || exit 1 ; cd kazoo ; make test || exit 1 ; cd ../dmt ; LANG=C LC_ALL=C PATH=$PATH:$HOME/tool-inst/share/asn1scc/ make || exit 1'
+  artifacts:
+    paths:
+      - 'kazoo/test/logs/*.err.txt'
+    when: on_failure
+    expire_in: 2 weeks
