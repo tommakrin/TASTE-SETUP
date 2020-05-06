@@ -1,5 +1,4 @@
 #!/bin/bash
-set -euo pipefail
 export DISPLAY=:0 
 export GIT_SSL_NO_VERIFY=true 
 export LD_LIBRARY_PATH=/lib
