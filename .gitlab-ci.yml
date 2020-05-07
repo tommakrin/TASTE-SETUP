@@ -1,0 +1,19 @@
+# image: $CI_REGISTRY_IMAGE/taste:latest
+image: taste:latest
+
+variables:
+  GIT_SUBMODULE_STRATEGY: normal
+
+stages:
+  - build
+  - post_build
+
+build:
+  stage: build
+  script:
+    - ./gitlabci-test.sh
+  artifacts:
+    paths:
+      - 'kazoo/test/logs/*.err.txt'
+    when: on_failure
+    expire_in: 2 weeks
