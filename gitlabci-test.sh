@@ -19,3 +19,6 @@ apt-get install -y --force-yes xvfb
 Xvfb & 
 export DISPLAY=:0 
 make test || exit 1
+cd ..
+cd opengeode
+make test-ada || exit 1
