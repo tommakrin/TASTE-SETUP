@@ -1,4 +1,4 @@
-[![Build and Test Status of Data Modelling Tools on Circle CI](https://circleci.com/gh/ttsiodras/taste-setup.svg?style=shield)](https://circleci.com/gh/ttsiodras/taste-setup/tree/master)
+[![Build and Test Status of TASTE on Gitlab CI](https://gitrepos.estec.esa.int/taste/taste-setup/badges/master/pipeline.svg)](https://gitrepos.estec.esa.int/taste/taste-setup/-/commits/master)
 
 TASTE
 =====
