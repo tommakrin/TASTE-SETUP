@@ -13,7 +13,7 @@ git log | head
 ./configure
 pip3 install --upgrade .
 pip3 uninstall --yes typing 
-LANG=C LC_ALL=C make
+PATH=$PATH:$HOME/tool-inst/share/asn1scc/ LANG=C LC_ALL=C make
 cd ..
 ./Update-TASTE.sh
 cd kazoo 
