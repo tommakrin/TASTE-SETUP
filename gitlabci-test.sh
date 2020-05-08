@@ -3,13 +3,14 @@ source ~/.bashrc
 set -e
 export GIT_SSL_NO_VERIFY=true 
 export TASTE_IN_DOCKER=1 
-git fetch 
+git pull --ff-only 
 git checkout -f "${CI_COMMIT_BRANCH}" 
 git submodule init
 git submodule update dmt
 cd dmt
 git log | head
 /etc/init.d/postgresql start 
+./configure
 pip3 install --upgrade .
 pip3 uninstall --yes typing 
 LANG=C LC_ALL=C make
