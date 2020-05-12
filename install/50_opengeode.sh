@@ -26,8 +26,9 @@ fi
 # Unfortunately, the --upgrade DOES NOT ALWAYS WORK.
 # Uninstall first...
 echo y | pip2 uninstall opengeode
+echo y | pip3 uninstall opengeode
 
-pip2 install --user --upgrade . || exit 1
+pip3 install --user --upgrade . || exit 1
 
 # Add .local/bin to PATH
 PATH_CMD='export PATH=$PATH:$HOME/.local/bin'
