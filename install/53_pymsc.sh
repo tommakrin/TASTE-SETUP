@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR/../pymsc" || exit 1
 
 # Skip install if the version installed is the same and the tree is clean
-HEAD="$(grep __version msccore/__init__.py | awk '{print $NF}' | tr -d '"')"
+HEAD="$(grep __version python3/msccore/__init__.py | awk '{print $NF}' | tr -d '"')"
 
 VERSION_INSTALLED="$(pip3 freeze | grep taste-msc | awk -F= '{print $NF}')"
 GIT_OUTPUT=$(git status --porcelain)
@@ -24,8 +24,7 @@ fi
 # Uninstall first...
 echo y | pip3 uninstall taste-msc
 echo y | pip2 uninstall taste-msc
-pip3 install --user --upgrade . || exit 1
-pip2 install --user --upgrade . || exit 1
+make install || exit 1
 
 # Add .local/bin to PATH
 PATH_CMD='export PATH=$PATH:$HOME/.local/bin'
