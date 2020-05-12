@@ -5,8 +5,6 @@ export GIT_SSL_NO_VERIFY=true
 export TASTE_IN_DOCKER=1 
 git fetch
 git checkout -f "${CI_COMMIT_BRANCH}" 
-git submodule init
-git submodule update dmt
 ./Update-TASTE.sh
 cd dmt
 git log | head
