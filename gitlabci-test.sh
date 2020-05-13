@@ -8,6 +8,8 @@ git checkout -f "${CI_COMMIT_BRANCH}"
 ./Update-TASTE.sh
 cd kazoo 
 export PATH=$HOME/tool-inst/bin:$HOME/.local/bin:$HOME/tool-inst/share/asn1scc:$PATH
+export PATH=$HOME/tool-inst/share/kazoo:$PATH
+export OCARINA_PATH=$HOME/tool-inst
 export LD_LIBRARY_PATH=$HOME/tool-inst/lib:$LD_LIBRARY_PATH
 make test || exit 1
 cd ..
