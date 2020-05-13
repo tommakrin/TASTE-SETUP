@@ -5,7 +5,9 @@ echo TASTE Data View Convertor - From ASN.1 to AADLV2
 # Initialise the progress bar
 myfifo=/tmp/$$$RANDOM
 mkfifo $myfifo
-tail -f $myfifo | taste-progress-dialog.py &
+
+# Use the progress dialog only if there is an X server
+[ -n "$DISPLAY" ] && tail -f $myfifo | taste-progress-dialog.py &
 
 function quit {
     echo '100 Completed' > $myfifo
