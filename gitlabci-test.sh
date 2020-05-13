@@ -3,6 +3,8 @@ source ~/.bashrc
 set -e
 export GIT_SSL_NO_VERIFY=true 
 export TASTE_IN_DOCKER=1 
+apt install -y --force-yes xvfb 
+Xvfb & 
 git fetch
 git checkout -f "${CI_COMMIT_BRANCH}" 
 ./Update-TASTE.sh
@@ -15,8 +17,6 @@ pip3 uninstall --yes typing
 PATH=$PATH:/asn1scc/ LANG=C LC_ALL=C make
 cd ..
 cd kazoo 
-apt-get install -y --force-yes xvfb 
-Xvfb & 
 export DISPLAY=:0 
 make test || exit 1
 cd ..
