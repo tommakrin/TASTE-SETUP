@@ -7,7 +7,7 @@ git fetch
 git checkout -f "${CI_COMMIT_BRANCH}" 
 ./Update-TASTE.sh
 cd kazoo 
-export PATH=$HOME/tool-inst/bin:$PATH
+export PATH=$HOME/tool-inst/bin:$HOME/.local/bin:$PATH
 make test || exit 1
 cd ..
 cd dmt
