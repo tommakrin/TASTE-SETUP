@@ -3,11 +3,10 @@ source ~/.bashrc
 set -e
 export GIT_SSL_NO_VERIFY=true 
 export TASTE_IN_DOCKER=1 
-apt install -y --force-yes xvfb 
 git fetch
 git checkout -f "${CI_COMMIT_BRANCH}" 
 ./Update-TASTE.sh
-source ../.bashrc.taste
+source ~/.bashrc.taste
 cd dmt
 git log | head
 /etc/init.d/postgresql start 
@@ -17,8 +16,6 @@ pip3 uninstall --yes typing
 PATH=$PATH:/asn1scc/ LANG=C LC_ALL=C make
 cd ..
 cd kazoo 
-#Xvfb & 
-#export DISPLAY=:0
 make test || exit 1
 cd ..
 cd opengeode
