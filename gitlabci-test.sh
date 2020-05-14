@@ -1,4 +1,5 @@
 #!/bin/bash
+/etc/init.d/postgresql start 
 source ~/.bashrc
 set -e
 export GIT_SSL_NO_VERIFY=true 
@@ -16,7 +17,6 @@ make test || exit 1
 cd ..
 cd dmt
 git log | head
-/etc/init.d/postgresql start 
 ./configure
 pip3 install --upgrade .
 pip3 uninstall --yes typing 
