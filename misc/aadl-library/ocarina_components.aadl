@@ -399,20 +399,20 @@ public
   end Client_BLE.pohiada;
 
   ----------------------------------
-  -- MSP430 serial minimal driver --
+  -- MSP430 eUSCI_A serial minimal driver --
   ----------------------------------
-  device MSP430_serial
+  device MSP430_eUSCI_A_serial
   features
     link : requires bus access ocarina_buses::serial.minimal;
-  end MSP430_serial;
+  end MSP430_eUSCI_A_serial;
 
-  device implementation MSP430_serial.minimal
+  device implementation MSP430_eUSCI_A_serial.minimal
   properties
-    Deployment::Driver_Name       => "MSP430_serial_minimal";
-    Device_Driver                 => classifier (ocarina_drivers_serial::serial_driver.msp430_minimal);
-    Initialize_Entrypoint         => classifier (ocarina_drivers_serial::spg_serial_msp430_minimal_init);
+    Deployment::Driver_Name       => "MSP430_eUSCI_A_serial_minimal";
+    Device_Driver                 => classifier (ocarina_drivers_serial::serial_driver.msp430_eusci_a_minimal);
+    Initialize_Entrypoint         => classifier (ocarina_drivers_serial::msp430_eusci_a_serial_minimal_init);
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::raw.i));
-  end MSP430_serial.minimal;
+  end MSP430_eUSCI_A_serial.minimal;
 
 ----------------------------------
 -- linux serial minimal driver --
@@ -2173,11 +2173,11 @@ properties
         Source_Name => "__po_hi_c_driver_serial_linux_poller";
 end spg_serial_poller_linux;
 
-subprogram spg_serial_msp430_minimal_poller
+subprogram msp430_eusci_a_serial_minimal_poller
 properties
   Source_Language => (C);
-  Source_Name => "spg_serial_msp430_minimal_poller";
-end spg_serial_msp430_minimal_poller;
+  Source_Name => "msp430_eusci_a_serial_minimal_poller";
+end msp430_eusci_a_serial_minimal_poller;
 
 subprogram spg_serial_linux_minimal_poller
 properties
@@ -2191,11 +2191,11 @@ properties
         Source_Name => "__po_hi_c_driver_serial_linux_sender";
 end spg_serial_sender_linux;
 
-subprogram spg_serial_msp430_minimal_sender
+subprogram msp430_eusci_a_serial_minimal_sender
 properties
   Source_Language => (C);
-  Source_Name => "spg_serial_msp430_minimal_sender";
-end spg_serial_msp430_minimal_sender;
+  Source_Name => "msp430_eusci_a_serial_minimal_sender";
+end msp430_eusci_a_serial_minimal_sender;
 
 subprogram spg_serial_linux_minimal_sender
 properties
@@ -2221,11 +2221,11 @@ properties
         Source_Name => "__po_hi_c_driver_serial_linux_init_receiver";
 end spg_serial_init_linux_receiver;
 
-subprogram spg_serial_msp430_minimal_init
+subprogram msp430_eusci_a_serial_minimal_init
 properties
   Source_Language => (C);
-  Source_Name => "spg_serial_msp430_minimal_init";
-end spg_serial_msp430_minimal_init;
+  Source_Name => "msp430_eusci_a_serial_minimal_init";
+end msp430_eusci_a_serial_minimal_init;
 
 subprogram spg_serial_linux_minimal_init
 properties
@@ -2246,15 +2246,15 @@ properties
    Dispatch_Protocol => Periodic;
 end serial_poller.linux;
 
-thread implementation serial_poller.msp430_minimal
+thread implementation serial_poller.msp430_eusci_a_minimal
 calls
   mycall : {
-  pspg : subprogram spg_serial_msp430_minimal_poller;
+  pspg : subprogram msp430_eusci_a_serial_minimal_poller;
   };
 properties
   Period => 1000ms;
   Dispatch_Protocol => Periodic;
-end serial_poller.msp430_minimal;
+end serial_poller.msp430_eusci_a_minimal;
 
 thread implementation serial_poller.linux_minimal
 calls
@@ -2290,11 +2290,11 @@ subcomponents
    serial_linux_receiver : thread serial_poller.linux;
 end serial_driver.linux_receiver;
 
-abstract implementation serial_driver.msp430_minimal
+abstract implementation serial_driver.msp430_eusci_a_minimal
 subcomponents
-  receiver : thread serial_poller.msp430_minimal;
-  sender   : subprogram spg_serial_msp430_minimal_sender;
-end serial_driver.msp430_minimal;
+  receiver : thread serial_poller.msp430_eusci_a_minimal;
+  sender   : subprogram msp430_eusci_a_serial_minimal_sender;
+end serial_driver.msp430_eusci_a_minimal;
 
 abstract implementation serial_driver.linux_minimal
 subcomponents
@@ -2631,24 +2631,24 @@ end driver.i;
 
 end ocarina_drivers_udp_exarm;
 
-package ocarina_processors_msp
+package ocarina_processors_msp430
 public
   with Deployment;
   with Cheddar_Properties;
 
-processor msp430
+processor msp430fr5969
 properties
   Deployment::Execution_Platform => MSP430_FREERTOS;
-end msp430;
+end msp430fr5969;
 
-processor implementation msp430.freertos
+processor implementation msp430fr5969.freertos
 properties
   Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
-  Priority_Range => 0 .. 255;
+  Priority_Range => 0 .. 4;
   Cheddar_Properties::Scheduler_Quantum => 0 Ms;
   Cheddar_Properties::Preemptive_Scheduler => true;
-end msp430.freertos;
-end ocarina_processors_msp;
+end msp430fr5969.freertos;
+end ocarina_processors_msp430;
 
 package ocarina_processors_arm
 
