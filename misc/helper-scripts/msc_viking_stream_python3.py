@@ -27,6 +27,18 @@ editor = subprocess.Popen ([path_to_msceditor, "-p", "5116"])
 # Prepare a command to the MSC Editor
 cmd = '{"CommandType": "Instance", "Parameters": {"name": "InstanceA"}}'
 
+# These are the possible commands:
+#{"CommandType": "VisibleItemLimit", "Parameters": {"number": "10"}}
+#{"CommandType": "Instance", "Parameters": {"name": "Instance_A"}}
+#{"CommandType": "Message", "Parameters": {"name": "Message_A-B","srcName": "Instance_A","dstName": "Instance_B"}}
+#{"CommandType": "Timer", "Parameters": {"name": "Timer_A_1","instanceName": "Instance_A","TimerType": "Start"}}
+# TimerType can then be "Stop" and "Timeout"
+#{"CommandType": "Condition","Parameters": {"name": "Condition_1", "instanceName": "Instance_B"}}
+#{"CommandType": "Message","Parameters": {"name": "Message_C-dynamic", "srcName": "Instance_C","dstName": "Instance_dynamic", "MessageType": "Create"}}
+#{"CommandType": "StopInstance", "Parameters": {"name": "Instance_dynamic_2"}}
+#{"CommandType": "Undo"}
+#{"CommandType": "Redo"}
+
 # Give some time for the MSC Editor process to open the socket
 time.sleep(0.5)
 
