@@ -14,5 +14,6 @@ property set TASTE_IV_Properties is
     is_instance_of    : aadlstring applies to (System);
     Default_CodeGen : enumeration (default, ada, c) applies to (System);
     FPGA_Configurations : aadlstring applies to (System);
+    Default_CodeGen : enumeration(default, ada, c) applies to (System);
 --    MSCFiles : list of aadlstring applies to (Subprogram);
 end TASTE_IV_Properties;
