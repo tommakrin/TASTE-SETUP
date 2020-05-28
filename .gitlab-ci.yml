@@ -15,6 +15,6 @@ build:
   artifacts:
     paths:
       - 'kazoo/test/logs/*.err.txt'
-      - 'opengeode/tests/regression/logs/*.err.txt'
+      - 'opengeode/tests/testsuite/logs/*.err.txt'
     when: on_failure
     expire_in: 2 weeks
