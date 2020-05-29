@@ -4,6 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Setup the stlink tools (if not there)
 cd $DIR/../stlink || exit 1
+make clean
 make release || exit 1
 
 STUTIL_PATH=$(realpath "${DIR}/../stlink/build/Release/src/gdbserver")
