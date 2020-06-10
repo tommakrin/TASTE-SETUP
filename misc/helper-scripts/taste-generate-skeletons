@@ -6,7 +6,7 @@
 # Check if the project works with kazoo. If so, skip all the rest
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
-    make skeletons
+    make skeletons || exit 1
     exit 0
 fi
 
