@@ -19,6 +19,7 @@ cp -a ../kazoo/templates "${PREFIX}"/share/kazoo || exit 1
 # clean up their mess in the "templates-parser" after their build
 rm -f "${DIR}/../kazoo/templates-parser/tp_xmlada.gpr"
 rm -f "${DIR}/../kazoo/templates-parser/config/setup/foo.ads.std"???
+rm -f "${DIR}/../kazoo/templates-parser/config/setup/auto.cgpr"
 
 
 # Add kazoo binary to the PATH
