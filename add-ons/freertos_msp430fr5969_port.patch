@@ -119,7 +119,7 @@ diff -ruN FreeRTOS.orig/Source/portable/GCC/MSP430FR5969/port.c FreeRTOS/Source/
 +    asm volatile (  "mov.w  &pxCurrentTCB, r12       \n\t"   \
 +                    "mov.w @r12, sp                  \n\t"   \
 +                    "pop.w r15                       \n\t"   \
-+                    "mow.w r15, &usCriticalNesting   \n\t"   \
++                    "mov.w r15, &usCriticalNesting   \n\t"   \
 +                    "popm.w #12, r15                 \n\t"   \
 +                    "nop                             \n\t"   \
 +                    "pop.w sr                        \n\t"   \
