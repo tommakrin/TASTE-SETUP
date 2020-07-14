@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
-import PySide
-from PySide.QtGui import (QApplication,
-                          QMessageBox)
+from PySide2.QtGui import *
+from PySide2.QtCore import *
+from PySide2.QtWidgets import *
+from PySide2.QtUiTools import *
 
 def install_gr740_rtems410_gaisler_posix():
     """ $ $HOME/tool-src/add-ons/install-gaisler-4.10.sh """
