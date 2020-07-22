@@ -21,11 +21,11 @@ MSC_FILENAME=$1
 echo -e "${INFO} Opening MSC Editor..."
 echo -e "${INFO} Filename: ${MSC_FILENAME}"
 
-EDITOR=taste-msc-editor
+EDITOR=msceditor
 
 
 if [ -z $NONINTERACTIVE ]
 then
-    $EDITOR -o $MSC_FILENAME
+    $EDITOR -m $MSC_FILENAME
 fi
 

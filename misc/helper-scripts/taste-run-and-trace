@@ -33,15 +33,16 @@ then
     kill -INT "$tracer_pid"
 fi
 
-cp ../dataview-uniq.asn .
+# In kazoo-based systems, the full dataview is in ../dataview
+cp ../dataview/dataview-uniq.asn .
 
 # Patch the VCD file (if any)
 if [ -f bench.vcd ]
 then
-    taste-patch-vcd.py ../GlueAndBuild/deploymentview_final/"$1"/deployment.h bench.vcd
+    taste-patch-vcd.py ../build/deploymentview_final/"$1"/deployment.h bench.vcd
 fi
 
 echo 'Trace file were generated. You may now run:
-    taste-msc-editor -o ./trace.msc
-    gtkwave ./bench.vcd.new
+    taste-edit-msc trace.msc
+    gtkwave ./bench.vcd.new   # if a VCD file was generated
 '
