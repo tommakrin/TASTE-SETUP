@@ -61,6 +61,3 @@
 [submodule "kazoo"]
 	path = kazoo
 	url = https://gitrepos.estec.esa.int/taste/kazoo.git
-[submodule "binaries_for_install"]
-	path = binaries_for_install
-	url = https://gitrepos.estec.esa.int/taste/binaries_for_install.git
