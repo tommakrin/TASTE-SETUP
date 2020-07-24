@@ -26,7 +26,8 @@ def Exercise_{{ instance.name }}{% if instance.denominatorAndKind %}: {{ instanc
 {% include "msctimer.tmplt" %}
 {% endif %}
 {% endfor %}
-{% if instance.explicitStop %}stop;{% else %}{% endif %}
+{% if instance.explicitStop %}
+    return{% else %}{% endif %}
 
 # Entry point
 def runScenario(pipe_in=None, pipe_out=None, udpController=None):
