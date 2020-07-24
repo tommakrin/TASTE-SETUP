@@ -29,6 +29,9 @@ cp peek-poke/PeekPoke.glade ${PREFIX}/share/peekpoke/PeekPoke.glade || exit 1
 # Shared function types
 cp -ru SharedTypes ${PREFIX}/share/
 
+# msc templates for the Viking editor
+cp -ru msc ${PREFIX}/share
+
 # Helper scripts
 cp -a helper-scripts/* ${PREFIX}/bin/
 
