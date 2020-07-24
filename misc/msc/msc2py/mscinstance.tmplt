@@ -1,6 +1,8 @@
 {% comment %}
 one single instance -> basis for a scenario
+Ignore instances named "TASTE_System"
 {% endcomment %}
+{% if instance.name != "TASTE_System" %}
 
 @Scenario
 def Exercise_{{ instance.name }}{% if instance.denominatorAndKind %}: {{ instance.denominatorAndKind }} {{ instance.inheritance }}{% endif %}(queue):
@@ -75,4 +77,6 @@ def runScenario(pipe_in=None, pipe_out=None, udpController=None):
                             return
                 except AttributeError:
                     pass
+
+{% endif %}
 
