@@ -59,3 +59,9 @@ echo "Please close this terminal and open a new one"
 echo "(to make sure the environment variables are updated)."
 echo "====================================================="
 echo -e "${COLOROFF}"
+if [ ! -f $HOME/.taste.shell.config.warning ] ; then
+   touch $HOME/.taste.shell.config.warning
+   echo -e "POST INSTALL: You must source ~/.bashrc.taste before you can start"
+   echo -e "              using TASTE and modify your shell's configuration"
+   echo -e "              (e.g. .bashrc) to always source it"
+fi
