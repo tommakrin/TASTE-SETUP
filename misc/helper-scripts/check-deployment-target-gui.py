@@ -19,6 +19,12 @@ def install_gr740_rcc13rc4_posix():
     """ $ $HOME/tool-src/add-ons/install-gaisler-rcc-1.3-rc4.sh """
     os.system("xterm -e $HOME/tool-src/add-ons/install-gaisler-rcc-1.3-rc4.sh")
 
+def install_msp430_gcc_freertos():
+    """$HOME/tool-src/add-ons/install-msp430-gcc.sh
+$HOME/tool-src/add-ons/install-freertos.sh"""
+    os.system("xterm -e $HOME/tool-src/add-ons/install-msp430-gcc.sh")
+    os.system("xterm -e $HOME/tool-src/add-ons/install-freertos.sh")
+
 def check_gr740_rtems410_gaisler_posix():
     if not os.path.isdir("/opt/rtems-4.10"):
         raise NotImplementedError(install_gr740_rtems410_gaisler_posix)
@@ -31,6 +37,12 @@ def check_gr740_rcc13rc4_posix():
     if not os.path.isdir("/opt/rcc-1.3-rc4"):
         raise NotImplementedError(install_gr740_rcc13rc4_posix)
 
+def check_msp430_freertos():
+    if not os.path.isdir("/opt/msp430-gcc"):
+        raise NotImplementedError(install_msp430_gcc_freertos)
+    if not os.path.isdir("/opt/FreeRTOSv10.2.1"):
+        raise NotImplementedError()
+
 # When editing, replace dot (.) with underscore (_)
 # the TASTE GUI mixes them up if there is more than one underscore
 PLATFORMS = { "crazyflie_v2_gnat"      : lambda: True,
@@ -40,14 +52,16 @@ PLATFORMS = { "crazyflie_v2_gnat"      : lambda: True,
               "leon3_rtems412_posix"   : lambda: True,
               "gr712_rtems412_posix"   : lambda: True,
               "gr740_rtems412_posix"   : lambda: True,
-              "gr740_rtems51_posix"    : 
+              "gr740_rtems51_posix"    :
                   check_gr740_rtems51_posix,
               "gr740_rtems410_gaisler_posix" :
                   check_gr740_rtems410_gaisler_posix,
               "gr740_rcc13rc4_posix"   :
                   check_gr740_rcc13rc4_posix,
               "x86_linux"              : lambda: True,
-              "x86_win32"              : lambda: True
+              "x86_win32"              : lambda: True,
+              "msp430fr5969_freertos"  :
+                  check_msp430_freertos
              }
 
 def query_user(platform):
@@ -93,4 +107,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
