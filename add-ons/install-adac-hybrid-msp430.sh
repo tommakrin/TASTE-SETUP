@@ -13,7 +13,7 @@ TEMP_INSTALL_PATH=$(mktemp -d --tmpdir="$TMP_DIR")
 
 CheckTargetFolder "${DESCRIPTION}" "${INSTALL_PATH}"
 
-DownloadToTemp "${DESCRIPTION}" "https://github.com/n7space/adac-hybrid-msp430/releases/download/v1.0.0/adac-linux-1.0.0.tar.gz"
+DownloadToTemp "${DESCRIPTION}" "https://github.com/n7space/adac-hybrid-msp430/releases/download/v${ADAC_HYBRID_MSP430_VERSION}/adac-linux-${ADAC_HYBRID_MSP430_VERSION}.tar.gz"
 
 echo "[-]"
 echo "[-] Installing adac-hybrid-msp430..."
