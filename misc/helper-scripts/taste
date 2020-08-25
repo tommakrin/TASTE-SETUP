@@ -53,14 +53,21 @@ else
         new_folder=.
     fi
     echo 'KAZOO?=kazoo
-# Here you can specify folders containing external code you want to
-# compile and link for a specific partition.
+# Here you can specify custom compiler/linker flags, and add folders containing
+# external code you want to compile and link for a specific partition.
 # Use upper case for the partition name:
-# export <PARTITION_NAME>_EXTERNAL_SOURCE_PATH=/absolute/path/1:/....
+# export <PARTITIONNAME>_USER_CFLAGS=...
+# export <PARTITIONNAME>_USER_LDFLAGS=...
+# export <PARTITIONNAME>_EXTERNAL_SOURCE_PATH=
 
 all:	c
 
 c:	work/glue_built
+	$(MAKE) -C work
+
+# Simulation target (experimental)
+simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+	$(KAZOO) -t SIMU --glue --gw
 	$(MAKE) -C work
 
 skeletons:
@@ -81,7 +88,7 @@ clean:
 	find work -type d -name "wrappers" -exec rm -rf {} +
 	find work -type d -name "*_GUI" -exec rm -rf {} +
 
-.PHONY: clean skeletons c
+.PHONY: clean skeletons c simu
 ' > Makefile
     # If there is already a dataview, use it, otherwise create one
     if [ ! -f DataView.aadl ]
