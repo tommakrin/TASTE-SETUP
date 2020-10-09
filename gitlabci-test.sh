@@ -1,4 +1,8 @@
 #!/bin/bash
+# Testing updated gitlab runner
+echo 100 > /proc/sys/fs/mqueue/msg_max
+cat /proc/sys/fs/mqueue/msg_max
+exit 1
 /etc/init.d/postgresql start 
 source ~/.bashrc
 set -e
