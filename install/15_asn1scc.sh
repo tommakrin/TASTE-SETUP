@@ -6,8 +6,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 mkdir -p "${PREFIX}/share/asn1scc/" || exit 1
 cd "${PREFIX}/share/" || exit 1
 VER=$(mono ~/tool-inst/share/asn1scc/asn1.exe -v |  head -1 | awk '{print $NF}')
-if [ "${VER}" != "4.2.1.3f" ] ; then
-    wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.1.3f/asn1scc-bin-4.2.1.3f.tar.bz2 \
+if [ "${VER}" != "4.2.4.1f" ] ; then
+    wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.1f/asn1scc-bin-4.2.4.1f.tar.bz2 \
         | tar jxvf -
 fi
 
