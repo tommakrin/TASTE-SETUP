@@ -10,6 +10,8 @@ if [ "${VER}" != "4.2.4.3f" ] ; then
     wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.3f/asn1scc-bin-4.2.4.3f.tar.bz2 \
         | tar jxvf -
 fi
+# Delete the AST cache folder in case the new version of the compiler generates different XML/Python output
+find $HOME/.taste_AST_cache/ -type f -delete
 
 # Add to PATH
 PATH_CMD='export PATH=$PATH:'"${PREFIX}/share/asn1scc/"

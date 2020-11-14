@@ -36,11 +36,17 @@ fi
 # In kazoo-based systems, the full dataview is in ../dataview
 cp ../dataview/dataview-uniq.asn .
 
+echo '================================================'
+echo 'Trace file were generated. You may now run:
+    taste-edit-msc trace.msc'
+
 # Patch the VCD file (if any)
-if [ -f bench.vcd ]
-then
-    taste-patch-vcd.py ../build/deploymentview_final/"$1"/deployment.h bench.vcd
-fi
+for f in $(find *.vcd)
+do
+    taste-patch-vcd.py ../build/deploymentview_final/"$1"/deployment.h $f
+    echo "    gtkwave ./$f.new"
+done
+echo '================================================'
 
 echo 'Trace file were generated. You may now run:
     taste-edit-msc trace.msc
