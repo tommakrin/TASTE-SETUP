@@ -1,5 +1,5 @@
 #!/bin/bash
-[ ! -d /usr/lib/python3.5 ] && {
+[ -d /usr/lib/python3.5 ] || {
     echo "[-] Installing support files from old Debian for Leon3 simulation..."
     OLD_PY=/tmp/python3.5.tar.gz
     if wget -O $OLD_PY "https://download.tuxfamily.org/taste/python3.5.tar.bz2" ; then
@@ -15,4 +15,4 @@
         echo "[x] Failed to download the dependencies for the Leon3 simulator... Aborting."
         exit 1
     fi
-}
+} && exit 0
