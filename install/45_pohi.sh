@@ -12,6 +12,7 @@ make || exit 1
 make install || exit 1
 
 cd $DIR/../polyorb-hi-ada || exit 1
+make uninstall # remove anything left in tool-inst
 make distclean # ignore any errors here
 ./support/reconfig || exit 1
 PATH=${PREFIX}/bin:${PATH} ./configure || exit 1
