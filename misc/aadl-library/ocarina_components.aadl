@@ -42,6 +42,9 @@ end serial;
 bus implementation serial.generic
 end serial.generic;
 
+bus implementation serial.minimal
+end serial.minimal;
+
 bus bluetooth
 end bluetooth;
 
@@ -97,13 +100,10 @@ public
 
   with ocarina_drivers_star_dundee_spacewire_brick;
 
-  with ocarina_drivers_udp_exarm;
   with ocarina_drivers_serial;
 
   with ocarina_drivers_ip_pohic;
 
-  with ocarina_drivers_exarm_ni_6071e_analog;
-  with ocarina_drivers_exarm_ni_6071e_digital;
 
   with ocarina_drivers_generic_keyboard;
 
@@ -395,6 +395,38 @@ public
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::raw.i));
   end Client_BLE.pohiada;
 
+  ----------------------------------
+  -- MSP430 eUSCI_A serial minimal driver --
+  ----------------------------------
+  device MSP430_eUSCI_A_serial
+  features
+    link : requires bus access ocarina_buses::serial.minimal;
+  end MSP430_eUSCI_A_serial;
+
+  device implementation MSP430_eUSCI_A_serial.minimal
+  properties
+    Deployment::Driver_Name       => "MSP430_eUSCI_A_serial_minimal";
+    Device_Driver                 => classifier (ocarina_drivers_serial::serial_driver.msp430_eusci_a_minimal);
+    Initialize_Entrypoint         => classifier (ocarina_drivers_serial::msp430_eusci_a_serial_minimal_init);
+    Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::raw.i));
+  end MSP430_eUSCI_A_serial.minimal;
+
+----------------------------------
+-- linux serial minimal driver --
+----------------------------------
+  device linux_serial
+  features
+    link : requires bus access ocarina_buses::serial.minimal;
+  end linux_serial;
+
+  device implementation linux_serial.minimal
+  properties
+    Deployment::Driver_Name       => "linux_serial_minimal";
+    Device_Driver                 => classifier (ocarina_drivers_serial::serial_driver.linux_minimal);
+    Initialize_Entrypoint         => classifier (ocarina_drivers_serial::spg_serial_linux_minimal_init);
+    Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::raw.i));
+  end linux_serial.minimal;
+
   ---------------------------
   -- Generic serial driver --
   ---------------------------
@@ -479,87 +511,6 @@ public
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::pohi.c));
   end rtems_ne2000.ip_pohic;
 
-  ------------------------------------------
-  --            Exarm UDP driver          --
-  ------------------------------------------
-  --  This driver is used to communicate  --
-  --  with the exarm robot and also       --
-  --  the Matlab simulator.               --
-  ------------------------------------------
-
-  device exarm_ip
-  features
-    link : requires bus access ocarina_buses::ip.i;
-  end exarm_ip;
-
-  device implementation exarm_ip.vr_udp
-  properties
-    Deployment::Driver_Name    => "exarm";
-    Device_Driver              => classifier (ocarina_drivers_udp_exarm::driver.i);
-    Initialize_Entrypoint      => classifier (ocarina_drivers_udp_exarm::init);
-  end exarm_ip.vr_udp;
-
-  data exarm_protocol_data
-  end exarm_protocol_data;
-
-  data implementation exarm_protocol_data.vr extends ocarina_drivers_udp_exarm::protocol.vr
-  properties
-    Data_Model::Data_Representation => Struct;
-  end exarm_protocol_data.vr;
-
-  data implementation exarm_protocol_data.robot extends ocarina_drivers_udp_exarm::protocol.robot
-  properties
-    Data_Model::Data_Representation => Struct;
-  end exarm_protocol_data.robot;
-
-  ---------------------------------------
-  --   Devices for the Exo skeleton    --
-  --  National Instruments PCI-6071E   --
-  ---------------------------------------
-  --  This device is used to make data --
-  --  acquisition of the EXARM robot.  --
-  ---------------------------------------
-
-  device exarm_ni_6071e_analog
-  features
-    data1  : out data port Base_Types::Float_64;
-    data2  : out data port Base_Types::Float_64;
-    data3  : out data port Base_Types::Float_64;
-    data4  : out data port Base_Types::Float_64;
-    data5  : out data port Base_Types::Float_64;
-    data6  : out data port Base_Types::Float_64;
-    data7  : out data port Base_Types::Float_64;
-    data8  : out data port Base_Types::Float_64;
-    data9  : out data port Base_Types::Float_64;
-    data10 : out data port Base_Types::Float_64;
-    data11 : out data port Base_Types::Float_64;
-    data12 : out data port Base_Types::Float_64;
-    data13 : out data port Base_Types::Float_64;
-    data14 : out data port Base_Types::Float_64;
-    data15 : out data port Base_Types::Float_64;
-    data16 : out data port Base_Types::Float_64;
-  end exarm_ni_6071e_analog;
-
-  device implementation exarm_ni_6071e_analog.i
-  properties
-    Deployment::Driver_Name    => "exarm_ni_6071e_analog";
-    Device_Driver              => classifier (ocarina_drivers_exarm_ni_6071e_analog::driver.i);
-    Initialize_Entrypoint      => classifier (ocarina_drivers_exarm_ni_6071e_analog::spg_init);
-  end exarm_ni_6071e_analog.i;
-
-  device exarm_ni_6071e_digital
-  features
-    data1  : out data port Base_Types::Unsigned_8;
-    data2  : out data port Base_Types::Unsigned_8;
-  end exarm_ni_6071e_digital;
-
-  device implementation exarm_ni_6071e_digital.i
-  properties
-    Deployment::Driver_Name    => "exarm_ni_6071e_digital";
-    Device_Driver              => classifier (ocarina_drivers_exarm_ni_6071e_digital::driver.i);
-    Initialize_Entrypoint      => classifier (ocarina_drivers_exarm_ni_6071e_digital::spg_init);
-  end exarm_ni_6071e_digital.i;
-
 end ocarina_drivers;
 package ocarina_types
 
@@ -592,197 +543,6 @@ properties
 end boolean.i;
 
 end ocarina_types;
-package ocarina_drivers_exarm_ni_6071e_analog
-
-public
-
-with Base_Types;
-with Deployment;
-
-subprogram spg_init
-properties
-   Source_Language   => (C);
-   Source_Name       => "__po_hi_c_driver_exarm_ni_6071e_analog_init";
-end spg_init;
-
-
-subprogram spg_poller
-features
-   data1  : out parameter Base_Types::Float_64;
-   data2  : out parameter Base_Types::Float_64;
-   data3  : out parameter Base_Types::Float_64;
-   data4  : out parameter Base_Types::Float_64;
-   data5  : out parameter Base_Types::Float_64;
-   data6  : out parameter Base_Types::Float_64;
-   data7  : out parameter Base_Types::Float_64;
-   data8  : out parameter Base_Types::Float_64;
-   data9  : out parameter Base_Types::Float_64;
-   data10 : out parameter Base_Types::Float_64;
-   data11 : out parameter Base_Types::Float_64;
-   data12 : out parameter Base_Types::Float_64;
-   data13 : out parameter Base_Types::Float_64;
-   data14 : out parameter Base_Types::Float_64;
-   data15 : out parameter Base_Types::Float_64;
-   data16 : out parameter Base_Types::Float_64;
-properties
-   Source_Language   => (C);
-   Source_Name       => "__po_hi_c_driver_exarm_ni_6071e_analog_poller";
-end spg_poller;
-
-
-thread thr_poller
-features
-   data1  : out data port Base_Types::Float_64;
-   data2  : out data port Base_Types::Float_64;
-   data3  : out data port Base_Types::Float_64;
-   data4  : out data port Base_Types::Float_64;
-   data5  : out data port Base_Types::Float_64;
-   data6  : out data port Base_Types::Float_64;
-   data7  : out data port Base_Types::Float_64;
-   data8  : out data port Base_Types::Float_64;
-   data9  : out data port Base_Types::Float_64;
-   data10 : out data port Base_Types::Float_64;
-   data11 : out data port Base_Types::Float_64;
-   data12 : out data port Base_Types::Float_64;
-   data13 : out data port Base_Types::Float_64;
-   data14 : out data port Base_Types::Float_64;
-   data15 : out data port Base_Types::Float_64;
-   data16 : out data port Base_Types::Float_64;
-end thr_poller;
-
-thread implementation thr_poller.i
-calls
-        mycall : {
-          pspg : subprogram spg_poller;
-        };
-connections
-   parameter pspg.data1 -> data1;
-   parameter pspg.data2 -> data2;
-   parameter pspg.data3 -> data3;
-   parameter pspg.data4 -> data4;
-   parameter pspg.data5 -> data5;
-   parameter pspg.data6 -> data6;
-   parameter pspg.data7 -> data7;
-   parameter pspg.data8 -> data8;
-   parameter pspg.data9 -> data9;
-   parameter pspg.data10 -> data10;
-   parameter pspg.data11 -> data11;
-   parameter pspg.data12 -> data12;
-   parameter pspg.data13 -> data13;
-   parameter pspg.data14 -> data14;
-   parameter pspg.data15 -> data15;
-   parameter pspg.data16 -> data16;
-properties
-   Period => 100 ms;
-   Dispatch_Protocol => Periodic;
-end thr_poller.i;
-
-
-abstract driver
-features
-   data1  : out data port Base_Types::Float_64;
-   data2  : out data port Base_Types::Float_64;
-   data3  : out data port Base_Types::Float_64;
-   data4  : out data port Base_Types::Float_64;
-   data5  : out data port Base_Types::Float_64;
-   data6  : out data port Base_Types::Float_64;
-   data7  : out data port Base_Types::Float_64;
-   data8  : out data port Base_Types::Float_64;
-   data9  : out data port Base_Types::Float_64;
-   data10 : out data port Base_Types::Float_64;
-   data11 : out data port Base_Types::Float_64;
-   data12 : out data port Base_Types::Float_64;
-   data13 : out data port Base_Types::Float_64;
-   data14 : out data port Base_Types::Float_64;
-   data15 : out data port Base_Types::Float_64;
-   data16 : out data port Base_Types::Float_64;
-end driver;
-
-abstract implementation driver.i
-subcomponents
-   ni6071e_analog_poller : thread thr_poller.i;
-connections
-   port ni6071e_analog_poller.data1 -> data1;
-   port ni6071e_analog_poller.data2 -> data2;
-   port ni6071e_analog_poller.data3 -> data3;
-   port ni6071e_analog_poller.data4 -> data4;
-   port ni6071e_analog_poller.data5 -> data5;
-   port ni6071e_analog_poller.data6 -> data6;
-   port ni6071e_analog_poller.data7 -> data7;
-   port ni6071e_analog_poller.data8 -> data8;
-   port ni6071e_analog_poller.data9 -> data9;
-   port ni6071e_analog_poller.data10 -> data10;
-   port ni6071e_analog_poller.data11 -> data11;
-   port ni6071e_analog_poller.data12 -> data12;
-   port ni6071e_analog_poller.data13 -> data13;
-   port ni6071e_analog_poller.data14 -> data14;
-   port ni6071e_analog_poller.data15 -> data15;
-   port ni6071e_analog_poller.data16 -> data16;
-end driver.i;
-
-end ocarina_drivers_exarm_ni_6071e_analog;
-package ocarina_drivers_exarm_ni_6071e_digital
-
-public
-
-with Base_Types;
-with Deployment;
-
-subprogram spg_init
-properties
-   Source_Language   => (C);
-   Source_Name       => "__po_hi_c_driver_exarm_ni_6071e_digital_init";
-end spg_init;
-
-
-subprogram spg_poller
-features
-   data1 : out parameter Base_Types::Unsigned_32;
-   data2 : out parameter Base_Types::Unsigned_32;
-properties
-   Source_Language   => (C);
-   Source_Name       => "__po_hi_c_driver_exarm_ni_6071e_digital_poller";
-end spg_poller;
-
-
-thread thr_poller
-features
-   data1 : out data port Base_Types::Unsigned_32;
-   data2 : out data port Base_Types::Unsigned_32;
-end thr_poller;
-
-thread implementation thr_poller.i
-calls
-        mycall : {
-          pspg : subprogram spg_poller;
-        };
-connections
-   parameter pspg.data1 -> data1;
-   parameter pspg.data2 -> data2;
-properties
-   Period => 100 ms;
-   Dispatch_Protocol => Periodic;
-end thr_poller.i;
-
-
-abstract driver
-features
-   data1 : out data port Base_Types::Unsigned_32;
-   data2 : out data port Base_Types::Unsigned_32;
-properties
-   Deployment::Version  => "0.1beta";
-   Deployment::Help     => "Write your ASN.1 configuration here";
-end driver;
-
-abstract implementation driver.i
-subcomponents
-   ni6071e_digital_poller : thread thr_poller.i;
-connections
-   port ni6071e_digital_poller.data1 -> data1;
-   port ni6071e_digital_poller.data2 -> data2;
-end driver.i;
-
-end ocarina_drivers_exarm_ni_6071e_digital;
 package Generic_Bus
 public
 
@@ -2138,6 +1898,17 @@ properties
         Source_Name => "__po_hi_c_driver_serial_linux_poller";
 end spg_serial_poller_linux;
 
+subprogram msp430_eusci_a_serial_minimal_poller
+properties
+  Source_Language => (C);
+  Source_Name => "msp430_eusci_a_serial_minimal_poller";
+end msp430_eusci_a_serial_minimal_poller;
+
+subprogram spg_serial_linux_minimal_poller
+properties
+  Source_Language => (C);
+  Source_Name => "__po_hi_c_driver_linux_serial_minimal_poller";
+end spg_serial_linux_minimal_poller;
 
 subprogram spg_serial_sender_linux
 properties
@@ -2145,6 +1916,17 @@ properties
         Source_Name => "__po_hi_c_driver_serial_linux_sender";
 end spg_serial_sender_linux;
 
+subprogram msp430_eusci_a_serial_minimal_sender
+properties
+  Source_Language => (C);
+  Source_Name => "msp430_eusci_a_serial_minimal_sender";
+end msp430_eusci_a_serial_minimal_sender;
+
+subprogram spg_serial_linux_minimal_sender
+properties
+  Source_Language => (C);
+  Source_Name => "__po_hi_c_driver_linux_serial_minimal_sender";
+end spg_serial_linux_minimal_sender;
 
 subprogram spg_serial_init_linux
 properties
@@ -2164,6 +1946,18 @@ properties
         Source_Name => "__po_hi_c_driver_serial_linux_init_receiver";
 end spg_serial_init_linux_receiver;
 
+subprogram msp430_eusci_a_serial_minimal_init
+properties
+  Source_Language => (C);
+  Source_Name => "msp430_eusci_a_serial_minimal_init";
+end msp430_eusci_a_serial_minimal_init;
+
+subprogram spg_serial_linux_minimal_init
+properties
+  Source_Language => (C);
+  Source_Name => "__po_hi_c_driver_linux_serial_minimal_init";
+end spg_serial_linux_minimal_init;
+
 thread serial_poller
 end serial_poller;
 
@@ -2177,6 +1971,25 @@ properties
    Dispatch_Protocol => Periodic;
 end serial_poller.linux;
 
+thread implementation serial_poller.msp430_eusci_a_minimal
+calls
+  mycall : {
+  pspg : subprogram msp430_eusci_a_serial_minimal_poller;
+  };
+properties
+  Period => 1000ms;
+  Dispatch_Protocol => Periodic;
+end serial_poller.msp430_eusci_a_minimal;
+
+thread implementation serial_poller.linux_minimal
+calls
+  mycall : {
+  pspg : subprogram spg_serial_linux_minimal_poller;
+  };
+properties
+  Period => 1000ms;
+  Dispatch_Protocol => Periodic;
+end serial_poller.linux_minimal;
 
 abstract serial_driver
 properties
@@ -2201,6 +2014,18 @@ abstract implementation serial_driver.linux_receiver
 subcomponents
    serial_linux_receiver : thread serial_poller.linux;
 end serial_driver.linux_receiver;
+
+abstract implementation serial_driver.msp430_eusci_a_minimal
+subcomponents
+  receiver : thread serial_poller.msp430_eusci_a_minimal;
+  sender   : subprogram msp430_eusci_a_serial_minimal_sender;
+end serial_driver.msp430_eusci_a_minimal;
+
+abstract implementation serial_driver.linux_minimal
+subcomponents
+  receiver : thread serial_poller.linux_minimal;
+  sender   : subprogram spg_serial_linux_minimal_sender;
+end serial_driver.linux_minimal;
 
 end ocarina_drivers_serial;
 package ocarina_drivers_ip_pohic
@@ -2437,99 +2262,26 @@ public
    end Send;
 
 end TCP_IP_Protocol;
-package ocarina_drivers_udp_exarm
 
+package ocarina_processors_msp430
 public
+  with Deployment;
+  with Cheddar_Properties;
 
-with Data_Model;
-with Base_Types;
-
-data protocol
+processor msp430fr5969
 properties
-   Data_Model::Data_Representation => Struct;
-end protocol;
+  Deployment::Execution_Platform => MSP430_FREERTOS;
+end msp430fr5969;
 
-data implementation protocol.robot
-subcomponents
-   cmd   : data Base_Types::Unsigned_32;
-   pktid : data Base_Types::Unsigned_32;
-   X1    : data Base_Types::Float_32;
-   X2    : data Base_Types::Float_32;
-   X3    : data Base_Types::Float_32;
-   Y1    : data Base_Types::Float_32;
-   Y2    : data Base_Types::Float_32;
-   Y3    : data Base_Types::Float_32;
-   Z1    : data Base_Types::Float_32;
-   Z2    : data Base_Types::Float_32;
-   Z3    : data Base_Types::Float_32;
-   P1    : data Base_Types::Float_32;
-   P2    : data Base_Types::Float_32;
-   P3    : data Base_Types::Float_32;
-   J1    : data Base_Types::Float_32;
-   J2    : data Base_Types::Float_32;
-   J3    : data Base_Types::Float_32;
-   J4    : data Base_Types::Float_32;
-   J5    : data Base_Types::Float_32;
-   J6    : data Base_Types::Float_32;
-   J7    : data Base_Types::Float_32;
-   Elbow : data Base_Types::Float_32;
-end protocol.robot;
-
-
-data implementation protocol.vr
-subcomponents
-   J1    : data Base_Types::Float_64;
-   J2    : data Base_Types::Float_64;
-   J3    : data Base_Types::Float_64;
-   J4    : data Base_Types::Float_64;
-   J5    : data Base_Types::Float_64;
-   J6    : data Base_Types::Float_64;
-   J7    : data Base_Types::Float_64;
-   J8    : data Base_Types::Float_64;
-   J9    : data Base_Types::Float_64;
-   J10    : data Base_Types::Float_64;
-   J11    : data Base_Types::Float_64;
-   J12    : data Base_Types::Float_64;
-   J13    : data Base_Types::Float_64;
-   J14    : data Base_Types::Float_64;
-   J15    : data Base_Types::Float_64;
-   J16    : data Base_Types::Float_64;
-   P1    : data Base_Types::Float_64;
-   P2    : data Base_Types::Float_64;
-   P3    : data Base_Types::Float_64;
-   X1    : data Base_Types::Float_64;
-   X2    : data Base_Types::Float_64;
-   X3    : data Base_Types::Float_64;
-   Y1    : data Base_Types::Float_64;
-   Y2    : data Base_Types::Float_64;
-   Y3    : data Base_Types::Float_64;
-   Z1    : data Base_Types::Float_64;
-   Z2    : data Base_Types::Float_64;
-   Z3    : data Base_Types::Float_64;
-end protocol.vr;
-
-
-subprogram init
+processor implementation msp430fr5969.freertos
 properties
-   Source_Language   => (C);
-   Source_Name       => "__po_hi_driver_exarm_init";
-end init;
+  Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+  Priority_Range => 0 .. 4;
+  Cheddar_Properties::Scheduler_Quantum => 0 Ms;
+  Cheddar_Properties::Preemptive_Scheduler => true;
+end msp430fr5969.freertos;
+end ocarina_processors_msp430;
 
-subprogram spg_sender
-properties
-   Source_Language   => (C);
-   Source_Name       => "__po_hi_driver_exarm_send";
-end spg_sender;
-
-abstract driver
-end driver;
-
-abstract implementation driver.i
-subcomponents
-   sender : subprogram spg_sender;
-end driver.i;
-
-end ocarina_drivers_udp_exarm;
 package ocarina_processors_arm
 
 public
@@ -2615,31 +2367,6 @@ properties
 end stm32f429_discovery.gnat2017;
 
 
-
-processor nds extends arm
-end nds;
-
---   processor implementation nds.rtems
---   properties
---      Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
---      Priority_Range => 0 .. 255;
---      Cheddar_Properties::Scheduler_Quantum => 0 Ms;
---      Cheddar_Properties::Preemptive_Scheduler => true;
---      Deployment::Execution_Platform => NDS_RTEMS;
---   end nds.rtems;
-
-
-processor gumstix extends arm
-end gumstix;
-
---   processor implementation gumstix.rtems
---   properties
---      Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
---      Priority_Range => 0 .. 255;
---      Cheddar_Properties::Scheduler_Quantum => 0 Ms;
---      Cheddar_Properties::Preemptive_Scheduler => true;
---      Deployment::Execution_Platform => GUMSTIX_RTEMS;
---   end gumstix.rtems;
 
 end ocarina_processors_arm;
 property set Processor_Properties is
@@ -2806,7 +2533,7 @@ end xtratum_partition.generic;
      --  properties
      --   ARINC653::Partition_Slots => (500ms, 500ms);
      --   ARINC653::Slots_Allocation => (reference (part1), reference (part2));
-     --	ARINC653::Module_Major_Frame => 1000ms;
+     -- ARINC653::Module_Major_Frame => 1000ms;
 --   end leon3.xtratum_2partitions;
 
 end ocarina_processors_leon;
