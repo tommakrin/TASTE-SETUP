@@ -7,7 +7,7 @@ cd $DIR/../polyorb-hi-c || exit 1
 ./support/reconfig || exit 1
 PATH=${PREFIX}/bin:${PATH} ./configure || exit 1
 make uninstall || exit 1 # remove anything left in tool-inst
-make distclean || exit 1 # ignore any errors here
+make distclean  # ignore any errors here
 make || exit 1
 make install || exit 1
 
@@ -15,7 +15,7 @@ cd $DIR/../polyorb-hi-ada || exit 1
 ./support/reconfig || exit 1
 PATH=${PREFIX}/bin:${PATH} ./configure || exit 1
 make uninstall || exit 1 # remove anything left in tool-inst
-make distclean || exit 1 # ignore any errors here
+make distclean  # ignore any errors here
 make || exit 1
 make install || exit 1
 
