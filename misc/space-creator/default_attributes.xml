@@ -17,10 +17,10 @@
         </Scopes>
         <Type>
             <Enumeration defaultValue="SDL">
+                <Entry value="Ada"/>
+                <Entry value="CPP"/>
                 <Entry value="C"/>
-                <Entry value="ADA"/>
                 <Entry value="SDL"/>
-                <Entry value="Cobol"/>
             </Enumeration>
         </Type>
     </Attr>
