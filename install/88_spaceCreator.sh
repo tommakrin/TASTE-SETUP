@@ -21,6 +21,8 @@ dpkg -l | grep '^ii.*spacecreator.*0.1.32074' > /dev/null || {
 }
 # install the taste configuration files for Space Creator (color scheme, etc.)
 echo "Installing Space Creator configuration files"
+mkdir -p ~/.local/share/QtProject/QtCreator/colors || exit 1
+mkdir -p ~/.local/share/QtProject/QtCreator/contextMenu || exit 1
 cp -u misc/space-creator/default_colors.json ~/.local/share/QtProject/QtCreator/colors/  || exit 1
 cp -u misc/space-creator/contextmenu.json ~/.local/share/QtProject/QtCreator/contextMenu/ || exit 1
 cp -u misc/space-creator/default_attributes.xml ~/.local/share/QtProject/QtCreator/ || exit 1
