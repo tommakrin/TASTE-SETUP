@@ -7,10 +7,10 @@ export TASTE_IN_DOCKER=1
 git fetch
 git checkout -f "${CI_COMMIT_BRANCH}" 
 ./Update-TASTE.sh
-echo y | ./add-ons/install-msp430-gcc.sh > /dev/null || exit 1
-./add-ons/install-gnat2020-for-arm.sh  > /dev/null || exit 1
-echo y | ./add-ons/install-adac-hybrid-msp430.sh > /dev/null || exit 1
-echo y | ./add-ons/install-freertos.sh > /dev/null || exit 1
+echo y | ./add-ons/install-msp430-gcc.sh 2>&1 > /dev/null || exit 1
+./add-ons/install-gnat2020-for-arm.sh 2>&1 > /dev/null || exit 1
+echo y | ./add-ons/install-adac-hybrid-msp430.sh 2>&1 > /dev/null || exit 1
+echo y | ./add-ons/install-freertos.sh 2>&1 > /dev/null || exit 1
 source ~/.bashrc.taste
 cd kazoo 
 export PATH=$HOME/tool-inst/bin:$HOME/.local/bin:$HOME/tool-inst/share/asn1scc:$PATH
