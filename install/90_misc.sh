@@ -29,8 +29,11 @@ cp peek-poke/PeekPoke.glade ${PREFIX}/share/peekpoke/PeekPoke.glade || exit 1
 # Shared function types
 cp -ru SharedTypes ${PREFIX}/share/
 
-# msc templates for the Viking editor
+# msc templates for Space Creator (to convert MSC to Python)
 cp -ru msc ${PREFIX}/share
+
+# Space creator templates to convert XML to AADL
+cp -ru space-creator/xml2aadl ${PREFIX}/share
 
 # Helper scripts
 cp -a helper-scripts/* ${PREFIX}/bin/
