@@ -7,6 +7,11 @@ export TASTE_IN_DOCKER=1
 git fetch
 git checkout -f "${CI_COMMIT_BRANCH}" 
 ./Update-TASTE.sh
+./add-ons/install-msp430-gcc.sh || exit 1
+./add-ons/install-gnat2020-for-arm.sh  || exit 1
+./add-ons/install-adac-hybrid-msp430.sh || exit 1
+./add-ons/install-freertos.sh || exit 1
+source ~/.bashrc.taste
 cd kazoo 
 export PATH=$HOME/tool-inst/bin:$HOME/.local/bin:$HOME/tool-inst/share/asn1scc:$PATH
 export PATH=$HOME/tool-inst/share/kazoo:$PATH
