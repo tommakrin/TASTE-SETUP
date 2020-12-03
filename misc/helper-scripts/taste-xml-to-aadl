@@ -30,17 +30,16 @@ else
 fi
 
 # TODO: We should extract the list of ASN.1 and ACN files from the .pro file
-taste-update-data-view *.asn *.acn
+taste-update-data-view *.asn || exit 1
 
-aadlconverter -o interfaceview.xml -t $(taste-config --prefix)/share/xml2aadl/interfaceview.tmplt
+aadlconverter -o interfaceview.xml -t $(taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x InterfaceView.aadl || exit 1 
 
-make skeletons
-
-# Check if the project works with kazoo. If so, skip all the rest
+#  Generate code skeletons
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
     make skeletons || exit 1
-    exit 0
 else
     echo -e "${INFO} Initializing Kazoo project file (TODO)"
+    taste init
+    make skeletons || exit 1
 fi

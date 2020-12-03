@@ -13,8 +13,10 @@ echo -e "Welcome to ${COLORON}TASTE${COLOROFF}"
 INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
+
 # Check if there is an interface view in the current folder
-if [ -f InterfaceView.aadl ]
+# and if the init command is not invoked (to create initial Makefile)
+if [ -f InterfaceView.aadl ] && [ "$1" != "init" ]
 then
     echo -e "${INFO} Opening TASTE project in current folder"
     INTERFACEVIEW=InterfaceView.aadl
