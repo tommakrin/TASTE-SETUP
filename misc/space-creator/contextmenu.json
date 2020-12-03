@@ -1,18 +1,26 @@
 [
     {
+        "action": "Context actions",
+        "app": "",
+        "appArgs": [
+        ],
+        "appCwd": "",
         "conditions": [
             {
-                "attributes": [],
+                "attributes": [
+                ],
                 "itemType": "*"
             }
         ],
-        "action": "Context actions",
-        "title": "Context menu customization",
-        "app": "",
-        "appArgs": [],
-        "appCwd": ""
+        "title": "Context menu customization"
     },
     {
+        "action": "",
+        "app": "IVEditor",
+        "appArgs": [
+            "-l"
+        ],
+        "appCwd": "iveditor",
         "conditions": [
             {
                 "attributes": [
@@ -24,10 +32,43 @@
                 "itemType": "*"
             }
         ],
-        "action": "",
-        "app": "IVEditor",
-        "appArgs": [ "-l" ],
-        "appCwd": "iveditor",
         "title": "List scriptable actions"
+    },
+    {
+        "action": "",
+        "app": "taste-xml-to-aadl",
+        "appArgs": [
+            "$PRJ_FOLDER"
+        ],
+        "appCwd": "",
+        "conditions": [
+            {
+                "attributes": [
+                    {
+                        "title": "language",
+                        "value": "SDL"
+                    }
+                ],
+                "itemType": "Function"
+            }
+        ],
+        "title": "Edit"
+    },
+    {
+        "action": "",
+        "app": "make",
+        "appArgs": [
+            "-C",
+            "$PRJ_FOLDER"
+        ],
+        "appCwd": "$PRJ_FOLDER",
+        "conditions": [
+            {
+                "attributes": [
+                ],
+                "itemType": "*"
+            }
+        ],
+        "title": "Build system"
     }
 ]
