@@ -1,0 +1,46 @@
+#!/bin/bash
+# $1 shall be the project folder containing the Space Creator project files
+# this script converts the XML and ASN1 models into AADL and generates the code skeletons
+
+
+# Logging with colors (only in a terminal)
+if [ -t 1 ] ; then
+    COLORON="\e[1m\e[32m"
+    REDCOLORON="\e[1m\e[31m"
+    COLOROFF="\e[0m"
+else
+    COLORON=""
+    REDCOLORON=""
+    COLOROFF=""
+fi
+INFO="${COLORON}[INFO]${COLOROFF}"
+ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
+
+if [ ! -d "$1" ]
+then
+    echo -e "${ERROR} First argument must be the project folder"
+    exit 1
+else
+    cd "$1"
+    if [ ! -f interfaceview.xml ]
+    then
+        echo -e "${ERROR} $1/interfaceview.xml found"
+        exit 1
+    fi
+fi
+
+# TODO: We should extract the list of ASN.1 and ACN files from the .pro file
+taste-update-data-view *.asn *.acn
+
+aadlconverter -o interfaceview.xml -t $(taste-config --prefix)/share/xml2aadl/interfaceview.tmplt
+
+make skeletons
+
+# Check if the project works with kazoo. If so, skip all the rest
+if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
+then
+    make skeletons || exit 1
+    exit 0
+else
+    echo -e "${INFO} Initializing Kazoo project file (TODO)"
+fi
