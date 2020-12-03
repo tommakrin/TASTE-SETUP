@@ -1,0 +1,102 @@
+{% comment %}
+Template for generation of XML scheme of function.
+The following tags are available in this sub-template:
+func            : Instance of function (provided by a top level template)
+func.attributes :   |_ List of all attributes of function
+attr            :       |_ Instance of attriubute
+attr.name       :           |_ Name of attribute
+attr.value      :           |_ Value of attribute
+func.properties :   |_ List of all properties of function
+prop            :       |_ Instance of property
+prop.name       :           |_ Name of property
+prop.value      :           |_ Value of property
+func.interfaces :   |_ List of all interfaces of function
+iface           :       |_ Instance of interface
+func.functions  :   |_ List of all nested functions of function
+func            :       |_ Instance of nested function
+func.comments   :   |_ List of all nested comments of function
+comm            :       |_ Instance of nested comment
+func.connections:   |_ List of all nested connections of function
+conn            :       |_ Instance of nested connections
+{% endcomment %}
+{% for allattr in func.attributes %}
+{% if allattr.name == "name" %}
+{% with allattr.value as name %}
+
+PACKAGE interfaceview::IV::{{ name }}
+PUBLIC
+
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+
+
+{% for iface in func.interfaces %}
+    {% include "interface.tmplt" %}
+{% endfor %}
+
+SYSTEM {{ name }}
+{% if func.interfaces|length > 0 %}
+FEATURES
+{% endif %}
+{% for iface in func.interfaces %}
+{% for ifattr in iface.attributes %}
+{% if ifattr.name == "name" %}
+{% with ifattr.value as ifname %}
+{% if iface.isProvided %}
+   PI_{{ ifname }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{{ name }}::PI_{{ ifname }}.others {
+{% else %}
+   RI_{{ ifname }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{{ name }}::RI_{{ ifname }}.others {
+{% endif %}
+{% for ifprop in iface.properties %}
+      {{ ifprop.name }} => "{{ ifprop.value }}";
+{% endfor %}
+{% for attr in iface.attributes %}
+      {% if attr.name == "kind" %}      
+      Taste::RCMoperationKind => {{ attr.value|lower }};
+      {% elif attr.name == "period" %}
+      Taste::RCMperiod => {% if attr.value %}{{ attr.value }} {% else %} 0 {% endif %}ms;
+      {% elif attr.name == "wcet" %}
+      Compute_Execution_Time => {% if attr.value %}{{ attr.value }} .. {{ attr.value }} {% else %} 0 .. 0 {% endif %}ms;
+      {% elif attr.name == "queue_size" %}
+      Taste::Associated_Queue_Size => {% if attr.value %}{{ attr.value }}{% else %}1{% endif %};
+      {% else %}
+      -- {{ attr.name }} => {{ attr.value }}
+      {% endif %}      
+{% endfor %}
+   };
+{% endwith %}
+{% endif %}
+{% endfor %}
+{% endfor %}
+PROPERTIES
+{% for attr in func.attributes %}
+   {% if attr.name == "language" %}
+   Source_Language => ({{ attr.value }});
+   {% endif %}
+{% endfor %}
+END {{ name }};
+
+SYSTEM IMPLEMENTATION {{ name }}.others
+END {{ name }}.others;
+
+END interfaceview::IV::{{ name }};
+{% endwith %}
+{% endif %}
+{% endfor %}
+{% comment %}
+{% for func in func.functions %}
+    {% include "function.tmplt" %}
+{% endfor %}
+{% for comm in func.comments %}
+    {% include "comment.tmplt" %}
+{% endfor %}
+{% for conn in func.connections %}
+    {% include "connection.tmplt" %}
+{% endfor %}
+{% for conn in func.connectiongroups %}
+    {% include "connectiongroup.tmplt" %}
+{% endfor %}
+</Function>
+{% endcomment %}
