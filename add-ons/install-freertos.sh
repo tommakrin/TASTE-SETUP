@@ -10,6 +10,12 @@ FREERTOS_VERSION="10.2.1"
 PREFIX="/opt"
 INSTALL_PATH="$PREFIX/FreeRTOSv$FREERTOS_VERSION"
 
+if [ -d $INSTALL_PATH ]
+then
+    echo "[-] FreeRTOS is already installed. Skipped."
+    exit 0
+fi
+
 CheckTargetFolder "${DESCRIPTION}" "${INSTALL_PATH}"
 
 DownloadToTemp "${DESCRIPTION}" "https://sourceforge.net/projects/freertos/files/FreeRTOS/V${FREERTOS_VERSION}/FreeRTOSv${FREERTOS_VERSION}.zip/download"
