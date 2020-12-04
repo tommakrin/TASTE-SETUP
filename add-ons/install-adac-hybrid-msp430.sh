@@ -9,6 +9,13 @@ ADAC_HYBRID_MSP430_VERSION="1.0.0"
 
 PREFIX="/opt"
 INSTALL_PATH="$PREFIX/adac-hybrid-msp430-${ADAC_HYBRID_MSP430_VERSION}"
+
+if [ -d $INSTALL_PATH ]
+then
+    echo "[-] Ada hybrid MSP430 Compiler is already installed. Skipped."
+    exit 0
+fi
+
 TEMP_INSTALL_PATH=$(mktemp -d --tmpdir="$TMP_DIR")
 
 CheckTargetFolder "${DESCRIPTION}" "${INSTALL_PATH}"
