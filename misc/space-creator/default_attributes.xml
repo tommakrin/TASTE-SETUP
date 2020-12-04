@@ -5,12 +5,6 @@
         </Type>
         <Scopes/>
     </Attr>
-    <Attr name="value">
-        <Type>
-            <String validator="[a-zA-Z0-9_]+"/>
-        </Type>
-        <Scopes/>
-    </Attr>
     <Attr name="language">
         <Scopes>
             <Function/>
@@ -20,7 +14,11 @@
                 <Entry value="Ada"/>
                 <Entry value="CPP"/>
                 <Entry value="C"/>
+                <Entry value="GUI"/>
                 <Entry value="SDL"/>
+                <Entry value="Simulink"/>
+                <Entry value="Blackbox_Device"/>
+                <Entry value="VHDL"/>
             </Enumeration>
         </Type>
     </Attr>
