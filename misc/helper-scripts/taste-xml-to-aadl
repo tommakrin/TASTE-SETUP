@@ -16,17 +16,10 @@ fi
 INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
-if [ ! -d "$1" ]
+if [ ! -f interfaceview.xml ]
 then
-    echo -e "${ERROR} First argument must be the project folder"
+    echo -e "${ERROR} interfaceview.xml found"
     exit 1
-else
-    cd "$1"
-    if [ ! -f interfaceview.xml ]
-    then
-        echo -e "${ERROR} $1/interfaceview.xml found"
-        exit 1
-    fi
 fi
 
 # TODO: We should extract the list of ASN.1 and ACN files from the .pro file
