@@ -36,18 +36,15 @@
     },
     {
         "action": "",
-        "app": "taste-xml-to-aadl",
+        "app": "taste-edit-code",
         "appArgs": [
-            "$PRJ_FOLDER"
+            "$attr_language",
+            "$attr_name"
         ],
-        "appCwd": "",
+        "appCwd": "$PRJ_FOLDER",
         "conditions": [
             {
                 "attributes": [
-                    {
-                        "title": "language",
-                        "value": "SDL"
-                    }
                 ],
                 "itemType": "Function"
             }
