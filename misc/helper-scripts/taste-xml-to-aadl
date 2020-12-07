@@ -27,6 +27,15 @@ taste-update-data-view *.asn || exit 1
 
 aadlconverter -o interfaceview.xml -t $(taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x InterfaceView.aadl || exit 1 
 
+# Create/update a deployment view for Linux target (to be removed when we have a DV editor)
+aadlconverter -o interfaceview.xml -t $(taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x DeploymentView.aadl || exit 1 
+
+# To build the system, kazoo needs a concurrency view property files
+if [ ! -f ConcurrencyView_Propertiess.aadl ]
+then
+    touch ConcurrencyView_Properties.aadl
+fi
+
 #  Generate code skeletons
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
