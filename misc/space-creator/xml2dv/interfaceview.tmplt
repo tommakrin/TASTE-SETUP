@@ -54,11 +54,11 @@ SUBCOMPONENTS
 {% endfor %}
    demo : PROCESS deploymentview::DV::Node_Linux::demo.others {
       Deployment::Port_Number => 0;
-   }
+   };
    x86_linux : PROCESSOR ocarina_processors_x86::x86.linux;
 PROPERTIES
 {% for func in Functions %}
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO {{ func.name }};
+   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_{{ func.name }};
 {% endfor %}
    Actual_Processor_Binding => (reference (x86_linux)) APPLIES TO demo;
 END Node_Linux.others;
@@ -68,7 +68,7 @@ END deploymentview;
 
 SYSTEM IMPLEMENTATION deploymentview.others
 SUBCOMPONENTS
-  Node_Linux : SYSTEM Node_Linux1.others {
+  Node_Linux : SYSTEM Node_Linux.others {
     Taste::coordinates => "114754 39152 169951 82490";
   };
   interfaceview : SYSTEM interfaceview::IV::interfaceview.others;
