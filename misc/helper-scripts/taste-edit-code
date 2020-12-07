@@ -16,7 +16,7 @@ INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
 
-if [ $1 != "C" && $1 != "Ada" && $1 != "SDL" && $1 != "CPP" && "$1" != "Blackbox_C" ]
+if [[ $1 != "C" && $1 != "Ada" && $1 != "SDL" && $1 != "CPP" && "$1" != "Blackbox_Device" ]]
 then
     echo  -e "${ERROR} First argument must be C, CPP, Ada, SDL or Blackbox_C"
     exit 1
