@@ -19,55 +19,57 @@ comm            :       |_ Instance of nested comment
 func.connections:   |_ List of all nested connections of function
 conn            :       |_ Instance of nested connections
 {% endcomment %}
-{% for allattr in func.attributes %}
-{% if allattr.name == "name" %}
-{% with allattr.value as name %}
 
-PACKAGE interfaceview::IV::{{ name }}
+PACKAGE interfaceview::IV::{{ func.name }}
 PUBLIC
 
 
 WITH Taste;
 WITH DataView;
 WITH TASTE_IV_Properties;
-
+{% for connectedFunc in func.connectedFunctions %}
+WITH interfaceview::IV::{{ connectedFunc|join:"::" }};
+{% endfor %}
 
 {% for iface in func.interfaces %}
     {% include "interface.tmplt" %}
 {% endfor %}
 
-SYSTEM {{ name }}
+SYSTEM {{ func.name }}
 {% if func.interfaces|length > 0 %}
 FEATURES
 {% endif %}
 {% for iface in func.interfaces %}
-{% for ifattr in iface.attributes %}
-{% if ifattr.name == "name" %}
-{% with ifattr.value as ifname %}
+{% for endpoint in iface.connectedInterfaces %}
 {% if iface.isProvided %}
-   PI_{{ ifname }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{{ name }}::PI_{{ ifname }}.others {
+   PI_{{ iface.name }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
 {% else %}
-   RI_{{ ifname }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{{ name }}::RI_{{ ifname }}.others {
+   RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
 {% endif %}
 {% for ifprop in iface.properties %}
+      {% if ifprop.name == "Taste::InheritPI" %}
+      Taste::labelInheritance => "{{ ifprop.value }}";
+      {% else %}
       {{ ifprop.name }} => "{{ ifprop.value }}";
+      {% endif %}
 {% endfor %}
 {% for attr in iface.attributes %}
+      --  OK: {{ attr.name }} = {{ attr.value }}
       {% if attr.name == "kind" %}      
       Taste::RCMoperationKind => {{ attr.value|lower }};
       {% elif attr.name == "period" %}
       Taste::RCMperiod => {% if attr.value %}{{ attr.value }} {% else %} 0 {% endif %}ms;
       {% elif attr.name == "wcet" %}
-      Compute_Execution_Time => {% if attr.value %}{{ attr.value }} .. {{ attr.value }} {% else %} 0 .. 0 {% endif %}ms;
+      Compute_Execution_Time => {% if attr.value %}{{ attr.value }} ms .. {{ attr.value }} {% else %} 0 ms .. 0 {% endif %}ms;
       {% elif attr.name == "queue_size" %}
       Taste::Associated_Queue_Size => {% if attr.value %}{{ attr.value }}{% else %}1{% endif %};
+      {% elif attr.name == "name" %}
+      Taste::InterfaceName => "{{ attr.value }}";
       {% else %}
-      -- {{ attr.name }} => {{ attr.value }}
+      -- Unrecognized property: {{ attr.name }} => {{ attr.value }}
       {% endif %}      
 {% endfor %}
    };
-{% endwith %}
-{% endif %}
 {% endfor %}
 {% endfor %}
 PROPERTIES
@@ -76,15 +78,12 @@ PROPERTIES
    Source_Language => ({{ attr.value }});
    {% endif %}
 {% endfor %}
-END {{ name }};
+END {{ func.name }};
 
-SYSTEM IMPLEMENTATION {{ name }}.others
-END {{ name }}.others;
+SYSTEM IMPLEMENTATION {{ func.name }}.others
+END {{ func.name }}.others;
 
-END interfaceview::IV::{{ name }};
-{% endwith %}
-{% endif %}
-{% endfor %}
+END interfaceview::IV::{{ func.name }};
 {% comment %}
 {% for func in func.functions %}
     {% include "function.tmplt" %}
