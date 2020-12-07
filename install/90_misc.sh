@@ -34,6 +34,7 @@ cp -ru msc ${PREFIX}/share
 
 # Space creator templates to convert XML to AADL
 cp -ru space-creator/xml2aadl ${PREFIX}/share
+cp -ru space-creator/xml2dv ${PREFIX}/share
 
 # Helper scripts
 cp -a helper-scripts/* ${PREFIX}/bin/
