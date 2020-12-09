@@ -17,12 +17,7 @@ function banner()
     echo -e "${COLOROFF}"
 }
 
-echo "[-] Before git pull"
-git branch -a
 git pull || exit 1
-echo "[-] After git pull"
-git branch -a
-exit 1
 if [ -z "$1" -o "$1" == "--stable" ] ; then
     git submodule init || exit 1
     git submodule update || exit 1
