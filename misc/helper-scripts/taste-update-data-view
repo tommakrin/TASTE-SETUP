@@ -2,10 +2,12 @@
 
 echo TASTE Data View Convertor - From ASN.1 to AADLV2
 
-# Initialise the progress bar
+# Initialise the progress bar if there is an X server
 myfifo=/tmp/$$$RANDOM
-mkfifo $myfifo
-tail -f $myfifo | taste-progress-dialog.py &
+xset q &>/dev/null && (
+    mkfifo $myfifo
+    tail -f $myfifo | taste-progress-dialog.py &
+)
 
 function quit {
     echo '100 Completed' > $myfifo
@@ -15,12 +17,12 @@ function quit {
 except: pass")
     if [ ! -z $tailps ]
     then
-        kill $tailps || xterm -e "echo Internal Error in taste-update-data-view"
+        kill $tailps 2>&1 || xterm -e "echo Internal Error in taste-update-data-view"
     fi
     exit $1
 }
 
-# Install a trap handler to make sure Ctrl-C leads to calling the quit function (trap 2 = SINGINT)
+# Install a trap handler to make sure Ctrl-C leads to calling the quit function (trap 2 = SIGINT)
 trap 2 quit 1
 
 if [ -t 1 ] ; then
@@ -97,6 +99,11 @@ fi
 
 DATAVIEW+=" $(taste-config --prefix)/share/taste-types/taste-types.asn"
 
+# Make sure all parameters are unique
+DATAVIEW="$(echo ${DATAVIEW} | tr ' ' '\n' | sort | uniq | tr '\n' ' ')"
+COMMAND="asn2aadlPlus -f ${DATAVIEW} ${AADL} -aadlv2 2>&1 > >(uniq >&2)"
+echo -e "${INFO} Command:
+$COMMAND"
 # can asn2aadlPlus with a call to uniq to filter out duplicate outputs
 # due to multiple calls to the ASN.1 compiler
 #asn2aadlPlus $DATAVIEW "$AADL" -aadlv2 2>&1 | uniq >&2

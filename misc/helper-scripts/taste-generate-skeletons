@@ -6,7 +6,7 @@
 # Check if the project works with kazoo. If so, skip all the rest
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
-    make skeletons
+    make skeletons || exit 1
     exit 0
 fi
 
@@ -27,7 +27,7 @@ function quit {
 except: pass")
     if [ ! -z $tailps ]
     then
-        kill $tailps || xterm -e "echo Internal Error in taste-update-data-view"
+        kill $tailps 2>&1 || xterm -e "echo Internal Error in taste-update-data-view"
     fi
     exit $1
 }
