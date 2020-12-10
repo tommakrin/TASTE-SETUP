@@ -20,6 +20,7 @@ export PATH=$HOME/tool-inst/share/kazoo:$PATH
 export PATH=/opt/rtems-5.1-2019.07.25/bin:$PATH
 export OCARINA_PATH=$HOME/tool-inst
 export LD_LIBRARY_PATH=$HOME/tool-inst/lib:$LD_LIBRARY_PATH
+export ZYNQZC706=${CI_PROJECT_DIR}/misc/ZynQzc706/TASTE-VHDL-DESIGN.tar.bz2
 make test || exit 1
 cd ..
 cd dmt
