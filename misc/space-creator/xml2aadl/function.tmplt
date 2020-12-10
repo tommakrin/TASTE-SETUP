@@ -20,9 +20,12 @@ func.connections:   |_ List of all nested connections of function
 conn            :       |_ Instance of nested connections
 {% endcomment %}
 
+{% for nested in func.functions %}
+    {% include "function.tmplt" %}
+{% endfor %}
+
 PACKAGE interfaceview::IV::{{ func.name }}
 PUBLIC
-
 
 WITH Taste;
 WITH DataView;
@@ -84,18 +87,3 @@ SYSTEM IMPLEMENTATION {{ func.name }}.others
 END {{ func.name }}.others;
 
 END interfaceview::IV::{{ func.name }};
-{% comment %}
-{% for func in func.functions %}
-    {% include "function.tmplt" %}
-{% endfor %}
-{% for comm in func.comments %}
-    {% include "comment.tmplt" %}
-{% endfor %}
-{% for conn in func.connections %}
-    {% include "connection.tmplt" %}
-{% endfor %}
-{% for conn in func.connectiongroups %}
-    {% include "connectiongroup.tmplt" %}
-{% endfor %}
-</Function>
-{% endcomment %}
