@@ -1,0 +1,7 @@
+{% comment %}
+section starting with e.g. msc Recorded; scenario containing instances
+{% endcomment %}
+# msc {{ chart.name }};
+{% for instance in chart.instances %}
+{% include "mscinstance.tmplt" %}
+{% endfor %}

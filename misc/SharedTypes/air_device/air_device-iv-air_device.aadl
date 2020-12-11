@@ -1,0 +1,105 @@
+---------------------------------------------------
+-- AADL2.2
+-- TASTE type interfaceview
+-- 
+-- generated code: do not edit
+---------------------------------------------------
+
+PACKAGE Air_Device::IV::Air_Device
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+SUBPROGRAM PI_Write_to_Device
+FEATURES
+  stream : IN PARAMETER DataView::Data_Stream {
+    Taste::encoding => NATIVE;
+  };
+PROPERTIES
+  Taste::Associated_Queue_Size => 1;
+END PI_Write_to_Device;
+
+SUBPROGRAM IMPLEMENTATION PI_Write_to_Device.others
+PROPERTIES
+  Compute_Execution_Time => 0 ms .. 0 ms;
+END PI_Write_to_Device.others;
+
+SUBPROGRAM PI_Poll_Device
+PROPERTIES
+  Taste::Associated_Queue_Size => 1;
+END PI_Poll_Device;
+
+SUBPROGRAM IMPLEMENTATION PI_Poll_Device.others
+PROPERTIES
+  Compute_Execution_Time => 0 ms .. 0 ms;
+END PI_Poll_Device.others;
+
+SUBPROGRAM RI_Received_Data
+FEATURES
+  stream : IN PARAMETER DataView::Data_Stream {
+    Taste::encoding => NATIVE;
+  };
+END RI_Received_Data;
+
+SUBPROGRAM IMPLEMENTATION RI_Received_Data.others
+END RI_Received_Data.others;
+
+SYSTEM Air_Device
+FEATURES
+  PI_Write_to_Device : PROVIDES SUBPROGRAM ACCESS Air_Device::IV::Air_Device::PI_Write_to_Device.others {
+    Taste::coordinates => "79210 66295";
+    Taste::RCMoperationKind => sporadic;
+    Taste::RCMperiod => 500 ms;
+    Taste::Deadline => 0 ms;
+    Taste::InterfaceName => "Write_to_Device";
+  };
+  PI_Poll_Device : PROVIDES SUBPROGRAM ACCESS Air_Device::IV::Air_Device::PI_Poll_Device.others {
+    Taste::coordinates => "79210 76793";
+    Taste::RCMoperationKind => cyclic;
+    Taste::RCMperiod => 500 ms;
+    Taste::Deadline => 0 ms;
+    Taste::InterfaceName => "Poll_Device";
+  };
+  RI_Received_Data : REQUIRES SUBPROGRAM ACCESS Air_Device::IV::Air_Device::RI_Received_Data.others {
+    Taste::coordinates => "130390 69137";
+    Taste::RCMoperationKind => sporadic;
+    Taste::InterfaceName => "Received_Data";
+    Taste::labelInheritance => "false";
+  };
+PROPERTIES
+  Source_Language => (CPP);
+  Taste::Active_Interfaces => any;
+  Taste::is_Component_Type => true;
+END Air_Device;
+
+SYSTEM IMPLEMENTATION Air_Device.others
+SUBCOMPONENTS
+  device_config : DATA DataView::IOP_Device_Identifier {
+    Taste::FS_Default_Value => "eth: {n 0, ip {127, 0, 0, 1}, mac {0, 0, 0, 0, 0, 0}, routes {{route-ip {127,0,0,1}, route-mac {0,0,0,0,0,0}, route-port 5115}}}";
+  };
+END Air_Device.others;
+
+END Air_Device::IV::Air_Device;
+
+PACKAGE Air_Device::IV
+PUBLIC
+
+WITH Air_Device::IV::Air_Device;
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+SYSTEM Air_Device
+END Air_Device;
+
+SYSTEM IMPLEMENTATION Air_Device.others
+SUBCOMPONENTS
+  Air_Device : SYSTEM Air_Device::IV::Air_Device::Air_Device.others {
+    Taste::coordinates => "79210 62203 130390 105028";
+  };
+END Air_Device.others;
+
+PROPERTIES
+  Taste::version => "2.4";
+END Air_Device::IV;
+

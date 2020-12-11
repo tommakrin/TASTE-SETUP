@@ -1,0 +1,135 @@
+<Attrs>
+    <Attr name="name">
+        <Type>
+            <String defaultValue="AAAA" validator="[a-zA-Z0-9_]+"/>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="language">
+        <Scopes>
+            <Function/>
+        </Scopes>
+        <Type>
+            <Enumeration defaultValue="SDL">
+                <Entry value="Ada"/>
+                <Entry value="CPP"/>
+                <Entry value="C"/>
+                <Entry value="GUI"/>
+                <Entry value="SDL"/>
+                <Entry value="Simulink"/>
+                <Entry value="Blackbox_Device"/>
+                <Entry value="VHDL"/>
+            </Enumeration>
+        </Type>
+    </Attr>
+    <Attr name="is_type">
+        <Type>
+            <Enumeration>
+                <Entry value="YES"/>
+                <Entry value="NO"/>
+            </Enumeration>
+        </Type>
+        <Scopes>
+            <Function/>
+        </Scopes>
+    </Attr>
+    <Attr name="instance_of">
+        <Type>
+            <String validator="[a-zA-Z0-9_]+"/>
+        </Type>
+        <Scopes>
+            <Function>
+                <AttrValidator name="is_type" value="False"/>
+            </Function>
+        </Scopes>
+    </Attr>
+    <Attr name="kind">
+        <Scopes>
+            <Required_Interface/>
+            <Provided_Interface/>
+        </Scopes>
+        <Type>
+            <Enumeration>
+                <Entry value="Cyclic"/>
+                <Entry value="Sporadic"/>
+                <Entry value="Protected"/>
+                <Entry value="Unprotected"/>
+            </Enumeration>
+        </Type>
+    </Attr>
+    <Attr name="period">
+        <Type>
+            <String validator="\\d+"/>
+        </Type>
+        <Scopes>
+            <Required_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+            </Required_Interface>
+            <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr name="wcet">
+        <Type>
+            <String validator="\\d+"/>
+        </Type>
+        <Scopes>
+            <Required_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+            </Required_Interface>
+            <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr name="queue_size">
+        <Type>
+            <String validator="\\d+"/>
+        </Type>
+        <Scopes>
+            <Required_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+            </Required_Interface>
+            <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr name="Taste::coordinates" type="property" visible="false">
+        <Type>
+            <String validator="[0-9 ]+"/>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Taste::InnerCoordinates" type="property" visible="false">
+        <Type>
+            <String validator="[0-9 ]+"/>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr label="SomeLabel" name="Taste::RootCoordinates" type="property" visible="false">
+        <Type>
+            <String validator="[0-9 ]+"/>
+        </Type>
+        <Scopes>
+            <Function/>
+        </Scopes>
+    </Attr>
+    <Attr name="Taste::InheritPI" type="property">
+        <Type>
+            <Boolean/>
+        </Type>
+        <Scopes>
+            <Required_Interface/>
+        </Scopes>
+    </Attr>
+    <Attr name="Taste::Autonamed" type="property">
+        <Type>
+            <Boolean/>
+        </Type>
+        <Scopes>
+            <Required_Interface/>
+        </Scopes>
+    </Attr>
+</Attrs>

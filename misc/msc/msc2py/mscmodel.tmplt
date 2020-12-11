@@ -1,0 +1,68 @@
+{% comment %}
+this is just a comment in the template file?
+{% endcomment %}
+#!/usr/bin/env python3
+#
+# TASTE Automatically generated file...You may edit at will.
+# ----------------------------------------------------------------------------
+import os
+import sys
+import time
+import signal
+import queue
+from PySide2.QtCore                  import QCoreApplication, Qt
+# ----------------------------------------------------------------------------
+from asn1_value_editor.Scenario      import Scenario, PollerThread
+from asn1_value_editor.udpcontroller import tasteUDP
+# ----------------------------------------------------------------------------
+
+#  You may edit the scenario below or create new ones (@Scenario decorator)
+#  When you add new scenarios, they will all run in parallel.
+#
+#  You can use these three API functions to communicate with the main binary:
+#  (1) queue.sendMsg('Name of Provided Interface', 'Parameter')
+#          The parameters are expressed textually in ASN.1 Value Notation
+#          (also called GSER). For example a record's syntax is:
+#          { fieldName1 value1, fieldName2 value2 }
+#  (2) queue.expectMsg ('Name of RI',
+#                       'Parameter value in Extended ASN.1 format',
+#                       lineNo=optional line reference,
+#                       ignoreOther=True/False)
+#          Extended ASN.1 format lets you replace a field value with a star (*)
+#          meaning that you do not want the tool to check it against any
+#          specific value
+#          ignoreOther: set True if you want the tool to ignore other messages
+#                       and want to trigger an error only when you get this
+#                       message with the wrong parameters
+# (3) (msgId, val) = queue.getNextMsg(timeout=10)
+#      if msgId == 'Name of an interface':
+#          print 'The value is', val.fieldName.Get()
+# ----------------------------------------------------------------------------
+
+{% for document in model.documents %}
+    {% if forloop.first %}
+# First document
+        {% with model as mscModel %}
+            {% include "mscdocument.tmplt" %}
+        {% endwith %}
+# End of first document
+    {% else %}
+        # Next document
+        {% include "mscdocument.tmplt" %}
+    {% endif %}
+{% endfor %}
+{% for chart in model.charts %}
+    # Charts...
+    {% include "mscchart.tmplt" %}
+{% endfor %}
+
+
+# Entry point when scenario is executed from the command line
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    udpController = None
+    if '--udp' in sys.argv:
+        # Create UDP Controller with default IP/Port values (127.0.0.1:7755:7756)
+        udpController = tasteUDP()
+    QCoreApplication(sys.argv)
+    sys.exit(runScenario(udpController))

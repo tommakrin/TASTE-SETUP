@@ -1,6 +1,8 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. ${DIR}/common.sh
+
+# shellcheck source=common.sh
+. "${DIR}/common.sh"
 
 # Fetch and install latest AdaCore ARM release
 SIG=$(/usr/gnat/bin/arm-eabi-gcc -v 2>&1 | tail -1)
@@ -24,5 +26,4 @@ if [ "${SIG}" != "gcc version 6.3.1 20170510 (for GNAT GPL 2017 20170515) (GCC) 
 fi
 
 # Add to PATH
-PATH_CMD='export PATH=$PATH:'"/usr/gnat/bin"
-UpdatePATH
+UpdatePROFILE "export PATH=\$PATH:/usr/gnat/bin"

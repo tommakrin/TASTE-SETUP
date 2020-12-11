@@ -12,8 +12,6 @@ git checkout -f "${CI_COMMIT_BRANCH}"
 #echo y | ./add-ons/install-adac-hybrid-msp430.sh  || exit 1
 #echo y | ./add-ons/install-freertos.sh  || exit 1
 source ~/.bashrc.taste || echo "[-] Sourced new environment."
-echo "[-] On branch..."
-git branch -a
 cd kazoo 
 export PATH=$HOME/tool-inst/bin:$HOME/.local/bin:$HOME/tool-inst/share/asn1scc:$PATH
 export PATH=$HOME/tool-inst/share/kazoo:$PATH

@@ -1,0 +1,17 @@
+Context-air-device DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      IOP-Device-Identifier FROM AIR-IOP-DEVICE-DATAVIEW;
+
+--  Group all context parameters of this function in a record
+Context-air-device ::= SEQUENCE {
+   device-config IOP-Device-Identifier
+
+}
+
+--  Declare a constant with the values set by the user in the interface view
+air-device-ctxt Context-air-device ::= {
+   device-config eth: {n 0, ip {127, 0, 0, 1}, mac {0, 0, 0, 0, 0, 0}, routes {{route-ip {127,0,0,1}, route-mac {0,0,0,0,0,0}, route-port 5115}}}
+
+}
+END

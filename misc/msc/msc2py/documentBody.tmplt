@@ -1,0 +1,12 @@
+{% comment %}
+{% endcomment %}
+{% for declaration in document.declarations %}
+# {{ declaration.joinedNames }}{% if declaration.joinedTypeRefList != "" %} ({{ declaration.joinedTypeRefList }}){% endif %}
+{% endfor %}
+# ----------------------------------------------------------------------------
+{% for document in document.documents %}
+    {% include "mscdocument.tmplt" %}
+{% endfor %}
+{% for chart in document.charts %}
+    {% include "mscchart.tmplt" %}
+{% endfor %}
