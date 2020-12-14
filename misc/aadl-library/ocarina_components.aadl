@@ -2292,6 +2292,37 @@ with Cheddar_Properties;
 processor arm
 end arm;
 
+processor zynqzc706 extends arm
+properties
+    Deployment::Execution_Platform => ZYNQZC706_RTEMS;
+end zynqzc706;
+
+processor zynq_qemu extends arm
+properties
+    Deployment::Execution_Platform => ZYNQ_RTEMS_QEMU;
+end zynq_qemu;
+
+
+processor implementation zynqzc706.rtems_posix
+properties
+    Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+    Priority_Range => 0 .. 255;
+    Cheddar_Properties::Scheduler_Quantum => 0 Ms;
+    Cheddar_Properties::Preemptive_Scheduler => true;
+    -- for the moment it is reusing an RTEMS/LEON ExP while the proper target RTEMS/ARM ExP is still under build and test activities (this is only temporary and very shortly will be updated)
+    EnvVars => "RTEMS_MAKEFILE_PATH=/opt/rtems-5.1-2020.01.24/arm-rtems5/xilinx_zynq_zc706:CFLAGS=-DCONFIGURE_SMP_APPLICATION -DCONFIGURE_MAXIMUM_PROCESSORS=4";
+end zynqzc706.rtems_posix;
+
+processor implementation zynq_qemu.rtems_posix
+properties
+    Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+    Priority_Range => 0 .. 255;
+    Cheddar_Properties::Scheduler_Quantum => 0 Ms;
+    Cheddar_Properties::Preemptive_Scheduler => true;
+    EnvVars => "RTEMS_MAKEFILE_PATH=/opt/rtems-5.1-2020.01.24/arm-rtems5/xilinx_zynq_a9_qemu:CFLAGS=-DCONFIGURE_SMP_APPLICATION -DCONFIGURE_MAXIMUM_PROCESSORS=4:HWTARGET=ZYNQZC706";
+end zynq_qemu.rtems_posix;
+
+    
 processor crazyflie_v2 extends arm
 properties
    Deployment::Execution_Platform => GNAT_Runtime;
