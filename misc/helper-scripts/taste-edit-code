@@ -27,8 +27,20 @@ fi
 # Check if the project works with kazoo. If so, use the makefile rule to edit the code
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
+    # Text source code can be edited directly from within space creator
     cd work/"${2,,}"/"$1"
-    make edit
+    if [[ $1 == "C" ]]
+    then
+        qtcreator -client src/"${2,,}".c
+    elif [[ $1 == "Ada" ]]
+    then
+        qtcreator -client src/"${2,,}".adb
+    elif [[ $1 == "CPP" ]]
+    then
+        qtcreator -client src/"${2,,}".cc
+    else
+        make edit
+    fi
     exit 0
 else
     echo -e "${ERROR} Code skeleton generation failed"

@@ -59,7 +59,6 @@ FEATURES
       {% endif %}
 {% endfor %}
 {% for attr in iface.attributes %}
-      --  OK: {{ attr.name }} = {{ attr.value }}
       {% if attr.name == "kind" %}      
       Taste::RCMoperationKind => {{ attr.value|lower }};
       {% elif attr.name == "period" %}
@@ -86,6 +85,30 @@ PROPERTIES
 END {{ func.name }};
 
 SYSTEM IMPLEMENTATION {{ func.name }}.others
+{% if func.functions|length > 0 %}
+SUBCOMPONENTS
+   {% for func in func.functions %}
+   {{ func.name }} : SYSTEM interfaceview::IV::{{ func.path|join:"::" }}::{{ func.name }}.others;
+   {% endfor %}
+{% if func.connections|length > 0 %}
+CONNECTIONS
+   {% for conn in func.connections %}
+   {% if conn.siIsRequired %}
+   {{ conn.source }}_RI_{{ conn.siName }}_{{ conn.target }}_PI_{{ conn.tiName }} : SUBPROGRAM ACCESS RI_{{ conn.tiName }} -> {{ conn.source }}.RI_{{ conn.siName }} {
+   {% for prop in conn.properties %}
+      {{ prop.name }} => "{{ prop.value }}";
+   {% endfor %}
+   };
+   {% else %}
+   {{ conn.source }}_PI_{{ conn.siName }}_{{ conn.target }}_RI_{{ conn.tiName }} : SUBPROGRAM ACCESS {{ conn.target }}.PI_{{ conn.tiName }} -> PI_{{ conn.siName }} {
+   {% for prop in conn.properties %}
+      {{ prop.name }} => "{{ prop.value }}";
+   {% endfor %}
+   };
+   {% endif %}
+   {% endfor %}
+{% endif %}
+{% endif %}
 END {{ func.name }}.others;
 
 END interfaceview::IV::{{ func.path|join:"::" }};
