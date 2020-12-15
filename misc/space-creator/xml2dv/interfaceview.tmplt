@@ -32,7 +32,7 @@ PACKAGE deploymentview::DV
 PUBLIC
 
 {% for func in Functions %}
-WITH interfaceview::IV::{{ func.name }};
+{% include "function_with.tmplt" %}
 {% endfor %}
 
 WITH ocarina_processors_x86;
@@ -48,9 +48,7 @@ END Node_Linux;
 SYSTEM IMPLEMENTATION Node_Linux.others
 SUBCOMPONENTS
 {% for func in Functions %}
-   IV_{{ func.name }} : SYSTEM interfaceview::IV::{{ func.name }}::{{ func.name }}.others {
-      Taste::FunctionName => "{{ func.name }}";
-   };
+{% include "function_subcomponents.tmplt" %}
 {% endfor %}
    demo : PROCESS deploymentview::DV::Node_Linux::demo.others {
       Deployment::Port_Number => 0;
@@ -58,7 +56,7 @@ SUBCOMPONENTS
    x86_linux : PROCESSOR ocarina_processors_x86::x86.linux;
 PROPERTIES
 {% for func in Functions %}
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_{{ func.name }};
+{% include "function_properties.tmplt" %}
 {% endfor %}
    Actual_Processor_Binding => (reference (x86_linux)) APPLIES TO demo;
 END Node_Linux.others;
