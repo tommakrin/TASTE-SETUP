@@ -85,10 +85,15 @@ PROPERTIES
 END {{ func.name }};
 
 SYSTEM IMPLEMENTATION {{ func.name }}.others
-{% if func.functions|length > 0 %}
+{% if func.functions|length > 0  or func.contextParameters|length > 0 %}
 SUBCOMPONENTS
    {% for func in func.functions %}
    {{ func.name }} : SYSTEM interfaceview::IV::{{ func.path|join:"::" }}::{{ func.name }}.others;
+   {% endfor %}
+   {% for param in func.contextParameters %}
+   {{ param.name }} : DATA DataView::{{ param.type }} {
+      Taste::FS_Default_Value => "{{ param.defaultValue }}";
+   };
    {% endfor %}
 {% if func.connections|length > 0 %}
 CONNECTIONS
