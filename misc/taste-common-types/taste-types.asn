@@ -13,5 +13,7 @@ T-UInt8 ::= INTEGER (0 .. 255)
 
 T-Boolean ::= BOOLEAN
 
+T-Null-Record ::= SEQUENCE {}
+
 END
 
