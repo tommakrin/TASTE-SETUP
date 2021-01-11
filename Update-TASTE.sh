@@ -17,7 +17,7 @@ function banner()
     echo -e "${COLOROFF}"
 }
 
-if [ -z "GITLAB_CI" ] ; then
+if [ -z "$GITLAB_CI" ] ; then
     git pull || exit 1
     if [ -z "$1" -o "$1" == "--stable" ] ; then
         git submodule init || exit 1
