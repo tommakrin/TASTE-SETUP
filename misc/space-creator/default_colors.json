@@ -78,5 +78,13 @@
         "fill_type": 0,
         "pen_color": "#ff000000",
         "pen_width": 3
+    },
+    {
+        "brush_color0": "#ffcecece",
+        "brush_color1": "#ffffffff",
+        "color_type": 10,
+        "fill_type": 1,
+        "pen_color": "#ff000000",
+        "pen_width": 1
     }
 ]
