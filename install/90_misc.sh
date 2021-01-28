@@ -61,6 +61,11 @@ REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-linux/bin")
 PATH_CMD='export PATH=$PATH:'"${REAL_ELLIDISS}"
 UpdatePATH
 
+# 64-bits version
+REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-linux64/bin")
+PATH_CMD='export PATH='"${REAL_ELLIDISS}"':$PATH'
+UpdatePATH
+
 # Setup bash completion
 grep bash_completion $HOME/.bashrc.taste >/dev/null || {
     echo '. /etc/bash_completion' >> $HOME/.bashrc.taste
