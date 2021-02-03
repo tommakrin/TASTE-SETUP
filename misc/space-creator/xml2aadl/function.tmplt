@@ -80,6 +80,8 @@ PROPERTIES
 {% for attr in func.attributes %}
    {% if attr.name == "language" %}
    Source_Language => ({{ attr.value }});
+   {% elif attr.name == "is_type" %}
+   TASTE::Is_Component_Type => {% if attr.value == "YES" %}true{% else %}false{% endif %};
    {% endif %}
 {% endfor %}
 END {{ func.name }};
