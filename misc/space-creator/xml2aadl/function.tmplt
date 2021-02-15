@@ -103,21 +103,13 @@ SUBCOMPONENTS
    {% endfor %}
 {% if func.connections|length > 0 %}
 CONNECTIONS
-   {% for conn in func.connections %}
-   {% if conn.siIsRequired %}
-   {{ conn.source }}_RI_{{ conn.siName }}_{{ conn.target }}_PI_{{ conn.tiName }} : SUBPROGRAM ACCESS RI_{{ conn.tiName }} -> {{ conn.source }}.RI_{{ conn.siName }} {
-   {% for prop in conn.properties %}
-      {{ prop.name }} => "{{ prop.value }}";
-   {% endfor %}
-   };
-   {% else %}
-   {{ conn.source }}_PI_{{ conn.siName }}_{{ conn.target }}_RI_{{ conn.tiName }} : SUBPROGRAM ACCESS {{ conn.target }}.PI_{{ conn.tiName }} -> PI_{{ conn.siName }} {
-   {% for prop in conn.properties %}
-      {{ prop.name }} => "{{ prop.value }}";
-   {% endfor %}
-   };
-   {% endif %}
-   {% endfor %}
+{% for conn in func.connections %}
+ {% if conn.siIsRequired %}
+   {{ conn.source }}_RI_{{ conn.siName }}_{{ conn.target }}_PI_{{ conn.tiName }} : SUBPROGRAM ACCESS {% if conn.target != func.name %}{{ conn.target }}.PI_{% else %}RI_{% endif %}{{ conn.tiName }} -> {{ conn.source }}.RI_{{ conn.siName }};
+ {% else %}
+   {{ conn.source }}_PI_{{ conn.siName }}_{{ conn.target }}_RI_{{ conn.tiName }} : SUBPROGRAM ACCESS {{ conn.target }}.PI_{{ conn.tiName }} -> {% if conn.source != func.name %}{{ conn.source }}.RI_{% else %}PI_{% endif %}{{ conn.siName }};
+ {% endif %}
+{% endfor %}
 {% endif %}
 {% endif %}
 END {{ func.name }}.others;
