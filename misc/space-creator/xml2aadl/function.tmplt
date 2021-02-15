@@ -54,6 +54,10 @@ FEATURES
       Taste::labelInheritance => "{{ ifprop.value }}";
       {% elif ifprop.name == "Taste::Autonamed" %}
       --  {{ ifprop.name }} => "{{ ifprop.value }}";
+      {% elif ifprop.name == "Taste::InnerCoordinates" %}
+      --  Ignored InnerCoordinates (unknown TASTE property)
+      {% elif ifprop.name == "Taste::RootCoordinates" %}
+      --  Ignored RootCoordinates (unknown TASTE property)
       {% else %}
       {{ ifprop.name }} => "{{ ifprop.value }}";
       {% endif %}

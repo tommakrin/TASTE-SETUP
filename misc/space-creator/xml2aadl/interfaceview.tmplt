@@ -37,12 +37,15 @@ SUBCOMPONENTS
 {% if attr.name == "name" %}
   {{ attr.value }} : SYSTEM interfaceview::IV::{{ attr.value }}::{{ attr.value }}.others {
     {% for prop in func.properties %}
+     {% if prop.name != "Taste::RootCoordinates" %}
      {{ prop.name }} => "{{ prop.value }}";
+     {% endif %}
     {% endfor %}
   };
 {% endif %}
 {% endfor %}
 {% endfor %}
+{% if Connections|length > 0 %}
 CONNECTIONS
 {% for conn in Connections %}
    {{ conn.source }}_RI_{{ conn.siName }}_{{ conn.target }}_PI_{{ conn.tiName }} : SUBPROGRAM ACCESS {{ conn.target }}.PI_{{ conn.tiName }} -> {{ conn.source }}.RI_{{ conn.siName }} {
@@ -51,6 +54,7 @@ CONNECTIONS
    {% endfor %}
    };
 {% endfor %}
+{% endif %}
 END interfaceview.others;
 
 PROPERTIES
