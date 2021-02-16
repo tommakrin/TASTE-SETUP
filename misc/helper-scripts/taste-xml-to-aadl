@@ -36,7 +36,7 @@ fi
 # TODO: We should extract the list of ASN.1 and ACN files from the .pro file
 taste-update-data-view *.asn || exit 1
 
-if [ interfaceview.xml -nt InterfaceView.aadl ]
+if [[ interfaceview.xml -nt InterfaceView.aadl || ! -f work/skeletons_built ]]
 then
     # Interface view was updated since the last generation of the AADL file
     aadlconverter -o interfaceview.xml -t $(taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x InterfaceView.aadl || exit 1
@@ -55,7 +55,7 @@ then
     then
         make skeletons || exit 1
     else
-        echo -e "${INFO} Initializing Kazoo project file (TODO)"
+        echo -e "${INFO} Initializing Kazoo project file"
         taste init
         make skeletons || exit 1
     fi
