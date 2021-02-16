@@ -62,8 +62,10 @@ fi
 
 # Define strings to create Spacecrator's .pro.user config file:
 BUILD_DIRECTORY=$(pwd)
-UUID1=$(uuidgen)
-UUID2=$(uuidgen)
+# The UUID are not random, they relate to the version of Qt creator
+UUID1="6eae5ecd-6091-4f71-a6c8-6f8e9ff98645"
+UUID2="a16b9b9f-26ff-440d-8ea6-d1346fe4c67e"
+
 #  Create the main Makefile
 echo "KAZOO?=kazoo
 # Here you can specify custom compiler/linker flags, and add folders containing
