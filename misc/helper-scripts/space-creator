@@ -1,0 +1,175 @@
+#!/bin/bash
+if [ -t 1 ] ; then
+    COLORON="\e[1m\e[32m"
+    REDCOLORON="\e[1m\e[31m"
+    COLOROFF="\e[0m"
+else
+    COLORON=""
+    REDCOLORON=""
+    COLOROFF=""
+fi
+echo -e "Welcome to ${COLORON}TASTE${COLOROFF}"
+
+INFO="${COLORON}[INFO]${COLOROFF}"
+ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
+
+
+run_qt_creator () {
+    echo -e "${INFO} Running Space Creator with $1"
+    qtcreator $1 interfaceview.xml
+
+}
+# To determine if we are in an existing project folder
+PROJECT_FILE=$(find *.pro 2>/dev/null)
+
+# If the project file already exist, directly run qtcreator
+if [ -f "$PROJECT_FILE" ]
+then
+    run_qt_creator $PROJECT_FILE
+    exit $?
+fi
+
+# New project: was the script called with "init" ( = don't run any gui just setup the project files)
+if [ "$1" == "init" ]
+then
+   # With "init", a folder (project name) should be given as parameter
+   new_folder="$2"
+else
+   # New project, interactive session: prompt user for project name
+   echo -e "${INFO} A new TASTE Space Creator project folder will be created (use Ctrl-C to cancel)"
+   read -p "Please enter a name for the new project folder: " new_folder
+fi
+
+if [ "$new_folder" != "" ]
+then
+    if [ -d "$new_folder" ]
+    then
+        echo -e "${ERROR} Aborting - a folder with that name already exists"
+        exit 1
+    else
+        mkdir "$new_folder"
+        cd "$new_folder"
+        touch InterfaceView.aadl
+        PROJECT_FILE="$new_folder".pro
+        PROJECT_NAME="$new_folder"
+    fi
+else
+    # If no project name is given, use a default name
+    new_folder=.
+    PROJECT_FILE=taste_project.pro
+    PROJECT_NAME=taste_project
+fi
+
+# Define strings to create Spacecrator's .pro.user config file:
+BUILD_DIRECTORY=$(pwd)
+UUID1=$(uuidgen)
+UUID2=$(uuidgen)
+#  Create the main Makefile
+echo "KAZOO?=kazoo
+# Here you can specify custom compiler/linker flags, and add folders containing
+# external code you want to compile and link for a specific partition.
+# Use upper case for the partition name:
+# export <PARTITIONNAME>_USER_CFLAGS=...
+# export <PARTITIONNAME>_USER_LDFLAGS=...
+# export <PARTITIONNAME>_EXTERNAL_SOURCE_PATH=
+
+# Get the list of ASN.1 files from Space Creator project file:
+DISTFILES=\$(shell qmake $PROJECT_FILE -o /tmp/null 2>&1)
+ASN1_FILES=\$(shell find \${DISTFILES} 2>/dev/null | egrep '\.asn\$\$|\.asn1\$\$')
+
+all:	c
+
+c:	work/glue_built
+	\$(MAKE) -C work
+
+# Simulation target (experimental)
+simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+	\$(KAZOO) -t SIMU --glue --gw
+	\$(MAKE) -C work
+
+skeletons:
+	\$(MAKE) work/skeletons_built
+
+work/skeletons_built:	InterfaceView.aadl DataView.aadl
+	\$(KAZOO) --gw -o work
+	\$(MAKE) -C work dataview
+	touch \$@
+
+work/glue_built:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+	\$(KAZOO) -p --glue --gw -o work
+	touch \$@
+
+InterfaceView.aadl:	interfaceview.xml
+	aadlconverter -o \$^ -t \$(taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
+
+DeploymentView.aadl:	interfaceview.xml
+	# Create/update a deployment view for Linux target (to be removed when we have a DV editor)
+	aadlconverter -o \$^ -t \$(taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
+
+DataView.aadl: \${ASN1_FILES}
+	taste-update-data-view \$^
+
+clean:
+	rm -rf work/build
+	rm -f work/glue_built work/skeletons_built
+	find work -type d -name \"wrappers\" -exec rm -rf {} +
+	find work -type d -name \"*_GUI\" -exec rm -rf {} +
+
+.PHONY: clean skeletons c simu
+" > Makefile
+
+# Create Space Creator's project file
+# the message($$DISTFILE) is used to display on screen the list
+# of project files (to get the list of ASN.1 files for taste-update-dataview)
+echo "TEMPLATE = lib
+CONFIG -= qt
+CONFIG += generateC
+
+DISTFILES += DataView.asn
+DISTFILES += DataView.acn
+DISTFILES += $PROJECT_NAME.msc
+DISTFILES += interfaceview.xml
+#include(handleAsn1AcnBuild.pri)
+include(work/taste.pro)
+message(\$\$DISTFILES)
+" > $PROJECT_FILE
+
+# Create a default interface view
+echo '<InterfaceView asn1file="DataView.asn">
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+</InterfaceView>' > interfaceview.xml
+
+# Create default work folder
+mkdir -p work
+touch work/taste.pro
+
+# Create empty MSC file
+touch $PROJECT_NAME.msc
+
+# Create Qt Creator's XML Configuration file
+cp -f $(taste-config --prefix)/bin/space_creator_config.xml $PROJECT_FILE.user
+sed -i "s,BUILD_DIRECTORY,$BUILD_DIRECTORY," $PROJECT_FILE.user
+sed -i "s/UUID1/$UUID1/" $PROJECT_FILE.user
+sed -i "s/UUID2/$UUID2/" $PROJECT_FILE.user
+
+# Create mandatory ConcurrencyView_Properties.aadl for kazoo
+if [ ! -f ConcurrencyView_Properties.aadl ]
+then
+    touch ConcurrencyView_Properties.aadl
+fi
+
+# Create a default data view
+echo -e "${INFO} Creating a default ASN.1 data model."
+NONINTERACTIVE=1 taste-create-data-view
+
+
+if [ "$1" == "init" ]
+then
+    echo -e "${INFO} Done. You can run 'space-creator' from the project folder to open the editor"
+    echo -e "${INFO} 'make skeletons' to create the skeletons or just 'make' to build everything."
+else
+    run_qt_creator $PROJECT_FILE
+fi
