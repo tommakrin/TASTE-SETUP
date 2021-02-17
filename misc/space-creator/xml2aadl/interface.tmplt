@@ -31,11 +31,11 @@ SUBPROGRAM RI_{{ name }}
 FEATURES
 {% for param in iface.params %}
 {% if param.isIn %}
-    {{ param.name }} : IN PARAMETER DataView::{{ param.type }} {
+    {{ param.underscoredName }} : IN PARAMETER DataView::{{ param.underscoredType }} {
        Taste::encoding => {{ param.encoding }};
     };
 {% else %}
-    {{ param.name }} : OUT PARAMETER DataView::{{ param.type }} {
+    {{ param.underscoredName }} : OUT PARAMETER DataView::{{ param.underscoredType }} {
        Taste::encoding => {{ param.encoding }};
     };
 {% endif %}

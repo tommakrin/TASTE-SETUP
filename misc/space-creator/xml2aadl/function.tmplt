@@ -97,7 +97,7 @@ SUBCOMPONENTS
    {{ func.name }} : SYSTEM interfaceview::IV::{{ func.path|join:"::" }}::{{ func.name }}.others;
    {% endfor %}
    {% for param in func.contextParameters %}
-   {{ param.name }} : DATA DataView::{{ param.type }} {
+   {{ param.underscoredName }} : DATA DataView::{{ param.underscoredType }} {
       Taste::FS_Default_Value => "{{ param.defaultValue }}";
    };
    {% endfor %}
