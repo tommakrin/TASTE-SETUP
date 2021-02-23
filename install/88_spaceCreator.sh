@@ -26,13 +26,13 @@ mkdir -p ~/.local/share/QtProject/QtCreator/contextMenu || exit 1
 cp -u misc/space-creator/default_colors.json ~/.local/share/qtcreator/colors/default_colors.json  || exit 1
 cp -u misc/space-creator/contextmenu.json ~/.local/share/QtProject/QtCreator/contextMenu/ || exit 1
 cp -u misc/space-creator/default_attributes.xml ~/.local/share/QtProject/QtCreator/ || exit 1
-echo "Installing Syntax Highlighting files for Qt Creator"
+#echo "Installing Syntax Highlighting files for Qt Creator"
 # The "fallback" folder of Qt Creator may be either Kate or Qt Creator's install folder, depending on
 # the machine setup. We put the files in both locations to be sure it works everywhere
-cp -u /usr/share/kde4/apps/katepart/syntax/ada.xml ~/.config/QtProject/qtcreator/generic-highlighter
-sudo cp -u /usr/share/kde4/apps/katepart/syntax/ada.xml /usr/share/qtcreator/generic-highlighter
+#cp   -f -u /usr/share/kde4/apps/katepart/syntax/ada.xml ~/.config/QtProject/qtcreator/generic-highlighter
+#sudo cp -f -u /usr/share/kde4/apps/katepart/syntax/ada.xml /usr/share/qtcreator/generic-highlighter
 cp -u misc/space-creator/syntax/*  ~/.config/QtProject/qtcreator/generic-highlighter
-sudo cp -u misc/space-creator/syntax/* /usr/share/kde4/apps/katepart/syntax
+#sudo cp -u misc/space-creator/syntax/* /usr/share/kde4/apps/katepart/syntax
 
 
 
