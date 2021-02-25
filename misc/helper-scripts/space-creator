@@ -64,7 +64,9 @@ fi
 BUILD_DIRECTORY=$(pwd)
 # The UUID are not random, they relate to the version of Qt creator
 UUID1="6eae5ecd-6091-4f71-a6c8-6f8e9ff98645"
-UUID2="a16b9b9f-26ff-440d-8ea6-d1346fe4c67e"
+UUID1="3b50e4cf-621c-4917-bd95-57e41dc64b6f"
+#UUID2="a16b9b9f-26ff-440d-8ea6-d1346fe4c67e"
+UUID2="ce6e1740-b935-4eef-b343-b1dd3ac64d5d"
 
 #  Create the main Makefile
 echo "KAZOO?=kazoo
@@ -149,7 +151,18 @@ mkdir -p work
 touch work/taste.pro
 
 # Create empty MSC file
-touch $PROJECT_NAME.msc
+echo "mscdocument $PROJECT_NAME /* MSC AND */;
+    language ASN.1;
+    data DataView.asn;
+
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+
+mscdocument Nominal /* MSC LEAF */;
+
+msc $PROJECT_NAME;
+endmsc;
+endmscdocument;
+endmscdocument;" > $PROJECT_NAME.msc
 
 # Create Qt Creator's XML Configuration file
 cp -f $(taste-config --prefix)/bin/space_creator_config.xml $PROJECT_FILE.user
