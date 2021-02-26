@@ -105,7 +105,11 @@ fi
 
 # cp $(taste-config --prefix)/share/taste-types/taste-types.asn .
 
-taste-update-data-view
+if [ -z $ONLY_ASN ]
+then
+    # Optionally convert to AADL
+    taste-update-data-view
+fi
 
 if [ -z $NONINTERACTIVE ]
 then

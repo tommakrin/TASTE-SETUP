@@ -176,9 +176,13 @@ then
     touch ConcurrencyView_Properties.aadl
 fi
 
-# Create a default data view
+# Create a default data view (use pre-made DataView.aadl to speed up)
 echo -e "${INFO} Creating a default ASN.1 data model."
-NONINTERACTIVE=1 taste-create-data-view
+cp -f $(taste-config --prefix)/bin/space-creator-dataview.aadl DataView.aadl
+sed -i "s/MD5ACN/$MD5ACN/" DataView.aadl
+sed -i "s/MD5ASN/$MD5ASN/" DataView.aadl
+sed -i "s/PROJECTNAME/$PROJECT_NAME/" DataView.aadl
+NONINTERACTIVE=1 ONLY_ASN=1 taste-create-data-view
 
 
 if [ "$1" == "init" ]
