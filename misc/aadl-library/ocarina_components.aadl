@@ -2426,6 +2426,20 @@ end n2x_core;
 virtual processor implementation n2x_core.generic
 end n2x_core.generic;
 
+virtual processor leon3_core
+end leon3_core;
+
+virtual processor implementation leon3_core.generic
+end leon3_core.generic;
+
+processor implementation leon3.AIR
+subcomponents
+    Core_1 : virtual processor leon3_core.generic { Processor_Properties::Core_Id => 0;};
+    Core_2 : virtual processor leon3_core.generic { Processor_Properties::Core_Id => 1;};
+properties
+   Deployment::Execution_Platform => AIR;
+end leon3.AIR;
+
 processor implementation n2x.rtems51_posix
 subcomponents
     Core_1 : virtual processor n2x_core.generic { Processor_Properties::Core_Id => 0;};
