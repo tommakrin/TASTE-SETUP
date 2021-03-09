@@ -15,9 +15,9 @@ def install_gr740_rtems51_posix():
     """ $ $HOME/tool-src/install/85_rtems.sh """
     os.system("xterm -e $HOME/tool-src/install/85_rtems.sh")
 
-def install_gr740_rcc13rc4_posix():
-    """ $ $HOME/tool-src/add-ons/install-gaisler-rcc-1.3-rc4.sh """
-    os.system("xterm -e $HOME/tool-src/add-ons/install-gaisler-rcc-1.3-rc4.sh")
+def install_gr740_rcc13rc9_posix():
+    """ $ $HOME/tool-src/add-ons/install-gaisler-rcc-1.3-rc9.sh """
+    os.system("xterm -e $HOME/tool-src/add-ons/install-gaisler-rcc-1.3-rc9.sh")
 
 def install_msp430_gcc_freertos():
     """$HOME/tool-src/add-ons/install-msp430-gcc.sh
@@ -25,17 +25,21 @@ $HOME/tool-src/add-ons/install-freertos.sh"""
     os.system("xterm -e $HOME/tool-src/add-ons/install-msp430-gcc.sh")
     os.system("xterm -e $HOME/tool-src/add-ons/install-freertos.sh")
 
+def install_gnat2020_arm():
+    """ $ $HOME/tool-src/add-ons/install-gnat2020-for-arm.sh """
+    os.system("xterm -e $HOME/tool-src/add-ons/install-gnat2020-for-arm.sh")
+
 def check_gr740_rtems410_gaisler_posix():
     if not os.path.isdir("/opt/rtems-4.10"):
         raise NotImplementedError(install_gr740_rtems410_gaisler_posix)
 
 def check_gr740_rtems51_posix():
-    if not os.path.isdir("/opt/rtems-5.1-2018.03.08"):
+    if not os.path.isdir("/opt/rtems-5.1-2019.07.25"):
         raise NotImplementedError(install_gr740_rtems51_posix)
 
-def check_gr740_rcc13rc4_posix():
-    if not os.path.isdir("/opt/rcc-1.3-rc4"):
-        raise NotImplementedError(install_gr740_rcc13rc4_posix)
+def check_gr740_rcc13rc9_posix():
+    if not os.path.isdir("/opt/rcc-1.3-rc9"):
+        raise NotImplementedError(install_gr740_rcc13rc9_posix)
 
 def check_msp430_freertos():
     if not os.path.isdir("/opt/msp430-gcc"):
@@ -43,25 +47,28 @@ def check_msp430_freertos():
     if not os.path.isdir("/opt/FreeRTOSv10.2.1"):
         raise NotImplementedError()
 
+def check_gnat2020_arm():
+    if not os.path.isdir("/opt/GNAT/gnat-arm-2020/bin/"):
+        raise NotImplementedError(install_gnat2020_arm)
+
 # When editing, replace dot (.) with underscore (_)
 # the TASTE GUI mixes them up if there is more than one underscore
-PLATFORMS = { "crazyflie_v2_gnat"      : lambda: True,
-              "stm32f4_discovery_gnat" : lambda: True,
-              "leon_rtems_posix"       : lambda: True,
-              "leon2_rtems412_posix"   : lambda: True,
-              "leon3_rtems412_posix"   : lambda: True,
-              "gr712_rtems412_posix"   : lambda: True,
-              "gr740_rtems412_posix"   : lambda: True,
-              "gr740_rtems51_posix"    :
-                  check_gr740_rtems51_posix,
-              "gr740_rtems410_gaisler_posix" :
-                  check_gr740_rtems410_gaisler_posix,
-              "gr740_rcc13rc4_posix"   :
-                  check_gr740_rcc13rc4_posix,
-              "x86_linux"              : lambda: True,
-              "x86_win32"              : lambda: True,
-              "msp430fr5969_freertos"  :
-                  check_msp430_freertos
+PLATFORMS = { "crazyflie_v2_gnat"            : lambda: True,
+              "stm32f4_discovery_gnat"       : lambda: True,
+              "leon_rtems_posix"             : lambda: True,
+              "leon2_rtems412_posix"         : lambda: True,
+              "leon3_rtems412_posix"         : lambda: True,
+              "gr712_rtems412_posix"         : lambda: True,
+              "gr740_rtems412_posix"         : lambda: True,
+              "leon3_air"                    : check_gr740_rtems51_posix,
+              "stm32f407_discovery_gnat2020" : check_gnat2020_arm,
+              "stm32f429_discovery_gnat2020" : check_gnat2020_arm,
+              "gr740_rtems51_posix"          : check_gr740_rtems51_posix,
+              "gr740_rtems410_gaisler_posix" : check_gr740_rtems410_gaisler_posix,
+              "gr740_rcc13rc6_posix"         : check_gr740_rcc13rc9_posix,
+              "x86_linux"                    : lambda: True,
+              "x86_win32"                    : lambda: True,
+              "msp430fr5969_freertos"        : check_msp430_freertos
              }
 
 def query_user(platform):
