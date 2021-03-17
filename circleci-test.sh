@@ -2,6 +2,7 @@
 export TASTE_IN_DOCKER=1 
 export CIRCLECI 
 export CI
+
 rm -rf artifacts
 mkdir artifacts
 docker run \
