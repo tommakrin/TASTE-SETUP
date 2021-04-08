@@ -92,6 +92,11 @@ clean:
 
 .PHONY: clean skeletons c simu
 ' > Makefile
+    # Create mandatory ConcurrencyView_Properties.aadl for kazoo
+    if [ ! -f ConcurrencyView_Properties.aadl ]
+    then
+        touch ConcurrencyView_Properties.aadl
+    fi
     # If there is already a dataview, use it, otherwise create one
     if [ ! -f DataView.aadl ]
     then

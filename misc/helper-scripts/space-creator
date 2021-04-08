@@ -104,11 +104,11 @@ work/glue_built:	InterfaceView.aadl DeploymentView.aadl DataView.aadl Concurrenc
 	touch \$@
 
 InterfaceView.aadl:	interfaceview.xml
-	aadlconverter -o \$^ -t \$(taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
+	aadlconverter -o \$^ -t \$(shell taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
 
 DeploymentView.aadl:	interfaceview.xml
 	# Create/update a deployment view for Linux target (to be removed when we have a DV editor)
-	aadlconverter -o \$^ -t \$(taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
+	aadlconverter -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
 
 DataView.aadl: \${ASN1_FILES}
 	taste-update-data-view \$^
