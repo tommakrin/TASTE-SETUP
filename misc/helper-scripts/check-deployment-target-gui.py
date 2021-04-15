@@ -29,6 +29,14 @@ def install_gnat2020_arm():
     """ $ $HOME/tool-src/add-ons/install-gnat2020-for-arm.sh """
     os.system("xterm -e $HOME/tool-src/add-ons/install-gnat2020-for-arm.sh")
 
+def install_rpi_posix():
+    """$ sudo apt install gcc-arm-linux-gnueabihf"""
+    os.system("xterm -e sudo apt install -y gcc-arm-linux-gnueabihf")
+
+def check_rpi_posix():
+    if not os.path.isfile("/usr/bin/arm-linux-gnueabihf-gcc"):
+        raise NotImplementedError(install_rpi_posix)
+
 def check_gr740_rtems410_gaisler_posix():
     if not os.path.isdir("/opt/rtems-4.10"):
         raise NotImplementedError(install_gr740_rtems410_gaisler_posix)
@@ -60,6 +68,7 @@ PLATFORMS = { "crazyflie_v2_gnat"            : lambda: True,
               "leon3_rtems412_posix"         : lambda: True,
               "gr712_rtems412_posix"         : lambda: True,
               "gr740_rtems412_posix"         : lambda: True,
+              "rpi_posix"                    : check_rpi_posix,
               "leon3_AIR"                    : check_gr740_rtems51_posix,
               "stm32f407_discovery_gnat2020" : check_gnat2020_arm,
               "stm32f429_discovery_gnat2020" : check_gnat2020_arm,
