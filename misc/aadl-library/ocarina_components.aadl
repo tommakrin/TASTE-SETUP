@@ -2292,6 +2292,20 @@ with Cheddar_Properties;
 processor arm
 end arm;
 
+processor rpi extends arm
+properties
+   Deployment::Execution_Platform => RPI;
+end rpi;
+
+processor implementation rpi.posix
+properties
+   Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+   Priority_Range => 0 .. 139;
+   Cheddar_Properties::Scheduler_Quantum => 0 Ms;
+   Cheddar_Properties::Preemptive_Scheduler => true;
+end rpi.posix;
+
+
 processor zynqzc706 extends arm
 properties
     Deployment::Execution_Platform => ZYNQZC706_RTEMS;
