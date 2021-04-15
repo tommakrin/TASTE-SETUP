@@ -32,8 +32,9 @@ if [ -z "$GITLAB_CI" ] ; then
         done
     fi
 else
-    git submodule init || exit 1
-    git submodule update || exit 1
+    echo 'Updating TASTE in the CI container'
+    #git submodule init || exit 1
+    #git submodule update || exit 1
 fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export DISABLE_TASTE_BANNER=1

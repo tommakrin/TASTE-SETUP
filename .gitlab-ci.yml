@@ -2,7 +2,7 @@
 image: taste-buster:latest
 
 variables:
-  GIT_SUBMODULE_STRATEGY: normal
+  GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
   - build
