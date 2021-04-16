@@ -5,8 +5,8 @@ set -e
 export GIT_SSL_NO_VERIFY=true 
 export TASTE_IN_DOCKER=1
 rm -rf *
-git fetch
-git checkout -f "${CI_COMMIT_SHA}" 
+git fetch || exit 1
+git checkout -f "${CI_COMMIT_SHA}" || exit 1
 git submodule init || exit 1
 git submodule update || exit 1
 ./Update-TASTE.sh
