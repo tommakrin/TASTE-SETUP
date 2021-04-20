@@ -31,7 +31,7 @@ def install_gnat2020_arm():
 
 def install_rpi_posix():
     """$ sudo apt install gcc-arm-linux-gnueabihf"""
-    os.system("xterm -e sudo apt install -y gcc-arm-linux-gnueabihf")
+    os.system("xterm -e sudo apt install -y gcc-arm-linux-gnueabihf gnat-8-arm-linux-gnueabihf")
 
 def check_rpi_posix():
     if not os.path.isfile("/usr/bin/arm-linux-gnueabihf-gcc"):
