@@ -29,6 +29,13 @@ cp peek-poke/PeekPoke.glade ${PREFIX}/share/peekpoke/PeekPoke.glade || exit 1
 # Shared function types
 cp -ru SharedTypes ${PREFIX}/share/
 
+# msc templates for Space Creator (to convert MSC to Python)
+cp -ru msc ${PREFIX}/share
+
+# Space creator templates to convert XML to AADL
+cp -ru space-creator/xml2aadl ${PREFIX}/share
+cp -ru space-creator/xml2dv ${PREFIX}/share
+
 # Helper scripts
 cp -a helper-scripts/* ${PREFIX}/bin/
 
@@ -52,6 +59,11 @@ UpdatePATH
 
 REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-linux/bin")
 PATH_CMD='export PATH=$PATH:'"${REAL_ELLIDISS}"
+UpdatePATH
+
+# 64-bits version
+REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-linux64/bin")
+PATH_CMD='export PATH='"${REAL_ELLIDISS}"':$PATH'
 UpdatePATH
 
 # Setup bash completion

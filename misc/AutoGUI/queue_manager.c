@@ -39,6 +39,8 @@ typedef struct tagQinfo {
 Qinfo qinfo[MAX_POSSIBLE_QUEUES];
 int qinfoIdx = 0;
 
+int isApythonQ(mqd_t q);
+
 int isApythonQ(mqd_t q)
 {
     int i=0;
@@ -48,6 +50,8 @@ int isApythonQ(mqd_t q)
     }
     return 0;
 }
+
+char *nameOfQ(mqd_t q);
 
 char *nameOfQ(mqd_t q)
 {
@@ -73,6 +77,8 @@ typedef struct
 // Internal functions definition
 //
 
+void build_full_queue_name(char* queue_name, char* full_queue_name);
+
 void build_full_queue_name(char* queue_name, char* full_queue_name)
 { 
     // Reset name  
@@ -87,6 +93,8 @@ void build_full_queue_name(char* queue_name, char* full_queue_name)
 //
 // External functions definition
 //
+
+void checkMQsize(void);
 
 void checkMQsize(void)
 {
@@ -329,6 +337,8 @@ int write_message_to_queue(mqd_t queue_id, long message_data_length, void* messa
     free(p_full_message);
     return(0);
 }
+
+int common(char* queue_name, mqd_t* queue_id, int forWrite);
 
 int common(char* queue_name, mqd_t* queue_id, int forWrite)
 {

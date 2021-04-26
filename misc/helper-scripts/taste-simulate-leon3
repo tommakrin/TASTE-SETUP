@@ -84,13 +84,14 @@ fi
 #
 # </rant>
 if [ $(uname -m) == "x86_64" ] ; then
-    cd /usr/lib/python3.5
+    cd /usr/lib/python3.5 > /dev/null
     if [ ! -h _sysconfigdata_m.py ] ; then
         sudo ln -s plat-x86_64-linux-gnu/_sysconfigdata_m.py
     fi
-    cd -
+    cd - > /dev/null
 fi
 
 # Now, finally, launch GDB
 echo -en "tar sim -leon3 -m 4\nload \"$@\"\nrun\nquit\n" | \
-    /opt/rtems-5.1-2019.07.25/bin/sparc-rtems5-gdb "$@"
+    /opt/rtems-5.1-2019.07.25/bin/sparc-rtems5-gdb "$@" |& \
+    sed -u '1,/Starting program/d'

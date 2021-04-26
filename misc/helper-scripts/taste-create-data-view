@@ -43,9 +43,8 @@ else
     fi
     echo "${ASN1_MODULE} DEFINITIONS ::=
 BEGIN
-IMPORTS T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean FROM TASTE-BasicTypes;
 
-   My-Integer ::= INTEGER (3 .. 1415)
+   MyInteger ::= INTEGER (0 .. 10000)
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase
@@ -106,7 +105,11 @@ fi
 
 # cp $(taste-config --prefix)/share/taste-types/taste-types.asn .
 
-taste-update-data-view
+if [ -z $ONLY_ASN ]
+then
+    # Optionally convert to AADL
+    taste-update-data-view
+fi
 
 if [ -z $NONINTERACTIVE ]
 then
