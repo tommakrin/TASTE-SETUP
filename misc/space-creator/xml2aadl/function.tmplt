@@ -100,6 +100,10 @@ PROPERTIES
    Source_Language => ({{ attr.value }});
    {% elif attr.name == "is_type" %}
    TASTE::Is_Component_Type => {% if attr.value == "YES" %}true{% else %}false{% endif %};
+   {% elif attr.name == "instance_of" %}
+   TASTE_IV_Properties::is_instance_of => "{{ attr.value }}";
+   {% else %}
+   -- unsupported property found: name: "{{ attr.name }}"  value: "{{ attr.value }}"
    {% endif %}
 {% endfor %}
 END {{ func.name }};
