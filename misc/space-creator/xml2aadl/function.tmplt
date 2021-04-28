@@ -59,7 +59,17 @@ FEATURES
    The following works only because there is no multicast, otherwise it would repeat the same RI name multiple times
    In case of multiple RI->one PI connection there should be a different name for the RI here
 {% endcomment %}
+{% comment %}
+   for the RI there are two possible names, either PI_.. if it is a connected RI, or RI_ if it is a function type
+   we have to iterate over the function attributes to determine it..
+{% endcomment %}
+{% for attr in func.attributes %}
+   {% if attr.name == "is_type" and attr.value == "YES" %}
+   RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}RI_{{ endpoint|last }}.others {
+   {% elif attr.name == "is_type" and attr.value == "NO" %}
    RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
+   {% endif %}
+{% endfor %}
 {% endfor %}
 {% endif %}
 {% for ifprop in iface.properties %}
@@ -100,7 +110,7 @@ PROPERTIES
    Source_Language => ({{ attr.value }});
    {% elif attr.name == "is_type" %}
    TASTE::Is_Component_Type => {% if attr.value == "YES" %}true{% else %}false{% endif %};
-   {% elif attr.name == "instance_of" %}
+   {% elif attr.name == "instance_of" and attr.value != "" %}
    TASTE_IV_Properties::is_instance_of => "{{ attr.value }}";
    {% else %}
    -- unsupported property found: name: "{{ attr.name }}"  value: "{{ attr.value }}"
