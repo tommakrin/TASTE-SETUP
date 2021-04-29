@@ -66,9 +66,7 @@ END deploymentview;
 
 SYSTEM IMPLEMENTATION deploymentview.others
 SUBCOMPONENTS
-  Node_Linux : SYSTEM Node_Linux.others {
-    Taste::coordinates => "114754 39152 169951 82490";
-  };
+  Node_Linux : SYSTEM Node_Linux.others;
   interfaceview : SYSTEM interfaceview::IV::interfaceview.others;
 END deploymentview.others;
 

@@ -1,23 +1,31 @@
 {% comment %}
 Template for generation of XML scheme of function.
 The following tags are available in this sub-template:
-func            : Instance of function (provided by a top level template)
-func.attributes :   |_ List of all attributes of function
-attr            :       |_ Instance of attriubute
-attr.name       :           |_ Name of attribute
-attr.value      :           |_ Value of attribute
-func.properties :   |_ List of all properties of function
-prop            :       |_ Instance of property
-prop.name       :           |_ Name of property
-prop.value      :           |_ Value of property
-func.interfaces :   |_ List of all interfaces of function
-iface           :       |_ Instance of interface
-func.functions  :   |_ List of all nested functions of function
-func            :       |_ Instance of nested function
-func.comments   :   |_ List of all nested comments of function
-comm            :       |_ Instance of nested comment
-func.connections:   |_ List of all nested connections of function
-conn            :       |_ Instance of nested connections
+func                    : Instance of function (provided by a top level template)
+func.name               :   |_ Function name
+func.attributes         :   |_ List of all attributes of function
+attr                    :       |_ Instance of attriubute
+attr.name               :           |_ Name of attribute
+attr.value              :           |_ Value of attribute
+func.properties         :   |_ List of all properties of function
+prop                    :       |_ Instance of property
+prop.name               :           |_ Name of property
+prop.value              :           |_ Value of property
+func.contextParameters  :   |_ List of all context parameters of function
+param                   :       |_ Instance of context parameter
+param.name              :           |_ Name of context parameter
+param.type              :           |_ Type name context parameter (from ASN.1 for example)
+param.defaultValue      :           |_ Value of context parameter
+func.interfaces         :   |_ List of all interfaces of function
+iface                   :       |_ Instance of interface
+func.functions          :   |_ List of all nested functions of function
+func                    :       |_ Instance of nested function
+func.comments           :   |_ List of all nested comments of function
+comm                    :       |_ Instance of nested comment
+func.connections        :   |_ List of all nested connections of function
+conn                    :       |_ Instance of nested connections
+func.connectedFunctions :   |_ List of connected functions
+connectedFunc           :       |_ List of parent Functions names
 {% endcomment %}
 
 {% for func in func.functions %}
@@ -43,11 +51,26 @@ SYSTEM {{ func.name }}
 FEATURES
 {% endif %}
 {% for iface in func.interfaces %}
-{% for endpoint in iface.connectedInterfaces %}
 {% if iface.isProvided %}
-   PI_{{ iface.name }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
+   PI_{{ iface.name }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{{ func.name }}::PI_{{ iface.name }}.others {
 {% else %}
+{% for endpoint in iface.connectedInterfaces %}
+{% comment %}
+   The following works only because there is no multicast, otherwise it would repeat the same RI name multiple times
+   In case of multiple RI->one PI connection there should be a different name for the RI here
+{% endcomment %}
+{% comment %}
+   for the RI there are two possible names, either PI_.. if it is a connected RI, or RI_ if it is a function type
+   we have to iterate over the function attributes to determine it..
+{% endcomment %}
+{% for attr in func.attributes %}
+   {% if attr.name == "is_type" and attr.value == "YES" %}
+   RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}RI_{{ endpoint|last }}.others {
+   {% elif attr.name == "is_type" and attr.value == "NO" %}
    RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
+   {% endif %}
+{% endfor %}
+{% endfor %}
 {% endif %}
 {% for ifprop in iface.properties %}
       {% if ifprop.name == "Taste::InheritPI" %}
@@ -58,6 +81,8 @@ FEATURES
       --  Ignored InnerCoordinates (unknown TASTE property)
       {% elif ifprop.name == "Taste::RootCoordinates" %}
       --  Ignored RootCoordinates (unknown TASTE property)
+      {% elif ifprop.name == "Taste::coordinates" %}
+      --  Ignored coordinates (incompatible with Ellidiss GUI)
       {% else %}
       {{ ifprop.name }} => "{{ ifprop.value }}";
       {% endif %}
@@ -79,13 +104,16 @@ FEATURES
 {% endfor %}
    };
 {% endfor %}
-{% endfor %}
 PROPERTIES
 {% for attr in func.attributes %}
    {% if attr.name == "language" %}
    Source_Language => ({{ attr.value }});
    {% elif attr.name == "is_type" %}
    TASTE::Is_Component_Type => {% if attr.value == "YES" %}true{% else %}false{% endif %};
+   {% elif attr.name == "instance_of" and attr.value != "" %}
+   TASTE_IV_Properties::is_instance_of => "{{ attr.value }}";
+   {% else %}
+   -- unsupported property found: name: "{{ attr.name }}"  value: "{{ attr.value }}"
    {% endif %}
 {% endfor %}
 END {{ func.name }};
