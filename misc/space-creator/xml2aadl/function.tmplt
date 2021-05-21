@@ -52,7 +52,18 @@ FEATURES
 {% endif %}
 {% for iface in func.interfaces %}
 {% if iface.isProvided %}
+{% for endpoint in iface.connectedInterfaces %}
+{% comment %}
+   In nested function we must ensure AADL type consistency, so we have to connect the PI at the border of the nested function
+   so this excludes this pattern:
    PI_{{ iface.name }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{{ func.path|join:"::" }}::PI_{{ iface.name }}.others {
+   in fact in nested function we should not generate new SUBPROGRAMs as even if they would have the same name and content
+   as the ones in the terminal (connected) functions they would not have the same classifier (type) in AADL
+{% endcomment %}
+{% if forloop.first %}
+   PI_{{ iface.name }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
+{% endif %}
+{% endfor %}
 {% else %}
 {% for endpoint in iface.connectedInterfaces %}
 {% comment %}
@@ -63,6 +74,7 @@ FEATURES
    for the RI there are two possible names, either PI_.. if it is a connected RI, or RI_ if it is a function type
    we have to iterate over the function attributes to determine it..
 {% endcomment %}
+{% if forloop.first %}
 {% for attr in func.attributes %}
    {% if attr.name == "is_type" and attr.value == "YES" %}
    RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}RI_{{ endpoint|last }}.others {
@@ -70,6 +82,7 @@ FEATURES
    RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
    {% endif %}
 {% endfor %}
+{% endif %}
 {% endfor %}
 {% endif %}
 {% for ifprop in iface.properties %}
