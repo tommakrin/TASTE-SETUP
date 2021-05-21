@@ -52,7 +52,7 @@ FEATURES
 {% endif %}
 {% for iface in func.interfaces %}
 {% if iface.isProvided %}
-   PI_{{ iface.name }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{{ func.name }}::PI_{{ iface.name }}.others {
+   PI_{{ iface.name }} : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::{{ func.path|join:"::" }}::PI_{{ iface.name }}.others {
 {% else %}
 {% for endpoint in iface.connectedInterfaces %}
 {% comment %}
