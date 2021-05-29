@@ -32,36 +32,15 @@ then
     exit 1
 fi
 
-
-# TODO: We should extract the list of ASN.1 and ACN files from the .pro file
-taste-update-data-view *.asn || exit 1
-
-if [[ interfaceview.xml -nt InterfaceView.aadl || ! -f work/skeletons_built ]]
+# To build the system, kazoo needs a concurrency view property files
+if [ ! -f ConcurrencyView_Propertiess.aadl ]
 then
-    # Interface view was updated since the last generation of the AADL file
-    aadlconverter -o interfaceview.xml -t $(taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x InterfaceView.aadl || exit 1
-    
-    # Create/update a deployment view for Linux target (to be removed when we have a DV editor)
-    aadlconverter -o interfaceview.xml -t $(taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x DeploymentView.aadl || exit 1 
-
-    # To build the system, kazoo needs a concurrency view property files
-    if [ ! -f ConcurrencyView_Propertiess.aadl ]
-    then
-        touch ConcurrencyView_Properties.aadl
-    fi
-
-    #  Generate code skeletons
-    if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
-    then
-        make skeletons || exit 1
-    else
-        echo -e "${INFO} Initializing Kazoo project file"
-        taste init
-        make skeletons || exit 1
-    fi
+    touch ConcurrencyView_Properties.aadl
 fi
 
-echo projectFile = $projectFile
+make skeletons || exit 1
+
+
 if [[ $(grep taste.pro $projectFile) == "" ]]
 then
    echo 'include(work/taste.pro)' >> $projectFile
