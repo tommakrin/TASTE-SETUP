@@ -3,7 +3,10 @@
 {% include "function_subcomponents.tmplt" %}
 {% endfor %}
 {% else %}
+{% for attr in func.attributes %}
+   {% if attr.name == "is_type" and attr.value == "NO" %}
    IV_{{ func.name }} : SYSTEM interfaceview::IV::{{ func.path|join:"::" }}::{{ func.name }}.others {
       Taste::FunctionName => "{{ func.name }}";
-   };
+   };{% endif %}
+{% endfor %}
 {% endif %}

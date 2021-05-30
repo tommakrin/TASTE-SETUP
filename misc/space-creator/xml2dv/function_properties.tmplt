@@ -3,5 +3,7 @@
 {% include "function_properties.tmplt" %}
 {% endfor %}
 {% else %}
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_{{ func.name }};
+{% for attr in func.attributes %}
+   {% if attr.name == "is_type" and attr.value == "NO" %}Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_{{ func.name }};{% endif %}
+{% endfor %}
 {% endif %}
