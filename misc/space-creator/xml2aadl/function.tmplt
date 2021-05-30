@@ -129,6 +129,11 @@ PROPERTIES
    -- unsupported property found: name: "{{ attr.name }}"  value: "{{ attr.value }}"
    {% endif %}
 {% endfor %}
+{% for prop in func.properties %}
+  {% if prop.name != "Taste::coordinates" and prop.name != "Taste::InnerCoordinates" and prop.name != "Taste::RootCoordinates" %}
+   {{ prop.name }} => {{prop.value}};
+  {% endif %}
+{% endfor %}
 END {{ func.name }};
 
 SYSTEM IMPLEMENTATION {{ func.name }}.others
