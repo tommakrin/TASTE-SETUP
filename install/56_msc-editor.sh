@@ -1,7 +1,4 @@
 #!/bin/bash
-echo [MSC EDITOR V1] This version of the TASTE MSC editor cannot run in Debian buster
-echo [MSC EDITOR V1] Skipped installation
-exit 0
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "${DIR}/common.sh"
 

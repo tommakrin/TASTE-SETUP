@@ -6,12 +6,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 mkdir -p "${PREFIX}/share/asn1scc/" || exit 1
 cd "${PREFIX}/share/" || exit 1
 VER=$(mono ~/tool-inst/share/asn1scc/asn1.exe -v |  head -1 | awk '{print $NF}')
-if [ "${VER}" != "4.2.4.6f" ] ; then
-    wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.6f/asn1scc-bin-4.2.4.6f.tar.bz2 \
+if [ "${VER}" != "4.2.1.3f" ] ; then
+    wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.1.3f/asn1scc-bin-4.2.1.3f.tar.bz2 \
         | tar jxvf -
 fi
-# Delete the AST cache folder in case the new version of the compiler generates different XML/Python output
-find $HOME/.taste_AST_cache/ -type f -delete
 
 # Add to PATH
 PATH_CMD='export PATH=$PATH:'"${PREFIX}/share/asn1scc/"

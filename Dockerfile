@@ -7,9 +7,9 @@
 #
 #     ./Docker-run.sh
 #
-FROM debian:buster
+FROM debian:stretch
 RUN apt-get update
-RUN apt-get -y install netcat net-tools wget lsb-release
+RUN apt-get -y install netcat net-tools wget
 # There is immense waste of re-downloading the .deb files
 # in every attempt to setup the Docker image.
 # The following uses a locally-provided proxy
@@ -22,7 +22,6 @@ RUN echo "HEAD /" | nc `cat /tmp/host_ip.txt` 8000 | grep squid-deb-proxy \
   || echo "No squid-deb-proxy detected on docker host"
 RUN bash -c 'export DEBIAN_FRONTEND=noninteractive ; apt-get -y install git sudo'
 RUN bash -c 'cd /root ; git clone https://gitrepos.estec.esa.int/taste/taste-setup.git tool-src'
-RUN bash -c 'cd /root/tool-src ; git checkout -f feature_buster'
 
 # The following pieces correspond to the execution of Update-TASTE.sh ;
 # but the execution has to be broken down into steps, so that Docker
@@ -35,13 +34,11 @@ RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISAB
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/06_stlink.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/10_dmt.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/15_asn1scc.sh'
-RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/16_cleanup-old-mscc.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/20_msc.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/30_qemu.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/39_tasteconfig.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/40_ocarina.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/45_pohi.sh'
-RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/46_aadlib.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/50_opengeode.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/53_pymsc.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/54_speedometer.sh'
@@ -54,9 +51,6 @@ RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISAB
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/80_build-scripts.sh'
 # Those that need RTEMS can set it up themselves (avoid creating huge Docker image)
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/85_rtems.sh'
-RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/86_air.sh'
-RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/87_kazoo.sh'
-RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/88_spaceCreator.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/90_misc.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/91_env.sh'
 RUN bash -c 'cd /root/tool-src ; PATH=/root/tool-inst/bin:$PATH HOME=/root DISABLE_TASTE_BANNER=1 install/95_components_library.sh'

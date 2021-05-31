@@ -9,11 +9,14 @@ git submodule update
 make || exit 1
 
 mkdir -p "${PREFIX}"/share/kazoo || exit 1
-# Delete old templates before installing kazoo
-rm -rf "${PREFIX}"/share/kazoo/templates || exit 1
 cp -a kazoo "${PREFIX}"/share/kazoo || exit 1
 cp -a ../kazoo/templates "${PREFIX}"/share/kazoo || exit 1
 
+# Sadly, AdaCore has not responded to our pull request:
+#    https://github.com/AdaCore/templates-parser/pull/21
+#
+# To avoid false notification of "dirty" git status,
+# clean up their mess in the "templates-parser" after their build
 rm -f "${DIR}/../kazoo/templates-parser/tp_xmlada.gpr"
 rm -f "${DIR}/../kazoo/templates-parser/config/setup/foo.ads.std"???
 

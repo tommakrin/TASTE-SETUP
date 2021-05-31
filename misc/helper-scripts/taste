@@ -13,10 +13,8 @@ echo -e "Welcome to ${COLORON}TASTE${COLOROFF}"
 INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
-
 # Check if there is an interface view in the current folder
-# and if the init command is not invoked (to create initial Makefile)
-if [ -f InterfaceView.aadl ] && [ "$1" != "init" ]
+if [ -f InterfaceView.aadl ]
 then
     echo -e "${INFO} Opening TASTE project in current folder"
     INTERFACEVIEW=InterfaceView.aadl
@@ -55,21 +53,14 @@ else
         new_folder=.
     fi
     echo 'KAZOO?=kazoo
-# Here you can specify custom compiler/linker flags, and add folders containing
-# external code you want to compile and link for a specific partition.
+# Here you can specify folders containing external code you want to
+# compile and link for a specific partition.
 # Use upper case for the partition name:
-# export <PARTITIONNAME>_USER_CFLAGS=...
-# export <PARTITIONNAME>_USER_LDFLAGS=...
-# export <PARTITIONNAME>_EXTERNAL_SOURCE_PATH=
+# export <PARTITION_NAME>_EXTERNAL_SOURCE_PATH=/absolute/path/1:/....
 
 all:	c
 
 c:	work/glue_built
-	$(MAKE) -C work
-
-# Simulation target (experimental)
-simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
-	$(KAZOO) -t SIMU --glue --gw
 	$(MAKE) -C work
 
 skeletons:
@@ -80,7 +71,7 @@ work/skeletons_built:	InterfaceView.aadl DataView.aadl
 	$(MAKE) -C work dataview
 	touch $@
 
-work/glue_built:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+work/glue_built:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 	$(KAZOO) -p --glue --gw -o work
 	touch $@
 
@@ -90,13 +81,8 @@ clean:
 	find work -type d -name "wrappers" -exec rm -rf {} +
 	find work -type d -name "*_GUI" -exec rm -rf {} +
 
-.PHONY: clean skeletons c simu
+.PHONY: clean skeletons c
 ' > Makefile
-    # Create mandatory ConcurrencyView_Properties.aadl for kazoo
-    if [ ! -f ConcurrencyView_Properties.aadl ]
-    then
-        touch ConcurrencyView_Properties.aadl
-    fi
     # If there is already a dataview, use it, otherwise create one
     if [ ! -f DataView.aadl ]
     then

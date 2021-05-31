@@ -7,11 +7,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DESCRIPTION="MSP430 GCC Toolchain"
 INSTALL_PATH="/opt/msp430-gcc"
 
-if [ -d $INSTALL_PATH ]
-then
-    echo "[-] MSP4300 GCC Toolchain is already installed. Skipped."
-    exit 0
-fi
 CheckTargetFolder "${DESCRIPTION}" "${INSTALL_PATH}"
 
 MACHINE_TYPE=$(uname -m)

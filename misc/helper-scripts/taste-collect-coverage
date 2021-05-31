@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+# Run the tracer daemon - make sure only one instance exists at a time
 if [ ! -f "$1" ]
 then
     echo 'Usage: taste-collect-coverage binary'
@@ -8,8 +9,7 @@ else
     "$1" &
     pid=$!
     sleep 10
-    #kill -SIGUSR2 $pid
-    kill -SIGINT $pid
+    kill -SIGUSR2 $pid
     lcov --capture --directory .. --output-file coverage.info
     genhtml coverage.info --output-directory coverage
     xdg-open coverage/index.html    
