@@ -27,7 +27,7 @@
 # Install bare?
 #   [0]: No
 #   [1]: Yes
-# 1
+# 0
 # Install rtems5?
 #   [0]: No
 #   [1]: Yes
@@ -47,7 +47,7 @@ while { 1 } {
         "*Select debug monitor:" { send -- "0\r" }
         "*Install All RTOS ?" { send -- "0\r" }
         "*Install rtems48i?"  { send -- "0\r" }
-        "*Install bare?"   { send -- "1\r" }
+        "*Install bare?"   { send -- "0\r" }
         "*Install rtems5?"  { send -- "1\r" }
         "*Install posixrtems5?" { send -- "1\r" }
         eof { exit }

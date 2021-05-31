@@ -1,3 +1,0 @@
-{% if event.sourceInstance == instance or event.targetInstance == instance %}
-{% block direction1 %}{% endblock %}'{{ event.name }}', {% block params %}{% endblock %}{% block direction2 %}{% endblock %})
-{% endif %}

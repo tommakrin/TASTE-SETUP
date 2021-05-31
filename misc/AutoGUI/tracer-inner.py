@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import sys
-import time
 import subprocess
 import socket
 import re
@@ -123,17 +122,12 @@ def main():
                 sys.stdout.flush()
     except KeyboardInterrupt:
         if p:
-            print "Sending SIGUSR1 to", sys.argv[3] # to save the VCD in POHIC
-            p.send_signal(signal.SIGUSR1) 
-            time.sleep(1)
             print "Sending SIGINT to", sys.argv[3]
             p.send_signal(signal.SIGINT)
     except socket.error, e:
         if e.args[0] == errno.EINTR:  # Ctrl-C interrupted socket system call
             if p:
-                print "Sending SIGUSR1 and SIGINT  to", sys.argv[3]
-                p.send_signal(signal.SIGUSR1)
-                time.sleep(1)
+                print "Sending SIGINT to", sys.argv[3]
                 p.send_signal(signal.SIGINT)
         else:
             if p:

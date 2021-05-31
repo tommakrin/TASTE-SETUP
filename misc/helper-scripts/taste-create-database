@@ -73,7 +73,7 @@ engine = create_engine(
     'postgresql+psycopg2://taste:tastedb@localhost/${DBNAME}', echo=False)
 Base.metadata.create_all(engine)
 OEF
-python3 initdb.py
+python initdb.py
 
 cat > db.info << OEF2
 postgresql+psycopg2://taste:tastedb@localhost/${DBNAME}

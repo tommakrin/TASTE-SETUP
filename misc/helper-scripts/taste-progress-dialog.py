@@ -1,18 +1,24 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
+from __future__ import print_function
 import sys
 import time
 import signal
 import os
 from collections import deque
 
-from PySide2.QtGui import *
-from PySide2.QtCore import *
-from PySide2.QtWidgets import *
-from PySide2.QtUiTools import *
+import PySide
+from PySide import QtGui
+from PySide.QtCore import QThread, Signal, QObject, Qt, Slot, QTimer
 
+from PySide.QtGui import (QApplication,
+                          QMessageBox,
+                          QDialog,
+                          QPushButton,
+                          QProgressDialog)
 
 log = deque()
+
 
 class MyThread(QThread, QObject):
     ''' Thread waiting for data on stdin and sending signals to the prgress
@@ -83,16 +89,16 @@ class MyThread(QThread, QObject):
 class MyDialog(QDialog):
     def __init__(self):
         super(MyDialog, self).__init__()
-        self.bar         = QProgressBar()
-        self.more_button = QPushButton("Details")
-        self.extension   = QWidget()
-        self.log_window  = QListWidget()
-        self.label       = QLabel()
+        self.bar         = QtGui.QProgressBar()
+        self.more_button = QtGui.QPushButton("Details")
+        self.extension   = QtGui.QWidget()
+        self.log_window  = QtGui.QListWidget()
+        self.label       = QtGui.QLabel()
 
         # Layouts
-        self.top_layout  = QVBoxLayout()
-        self.ext_layout  = QVBoxLayout()
-        self.main_layout = QVBoxLayout()
+        self.top_layout  = QtGui.QVBoxLayout()
+        self.ext_layout  = QtGui.QVBoxLayout()
+        self.main_layout = QtGui.QVBoxLayout()
 
         self.more_button.setCheckable(True)
         self.more_button.hide()
