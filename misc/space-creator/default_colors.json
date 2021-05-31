@@ -6,7 +6,7 @@
             "color_type": 0,
             "fill_type": 1,
             "group": "IVE",
-            "pen_color": "#ff999999",
+            "pen_color": "#ff000000",
             "pen_width": 1
         },
         {
@@ -33,7 +33,7 @@
             "color_type": 3,
             "fill_type": 1,
             "group": "IVE",
-            "pen_color": "#ff999999",
+            "pen_color": "#ff000000",
             "pen_width": 1
         },
         {
@@ -60,7 +60,7 @@
             "color_type": 6,
             "fill_type": 0,
             "group": "IVE",
-            "pen_color": "#ff595050",
+            "pen_color": "#ff00007f",
             "pen_width": 2
         },
         {
