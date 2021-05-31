@@ -10,12 +10,6 @@ conngroups          :   |_ Instance of connection
 Comments            : List of all available NON-nested comments (provided by application)
 comm                :   |_ Instance of comment
 {% endcomment %}
----------------------------------------------------
--- AADL2.2
--- TASTE type interfaceview
--- 
--- generated code: do not edit
----------------------------------------------------
 {% for func in Functions %}
     {% include "function.tmplt" %}
 {% endfor %}
@@ -41,7 +35,13 @@ SUBCOMPONENTS
 {% for func in Functions %}
 {% for attr in func.attributes %}
 {% if attr.name == "name" %}
-  {{ attr.value }} : SYSTEM interfaceview::IV::{{ attr.value }}::{{ attr.value }}.others;
+  {{ attr.value }} : SYSTEM interfaceview::IV::{{ attr.value }}::{{ attr.value }}.others {
+    {% for prop in func.properties %}
+     {% if prop.name != "Taste::RootCoordinates" and prop.name != "Taste.InnerCoordinates" %}
+     {{ prop.name }} => "{{ prop.value }}";
+     {% endif %}
+    {% endfor %}
+  };
 {% endif %}
 {% endfor %}
 {% endfor %}
