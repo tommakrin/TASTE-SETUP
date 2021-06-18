@@ -45,7 +45,7 @@ else
 fi
 
 TASTE_TYPES=$(taste-config --prefix)/share/taste-types/taste-types.asn
-mono $(which asn1.exe) -ACND "$DATAVIEW" "$TASTE_TYPES"
+asn1scc -ACND "$DATAVIEW" "$TASTE_TYPES"
 
 ACNFILENAME=${DATAVIEW%.*}.acn
 
