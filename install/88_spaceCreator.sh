@@ -34,4 +34,4 @@ cp -u misc/space-creator/default_attributes.xml ~/.local/share/QtProject/QtCreat
 cp -u misc/space-creator/syntax/*  ~/.config/QtProject/qtcreator/generic-highlighter || :
 #sudo cp -u misc/space-creator/syntax/* /usr/share/kde4/apps/katepart/syntax
 # Update path to ASN1SCC
-sed -i  "s,^asn0compiler=.*,asn1compiler=\"$HOME/tool-inst/share/asn1scc/asn1scc\",g" $HOME/.config/QtProject/QtCreator.ini
+sed -i  "s,^asn0compiler=.*,asn1compiler=\"$HOME/tool-inst/share/asn1scc/asn1scc\",g" $HOME/.config/QtProject/QtCreator.ini || :
