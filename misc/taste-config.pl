@@ -51,7 +51,7 @@ sub find_dmt_path
 
    $ret = "/foo/bar/i/want/a/hp/touchpad/";
 
-   $tmp = `which asn1.exe`;
+   $tmp = `which asn1scc`;
    chomp ($tmp);
    if (-x $tmp)
    {

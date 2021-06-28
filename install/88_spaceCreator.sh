@@ -1,12 +1,12 @@
 #!/bin/bash
-dpkg -l | grep '^ii.*spacecreator.*0.1.3520' > /dev/null || {
+dpkg -l | grep '^ii.*spacecreator.*0.1.3933' > /dev/null || {
     dpkg -l | grep spacecreator > /dev/null && {
         echo "[-] Uninstalling previously existing version..."
         sudo apt remove -y --force-yes spacecreator || exit 1
     }
     echo "[-] Installing the latest Space Creator..."
     NEW_DEB=/tmp/newSpaceCreator.$$.deb
-    if wget -O $NEW_DEB "https://download.tuxfamily.org/taste/SpaceCreator-0.1.3520-Linux.deb" ; then
+    if wget -O $NEW_DEB "https://download.tuxfamily.org/taste/SpaceCreator-0.1.3933-Linux.deb" ; then
         sudo gdebi -n -o=--no-install-recommends $NEW_DEB || {
             echo "[x] Failed to install $NEW_DEB..."
             ls -l $NEW_DEB
@@ -33,6 +33,5 @@ cp -u misc/space-creator/default_attributes.xml ~/.local/share/QtProject/QtCreat
 #sudo cp -f -u /usr/share/kde4/apps/katepart/syntax/ada.xml /usr/share/qtcreator/generic-highlighter
 cp -u misc/space-creator/syntax/*  ~/.config/QtProject/qtcreator/generic-highlighter || :
 #sudo cp -u misc/space-creator/syntax/* /usr/share/kde4/apps/katepart/syntax
-
-
-
+# Update path to ASN1SCC
+sed -i  "s,^asn0compiler=.*,asn1compiler=\"$HOME/tool-inst/share/asn1scc/asn1scc\",g" $HOME/.config/QtProject/QtCreator.ini || :

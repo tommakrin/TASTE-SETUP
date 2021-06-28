@@ -1,3 +1,8 @@
 #!/bin/bash
-export LD_LIBRARY_PATH=$HOME/tool-src/qemu-Leon3
-/opt/qemu-leon2/bin/qemu-system-sparc -M at697 -nographic -kernel "$@"
+if [ $# -ne 1 ] ; then
+    echo Usage: $0 sparc_ELF_binary
+    exit 1
+fi
+echo -en "run\nquit\n" | \
+    /opt/rtems-5.1-2019.07.25/bin/sparc-rtems5-sis -leon2 -m 1 -freq 50 "$@" |& \
+    sed -u '1,7d'

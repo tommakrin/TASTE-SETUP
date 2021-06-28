@@ -6,8 +6,9 @@
 PRJ_FOLDER=${PWD}
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
-    mkdir -p work
     WORK_FOLDER=work
+    # ensure dataview-uniq is there
+    taste-generate-skeletons
 else
     WORK_FOLDER="${PRJ_FOLDER}"
 fi
@@ -51,7 +52,10 @@ then
     exit -1
 fi
 
-mono $(which taste-extract-asn-from-design.exe) -i "$INTERFACEVIEW" -j sql_db/$DBNAME.asn
+# Ensure skeletons have been generated, so that the dataview is up to date
+cp dataview/dataview-uniq.asn sql_db/$DBNAME.asn
+
+#mono $(which taste-extract-asn-from-design.exe) -i "$INTERFACEVIEW" -j sql_db/$DBNAME.asn
 
 # (4) create Python and SQL Alchemy interfaces
 
