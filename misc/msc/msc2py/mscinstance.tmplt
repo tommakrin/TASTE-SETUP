@@ -64,18 +64,22 @@ def runScenario(pipe_in=None, pipe_out=None, udpController=None):
                 if severity == 'ERROR' or msg == 'END':
                     # Stop execution on first error or completed scenario
                     try:
+                        # send to GUI
                         pipe_out.send(('All', 'COMMAND', 'END'))
                     except AttributeError:
                         {{ instance.name }}.stop()
                         poller.stop()
-                        return
+                        if severity == 'ERROR':
+                            return 1
+                        else:
+                            return 0
                 try:
                     if pipe_out.poll():
                         cmd = pipe_out.recv()
                         if cmd == 'STOP':
                             {{ instance.name }}.stop()
                             poller.stop()
-                            return
+                            return 0
                 except AttributeError:
                     pass
 
