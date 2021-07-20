@@ -6,14 +6,14 @@ Ignore instances named "TASTE_System"
 
 @Scenario
 def Exercise_{{ instance.name }}{% if instance.denominatorAndKind %}: {{ instance.denominatorAndKind }} {{ instance.inheritance }}{% endif %}(queue):
-{% for event in chart.instanceEvents %}
-{% if event.entityType == event.Action and event.instance == instance %}
+{% for event in instance.events %}
+{% if event.entityType == event.Action %}
 {% include "mscaction.tmplt" %}
 {% endif %}
-{% if event.entityType == event.Condition and event.instance == instance %}
+{% if event.entityType == event.Condition %}
 {% include "msccondition.tmplt" %}
 {% endif %}
-{% if event.entityType == event.Coregion and event.instance == instance %}
+{% if event.entityType == event.Coregion %}
 {% include "msccoregion.tmplt" %}
 {% endif %}
 {% if event.entityType == event.Create %}
@@ -22,7 +22,7 @@ def Exercise_{{ instance.name }}{% if instance.denominatorAndKind %}: {{ instanc
 {% if event.entityType == event.Message %}
 {% include "mscmessage.tmplt" %}
 {% endif %}
-{% if event.entityType == event.Timer and event.instance == instance  %}
+{% if event.entityType == event.Timer %}
 {% include "msctimer.tmplt" %}
 {% endif %}
 {% endfor %}
@@ -64,18 +64,22 @@ def runScenario(pipe_in=None, pipe_out=None, udpController=None):
                 if severity == 'ERROR' or msg == 'END':
                     # Stop execution on first error or completed scenario
                     try:
+                        # send to GUI
                         pipe_out.send(('All', 'COMMAND', 'END'))
                     except AttributeError:
                         {{ instance.name }}.stop()
                         poller.stop()
-                        return
+                        if severity == 'ERROR':
+                            return 1
+                        else:
+                            return 0
                 try:
                     if pipe_out.poll():
                         cmd = pipe_out.recv()
                         if cmd == 'STOP':
                             {{ instance.name }}.stop()
                             poller.stop()
-                            return
+                            return 0
                 except AttributeError:
                     pass
 
