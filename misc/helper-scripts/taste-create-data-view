@@ -18,6 +18,12 @@ fi
 INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
+if [ "$1" != "" ]
+then
+    PROJECT_NAME=$1
+else
+    PROJECT_NAME=DataView
+fi
 
 # Find a suitable text editor, in order of priority: kate, gvim, vi
 if [ ! -z $(which kate) ]
@@ -30,11 +36,11 @@ else
     EDITOR=vi
 fi
 
-if [ -f "DataView.asn" ]
+if [ -f "$PROJECT_NAME.asn" ]
 then
     if [ -z $NONINTERACTIVE ]
     then
-        echo -e "${INFO} Opening existing DataView.asn"
+        echo -e "${INFO} Opening existing ${PROJECT_NAME}.asn"
     fi
 else
     if [ -z $NONINTERACTIVE ]
@@ -82,7 +88,7 @@ BEGIN
 --  myVar       MySeqOf     ::= { hello, world }
 
 END
-" > DataView.asn
+" > $PROJECT_NAME.asn
 echo "${ASN1_MODULE} DEFINITIONS ::= BEGIN
 
     --  In this ACN model, you can specify custom binary encoding rules for
@@ -94,12 +100,12 @@ echo "${ASN1_MODULE} DEFINITIONS ::= BEGIN
    --  Example of custom encoding:
    --  My-Integer [encoding pos-int, endianness big, size 16]
 END
-" > DataView.acn
+" > $PROJECT_NAME.acn
 fi
 
 if [ -z $NONINTERACTIVE ]
 then
-    $EDITOR DataView.asn
+    $EDITOR $PROJECT_NAME.asn
     echo -e "${INFO} Converting the data view to AADL..."
 fi
 

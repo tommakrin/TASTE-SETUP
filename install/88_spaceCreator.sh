@@ -35,3 +35,7 @@ cp -u misc/space-creator/syntax/*  ~/.config/QtProject/qtcreator/generic-highlig
 #sudo cp -u misc/space-creator/syntax/* /usr/share/kde4/apps/katepart/syntax
 # Update path to ASN1SCC
 sed -i  "s,^asn0compiler=.*,asn1compiler=\"$HOME/tool-inst/share/asn1scc/asn1scc\",g" $HOME/.config/QtProject/QtCreator.ini || :
+# Install the HW library
+mkdir -p ~/.local/share/QtProject/QtCreator/HWlibrary
+cp -u misc/space-creator/Board1.xml ~/.local/share/QtProject/QtCreator/HWlibrary || exit 1
+
