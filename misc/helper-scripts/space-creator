@@ -40,7 +40,8 @@ else
    read -p "Please enter a name for the new project folder: " new_folder
 fi
 
-if [ "$new_folder" != "" ]
+# Project folder must start with a letter
+if [[ "$new_folder" =~ ^[A-Za-z].* ]]
 then
     if [ -d "$new_folder" ]
     then
@@ -54,10 +55,8 @@ then
         PROJECT_NAME="$new_folder"
     fi
 else
-    # If no project name is given, use a default name
-    new_folder=.
-    PROJECT_FILE=taste_project.pro
-    PROJECT_NAME=taste_project
+    echo -e "${ERROR} Aborting - The project name is invalid. Hint: first character shall be a letter."
+    exit 1
 fi
 
 # Define strings to create Spacecrator's .pro.user config file:
