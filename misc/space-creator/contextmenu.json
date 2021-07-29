@@ -1,71 +1,121 @@
-[
-    {
-        "action": "Context actions",
-        "app": "",
-        "appArgs": [
-        ],
-        "appCwd": "",
-        "conditions": [
-            {
-                "attributes": [
-                ],
-                "itemType": "*"
-            }
-        ],
-        "title": "Context menu customization"
-    },
-    {
-        "action": "",
-        "app": "IVEditor",
-        "appArgs": [
-            "-l"
-        ],
-        "appCwd": "iveditor",
-        "conditions": [
-            {
-                "attributes": [
-                    {
-                        "title": "name",
-                        "value": "*"
-                    }
-                ],
-                "itemType": "*"
-            }
-        ],
-        "title": "List scriptable actions"
-    },
-    {
-        "action": "",
-        "app": "taste-edit-code",
-        "appArgs": [
-            "$attr_language",
-            "$attr_name"
-        ],
-        "appCwd": "$PRJ_FOLDER",
-        "conditions": [
-            {
-                "attributes": [
-                ],
-                "itemType": "Function"
-            }
-        ],
-        "title": "Edit"
-    },
-    {
-        "action": "",
-        "app": "make",
-        "appArgs": [
-            "-C",
-            "$PRJ_FOLDER"
-        ],
-        "appCwd": "$PRJ_FOLDER",
-        "conditions": [
-            {
-                "attributes": [
-                ],
-                "itemType": "*"
-            }
-        ],
-        "title": "Build system"
-    }
-]
+{
+    "actions": [
+        {
+            "action": "Context actions",
+            "app": "",
+            "appArgs": [
+            ],
+            "appCwd": "",
+            "conditions": [
+                {
+                    "attributes": [
+                    ],
+                    "itemType": "*"
+                }
+            ],
+            "title": "Context menu customization"
+        },
+        {
+            "action": "",
+            "app": "IVEditor",
+            "appArgs": [
+                "-l"
+            ],
+            "appCwd": "iveditor",
+            "conditions": [
+                {
+                    "attributes": [
+                        {
+                            "title": "name",
+                            "value": "*"
+                        }
+                    ],
+                    "itemType": "*"
+                }
+            ],
+            "title": "List scriptable actions"
+        },
+        {
+            "action": "",
+            "app": "taste-edit-code",
+            "appArgs": [
+                "$attr_language",
+                "$attr_name"
+            ],
+            "appCwd": "$PRJ_FOLDER",
+            "conditions": [
+                {
+                    "attributes": [
+                    ],
+                    "itemType": "Function"
+                }
+            ],
+            "title": "Edit"
+        },
+        {
+            "action": "",
+            "app": "make",
+            "appArgs": [
+                "-C",
+                "$PRJ_FOLDER"
+            ],
+            "appCwd": "$PRJ_FOLDER",
+            "conditions": [
+                {
+                    "attributes": [
+                    ],
+                    "itemType": "*"
+                }
+            ],
+            "title": "Build system"
+        },
+        {
+            "action": "Asn1",
+            "app": "",
+            "appArgs": [
+            ],
+            "appCwd": "",
+            "conditions": [
+                {
+                    "attributes": [
+                    ],
+                    "itemType": "*"
+                }
+            ],
+            "title": "Edit ASN.1"
+        },
+        {
+            "action": "",
+            "app": "taste-create-database",
+            "appArgs": [
+                ""
+            ],
+            "appCwd": "$PRJ_FOLDER",
+            "conditions": [
+                {
+                    "attributes": [
+                    ],
+                    "itemType": "*"
+                }
+            ],
+            "title": "Generate SQL Database"
+        },
+        {
+            "action": "",
+            "app": "make",
+            "appArgs": [
+                "skeletons"
+            ],
+            "appCwd": "$PRJ_FOLDER",
+            "conditions": [
+                {
+                    "attributes": [
+                    ],
+                    "itemType": "*"
+                }
+            ],
+            "title": "Generate/update code skeletons"
+        }
+    ],
+    "version": "1.0"
+}
