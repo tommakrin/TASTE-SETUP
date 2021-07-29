@@ -109,7 +109,7 @@ public
 
   with ocarina_drivers_star_dundee_spacewire_brick;
 
-  with ocarina_drivers_ip_generic;
+  with ocarina_drivers_ip_socket;
 
   with ocarina_drivers_serial;
 
@@ -161,13 +161,13 @@ public
       Source_Text                   => ("/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/bluetooth.asn", "drivers/configuration/bluetooth.h");
    end configuration_type_bluetooth;
 
-   data configuration_type_generic_ip
+   data configuration_type_socket_ip
    properties
-	 Type_Source_Name               => "Generic-IP-Conf-T";
-	 Deployment::ASN1_Module_Name   => "GENERIC-IP-DRIVER-LINUX";
+	 Type_Source_Name               => "Socket-IP-Conf-T";
+	 Deployment::ASN1_Module_Name   => "LINUX-SOCKET-IP-DRIVER";
 	 Source_Language                => (ASN1);
-	 Source_Text                    => ("/home/taste/projects/TASTE-Linux-Drivers/configurations/generic-ip-driver-linux.asn", "drivers/configuration/generic_ip_driver_linux.h");
-   end configuration_type_generic_ip;
+	 Source_Text                    => ("/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-socket-ip-driver.asn", "drivers/configuration/linux_socket_ip.h");
+   end configuration_type_socket_ip;
 
   --------------
   -- Keyboard --
@@ -445,21 +445,21 @@ public
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::raw.i));
   end linux_serial.minimal;
 
-  -----------------------------
-  -- linux generic ip driver --
-  -----------------------------
-  device ip_generic
+  ---------------------
+  -- linux ip socket --
+  ---------------------
+  device ip_socket
   features
 	link : requires bus access ocarina_buses::ip.generic;
-  end ip_generic;
+  end ip_socket;
 
-  device implementation ip_generic.linux
+  device implementation ip_socket.linux
   properties
-	Deployment::Driver_Name       => "ip_generic_linux";
-	Device_Driver                 => classifier (ocarina_drivers_ip_generic::ip_generic_driver.linux);
-	Initialize_Entrypoint         => classifier (ocarina_drivers_ip_generic::generic_ip_driver_linux_init);
+	Deployment::Driver_Name       => "linux_ip_socket";
+	Device_Driver                 => classifier (ocarina_drivers_ip_socket::ip_socket.linux);
+	Initialize_Entrypoint         => classifier (ocarina_drivers_ip_socket::linux_ip_socket_init);
 	Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::generic.linux));
-  end ip_generic.linux;
+  end ip_socket.linux;
 
   ---------------------------
   -- Generic serial driver --
@@ -2877,54 +2877,60 @@ end eth_driver.leon_sender;
 
 end ocarina_drivers_greth;
 
-package ocarina_drivers_ip_generic
+package ocarina_drivers_ip_socket
 public
 
   with Deployment;
   with ocarina_drivers;
 
-  subprogram generic_ip_driver_linux_poll
+  subprogram linux_ip_socket_poll
   properties
     Source_Language => (Cpp);
-    Source_Name => "generic_ip_driver_linux_poll";
-  end generic_ip_driver_linux_poll;
+    Source_Name => "taste::LinuxIpSocketPoll";
+    Source_Text => ("LinuxIpSocket.cpp",
+                    "LinuxIpSocket.h");
+  end linux_ip_socket_poll;
 
-  subprogram generic_ip_driver_linux_send
+  subprogram linux_ip_socket_send
   properties
     Source_Language => (Cpp);
-    Source_Name => "generic_ip_driver_linux_send";
-  end generic_ip_driver_linux_send;
+    Source_Name => "taste::LinuxIpSocketSend";
+    Source_Text => ("LinuxIpSocket.cpp",
+                    "LinuxIpSocket.h");
+  end linux_ip_socket_send;
 
-  subprogram generic_ip_driver_linux_init
+  subprogram linux_ip_socket_init
   properties
     Source_Language => (Cpp);
-    Source_Name => "generic_ip_driver_linux_init";
-  end generic_ip_driver_linux_init;
+    Source_Name => "taste::LinuxIpSocketInit";
+    Source_Text => ("LinuxIpSocket.cpp",
+                    "LinuxIpSocket.h");
+  end linux_ip_socket_init;
 
-  thread ip_generic_driver_poller
-  end ip_generic_driver_poller;
+  thread linux_ip_socket_poller
+  end linux_ip_socket_poller;
 
-  thread implementation ip_generic_driver_poller.impl
+  thread implementation linux_ip_socket_poller.impl
   calls
     mycall : {
-    pspg : subprogram generic_ip_driver_linux_poll;
+    pspg : subprogram linux_ip_socket_poll;
     };
   properties
 	Period => 1000ms;
 	Dispatch_Protocol => Periodic;
-  end ip_generic_driver_poller.impl;
+  end linux_ip_socket_poller.impl;
 
-  abstract ip_generic_driver
+  abstract ip_socket
   properties
     Deployment::Version  => "1.0";
     Deployment::Help     => "Write your ASN.1 configuration here";
-    Deployment::Configuration_Type => classifier (ocarina_drivers::configuration_type_generic_ip);
-  end ip_generic_driver;
+    Deployment::Configuration_Type => classifier (ocarina_drivers::configuration_type_socket_ip);
+  end ip_socket;
 
-  abstract implementation ip_generic_driver.linux
+  abstract implementation ip_socket.linux
   subcomponents
-    receiver : thread ip_generic_driver_poller.impl;
-    sender : subprogram generic_ip_driver_linux_send;
-  end ip_generic_driver.linux;
+    receiver : thread linux_ip_socket_poller.impl;
+    sender : subprogram linux_ip_socket_send;
+  end ip_socket.linux;
 
-end ocarina_drivers_ip_generic;
+end ocarina_drivers_ip_socket;
