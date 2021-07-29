@@ -84,4 +84,11 @@ postgresql+psycopg2://taste:tastedb@localhost/${DBNAME}
 ${DBNAME}
 OEF2
 
+# (6) Create a diagram of the database
+echo -e "${INFO} Creating a diagram with the database schema in work/doc/database/${DBNAME}.png"
+taste-db-diagram ${DBNAME}
+mkdir -p ../doc/database
+mv ${DBNAME}.png ../doc/database
+
+echo -e "${INFO} All OK"
 cd "${PWD}"
