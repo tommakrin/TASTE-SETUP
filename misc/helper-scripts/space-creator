@@ -40,7 +40,8 @@ else
    read -p "Please enter a name for the new project folder: " new_folder
 fi
 
-if [ "$new_folder" != "" ]
+# Project folder must start with a letter
+if [[ "$new_folder" =~ ^[A-Za-z].* ]]
 then
     if [ -d "$new_folder" ]
     then
@@ -54,10 +55,8 @@ then
         PROJECT_NAME="$new_folder"
     fi
 else
-    # If no project name is given, use a default name
-    new_folder=.
-    PROJECT_FILE=taste_project.pro
-    PROJECT_NAME=taste_project
+    echo -e "${ERROR} Aborting - The project name is invalid. Hint: first character shall be a letter."
+    exit 1
 fi
 
 # Define strings to create Spacecrator's .pro.user config file:
@@ -129,8 +128,8 @@ echo "TEMPLATE = lib
 CONFIG -= qt
 CONFIG += generateC
 
-DISTFILES += DataView.asn
-DISTFILES += DataView.acn
+DISTFILES += $PROJECT_NAME.asn
+DISTFILES += $PROJECT_NAME.acn
 DISTFILES += $PROJECT_NAME.msc
 DISTFILES += interfaceview.xml
 #include(handleAsn1AcnBuild.pri)
@@ -139,12 +138,12 @@ message(\$\$DISTFILES)
 " > $PROJECT_FILE
 
 # Create a default interface view
-echo '<InterfaceView asn1file="DataView.asn">
-<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
-    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+echo "<InterfaceView asn1file=\"$PROJECT_NAME.asn\">
+<Comment name=\"Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3\">
+    <Property name=\"Taste::coordinates\" value=\"4800 5100 46100 20700\"/>
 </Comment>
 
-</InterfaceView>' > interfaceview.xml
+</InterfaceView>" > interfaceview.xml
 
 # Create default work folder
 mkdir -p work
@@ -153,7 +152,7 @@ touch work/taste.pro
 # Create empty MSC file
 echo "mscdocument $PROJECT_NAME /* MSC AND */;
     language ASN.1;
-    data DataView.asn;
+    data $PROJECT_NAME.asn;
 
 /* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
 
@@ -182,7 +181,7 @@ cp -f $(taste-config --prefix)/bin/space-creator-dataview.aadl DataView.aadl
 sed -i "s/MD5ACN/$MD5ACN/" DataView.aadl
 sed -i "s/MD5ASN/$MD5ASN/" DataView.aadl
 sed -i "s/PROJECTNAME/$PROJECT_NAME/" DataView.aadl
-NONINTERACTIVE=1 ONLY_ASN=1 taste-create-data-view
+NONINTERACTIVE=1 ONLY_ASN=1 taste-create-data-view "$PROJECT_NAME"
 
 
 if [ "$1" == "init" ]

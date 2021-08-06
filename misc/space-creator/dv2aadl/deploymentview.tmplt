@@ -1,0 +1,60 @@
+{% comment %}
+    Template for the transformatio of Space Creator's XML model of the Deployment view into AADL
+{% endcomment %}
+{% for node in Nodes %}
+package deploymentview::DV::{{ node.name }}
+public
+
+with TASTE;
+with deployment;
+with TASTE_DV_Properties;
+with deploymentview::DV;
+with Memory_Properties;
+with ARINC653;
+
+    --  {% for attr in node.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}
+    {% for prop in node.properties %}
+    --  name="{{ prop.name }}" value="{{ prop.value }}"
+    {% endfor %}
+
+    {% for partition in node.partitions %}
+        <Partition{% for attr in partition.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+        {% for prop in partition.properties %}
+            <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+        {% endfor %}
+        {% for function in partition.functions %}
+            <function>{{ function }}</function>
+        {% endfor %}
+        </Partition>
+    {% endfor %}
+    {% for device in node.devices %}
+        <Device{% for attr in device.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
+    {% endfor %}
+    </Node>
+{% endfor %}
+{% for connection in Connections %}
+    <Connection{% for attr in connection.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+        {% for message in connection.messages %}
+            <Message{% for attr in message.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
+        {% endfor %}
+    </Connection>
+
+end deploymentview::DV::{{ node.name }};
+{% endfor %}
+package deploymentview::DV
+public
+
+WITH TASTE;
+WITH Deployment;
+WITH interfaceview::IV;
+WITH TASTE_DV_Properties;
+
+system deploymentview;
+end deploymentview;
+
+system implementation deploymentview.others
+subcomponents
+   interfaceview: system interfaceview::IV::interfaceview.others;
+end deploymentview.others;
+
+end deploymentview::DV;

@@ -84,4 +84,16 @@ postgresql+psycopg2://taste:tastedb@localhost/${DBNAME}
 ${DBNAME}
 OEF2
 
-cd "${PWD}"
+# (6) Create a diagram of the database
+echo -e "${INFO} Creating a diagram with the database schema in work/doc/database/${DBNAME}.png"
+taste-db-diagram ${DBNAME}
+mkdir -p ../doc/database
+mv ${DBNAME}.png ../doc/database
+
+# (7) Add it to Space creator project file to make it appear in the workspace
+cd "${PRJ_FOLDER}"
+echo -e "${INFO} Updating the Space Creator project file"
+grep database ${DBNAME}.pro || echo "DISTFILES += work/doc/database/${DBNAME}.png" >> ${DBNAME}.pro
+
+
+echo -e "${INFO} All OK"

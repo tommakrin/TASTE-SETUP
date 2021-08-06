@@ -35,7 +35,7 @@ def panic(x, exitCode=1):
 def abortFunction():
     global g_mscDumped
     g_lockMSC.acquire()
-    print 'Closing tasted'
+    print('Closing tasted')
     #try:
     if not g_mscDumped and g_strMscFilename != "":
         f = open(g_strMscFilename, "w")
@@ -75,9 +75,9 @@ def abortFunction():
                 # message format is PIName:PARAM. remove PARAM
                 message_id = message.split(':')[0]
                 # timer SET or RESET: use the proper MSC construct
-                if(message_id.startswith(('SET', 'RESET')) and
+                if(message_id.lower().startswith(('set', 'reset')) and
                   receiver.endswith('_timer_manager')):
-                    if message_id.startswith('SET'):
+                    if message_id.lower().startswith('SET'):
                         action, timername = 'starttimer', message_id[4:]
                     else:
                         action, timername = 'stoptimer', message_id[6:]
@@ -109,11 +109,11 @@ def abortFunction():
 
     global g_abort
     g_abort = True
-    print "Ctrl-C pressed, waiting for threads to finish..."
+    print("Ctrl-C pressed, waiting for threads to finish...")
     for t in g_threads:
-        print "Thread dying..."
+        print("Thread dying...")
         t.join()
-    print "Clean shutdown"
+    print("Clean shutdown")
     sys.exit(0)
 
 
@@ -153,7 +153,7 @@ def mysend(s, firstTS=[]):
             elif err == errno.EINTR:
                 abortFunction()
             else:
-                print "Socket error:", msg
+                print("Socket error:", msg)
                 abortFunction()
 
 
@@ -165,7 +165,7 @@ class GUIThread(threading.Thread):
         self._conn.settimeout(1.0)
         self._lock = lockSocket
         #print '###Connection from', addr, 'thread spawned'
-        print '[tracerd] Control thread connected'
+        print('[tracerd] Control thread connected')
 
     def run(self):
         while not g_abort:
@@ -175,7 +175,7 @@ class GUIThread(threading.Thread):
                     raise Exception()
                 #print '### Received', data.strip()
                 if data[-1] != '\n':
-                    print '### Fragmentation... message lost\n'
+                    print('### Fragmentation... message lost\n')
                     panic('### Lost data was:' + str(data))
                 if 'taskCreated' in data:
                     self._lock.acquire()
@@ -190,7 +190,7 @@ class GUIThread(threading.Thread):
                         self._lock.release()
                         #print "### Added it...:\n", str(g_messages)
                     else:
-                        print '### Unknown data received:', data
+                        print('### Unknown data received:', data)
             except:
                 try:
                     time.sleep(0.1)
@@ -208,7 +208,7 @@ class MsgThread(threading.Thread):
         self._conn = conn
         self._conn.settimeout(1.0)
         self._lock = lockSocket
-        print '[tracerd] Data thread connected'
+        print('[tracerd] Data thread connected')
 
     def run(self):
         collection = ""
@@ -397,7 +397,7 @@ def main():
                 if e.args[0] == errno.EINTR:
                     abortFunction()
                 else:
-                    print "Socket error:", sock
+                    print("Socket error:", sock)
                     abortFunction()
             except:
                 raise

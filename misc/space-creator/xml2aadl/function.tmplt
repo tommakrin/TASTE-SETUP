@@ -73,10 +73,13 @@ FEATURES
 {% comment %}
    for the RI there are two possible names, either PI_.. if it is a connected RI, or RI_ if it is a function type
    we have to iterate over the function attributes to determine it..
+   It is also RI_ if the RI is not connected. Despite the iteration on "connectedInterfaces", unconnected ones are
+   also there and pointing to the current function. This hack is needed to figure this out:
+   {{ func.path|join:"::"|add:"::"|add:iface.name }} {{ endpoint|join:"::" }}
 {% endcomment %}
 {% if forloop.first %}
 {% for attr in func.attributes %}
-   {% if attr.name == "is_type" and attr.value == "YES" %}
+   {% if attr.name == "is_type" and attr.value == "YES" or attr.name == "is_type" and func.path|join:"::"|add:"::"|add:iface.name == endpoint|join:"::" %}
    RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}RI_{{ endpoint|last }}.others {
    {% elif attr.name == "is_type" and attr.value == "NO" %}
    RI_{{ iface.name }} : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::{% for item in endpoint %} {% if not forloop.last %}{{ item }}::{% endif %}{% endfor %}PI_{{ endpoint|last }}.others {
@@ -89,13 +92,9 @@ FEATURES
       {% if ifprop.name == "Taste::InheritPI" %}
       Taste::labelInheritance => "{{ ifprop.value }}";
       {% elif ifprop.name == "Taste::Autonamed" %}
-      --  {{ ifprop.name }} => "{{ ifprop.value }}";
       {% elif ifprop.name == "Taste::InnerCoordinates" %}
-      --  Ignored InnerCoordinates (unknown TASTE property)
       {% elif ifprop.name == "Taste::RootCoordinates" %}
-      --  Ignored RootCoordinates (unknown TASTE property)
       {% elif ifprop.name == "Taste::coordinates" %}
-      --  Ignored coordinates (incompatible with Ellidiss GUI)
       {% else %}
       {{ ifprop.name }} => "{{ ifprop.value }}";
       {% endif %}
