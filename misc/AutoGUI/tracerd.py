@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import os
 import socket
@@ -8,7 +8,7 @@ import re
 import threading
 import errno
 import getopt
-import cPickle
+import pickle
 
 g_ipaddress = ""
 g_strMscFilename = ""
@@ -42,14 +42,14 @@ def abortFunction():
         f.write('mscdocument automade;\n'
                 '    language ASN.1;\n'
                 '    data dataview-uniq.asn;\n')
-        for k in g_completeLog.viewkeys():
+        for k in g_completeLog.keys():
             # Declare all instances (corresponding to FV)
             if not k.endswith('_timer_manager'):
                 f.write('    inst {};\n'.format(k))
         f.write('\n')
 
         # Declare all messages and type of their parameter(s)
-        for msg, paramList in g_messagesDecl.viewitems():
+        for msg, paramList in g_messagesDecl.items():
             params = ','.join(paramList)
             f.write('    msg {name} : ({params});\n'.format
                     (name=msg, params=params.replace('_', '-')))
@@ -57,7 +57,7 @@ def abortFunction():
 
         f.write('    msc recorded;\n')
         # k is the instance name
-        for k in g_completeLog.viewkeys():
+        for k in g_completeLog.keys():
             if k.endswith('_timer_manager'):
                 continue
             f.write('        {}: instance;\n'.format(k))
@@ -103,8 +103,6 @@ def abortFunction():
         f.write('endmscdocument;\n')
         f.close()
     g_mscDumped = True
-    #except:
-    #    print "Exception happened while saving output (%s)" % g_strMscFilename
     g_lockMSC.release()
 
     global g_abort
@@ -123,7 +121,7 @@ def mysend(s, firstTS=[]):
     while True:
         m = re.search('^(.*?)-t([0-9]+)\|(.*)$', s, re.DOTALL)
         if m:
-            currTS = long(float(m.group(2))/1e6)
+            currTS = int(float(m.group(2))/1e6)
             if not firstTS:
                 firstTS.append(currTS)
             #print "Replacing", m.group(2), "with", str(currTS - firstTS[0])
@@ -144,7 +142,8 @@ def mysend(s, firstTS=[]):
                 return
         except KeyboardInterrupt:
             abortFunction()
-        except socket.error, (err, msg):
+        except socket.error as exc_err:
+            err, msg = exc_err.args
             if err == errno.EAGAIN:
                 try:
                     time.sleep(0.1)
@@ -241,7 +240,7 @@ class MsgThread(threading.Thread):
                  _) = lines[1].split('###')
                 # Decode list of message parameters and value
                 # (List of tuples (ASN.1 type, FieldName Value)
-                messageData = cPickle.loads(messageData)
+                messageData = pickle.loads(messageData)
                 asn1Params = [tup[1] for tup in messageData]
                 lines = lines[3:]
                 self._lock.acquire()
@@ -393,7 +392,7 @@ def main():
                     time.sleep(0.1)
                 except KeyboardInterrupt:
                     abortFunction()
-            except socket.error, e:
+            except socket.error as e:
                 if e.args[0] == errno.EINTR:
                     abortFunction()
                 else:
