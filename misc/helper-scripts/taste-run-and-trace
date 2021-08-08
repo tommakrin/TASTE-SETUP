@@ -1,15 +1,15 @@
 #!/bin/bash -e
 
 # Run the tracer daemon - make sure only one instance exists at a time
-exec 9>/tmp/tracerf.lck
-if flock -n 9
-then
-    $(taste-config --prefix)/share/AutoGUI/tracerd.py -s trace.msc &
-    tracer_pid=$!
-    sleep 0.5
-else
-    echo '(Info) Another instance of the tracer daemon is running'
-fi
+#   exec 9>/tmp/tracerf.lck
+#   if flock -n 9
+#   then
+#       $(taste-config --prefix)/share/AutoGUI/tracerd.py -s trace.msc &
+#       tracer_pid=$!
+#       sleep 0.5
+#   else
+#       echo '(Info) Another instance of the tracer daemon is running'
+#   fi
 
 if [ ! -f "$1" ]
 then
@@ -21,17 +21,17 @@ You can then open/edit this MSC with the TASTE MSC Editor
 '
 else
     export VCD_ENABLED=1
-    $(taste-config --prefix)/share/AutoGUI/tracer-inner.py $NOPARAMS 127.0.0.1 27183 "$1"
+    $(taste-config --prefix)/share/AutoGUI/tracer-inner2.py "$1"
 fi
 
 
 # If this script launched the tracer daemon, kill it at the end to write the MSC file
-if [ ! -z $tracer_pid ]
-then
-    echo 'Stopping tracer daemon'
-    # Send Ctrl-C
-    kill -INT "$tracer_pid"
-fi
+#   if [ ! -z $tracer_pid ]
+#   then
+#       echo 'Stopping tracer daemon'
+#       # Send Ctrl-C
+#       kill -INT "$tracer_pid"
+#   fi
 
 # In kazoo-based systems, the full dataview is in ../dataview
 cp ../dataview/dataview-uniq.asn .
@@ -47,8 +47,3 @@ do
     echo "    gtkwave ./$f.new"
 done
 echo '================================================'
-
-echo 'Trace file were generated. You may now run:
-    taste-edit-msc trace.msc
-    gtkwave ./bench.vcd.new   # if a VCD file was generated
-'
