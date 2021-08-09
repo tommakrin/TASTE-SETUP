@@ -20,6 +20,8 @@ g_completeMessages = []
 g_instances = defaultdict(list)
 # to store message declarations with their parameters:
 g_messagesDecl = defaultdict(list)
+# list of timers
+g_timers = []
 
 g_strMscFilename = "trace.msc"
 
@@ -27,17 +29,14 @@ def saveMSC():
     with open(g_strMscFilename, "w") as f:
         f.write('mscdocument automade;\n'
                 '   language ASN.1;\n'
-                '   data dataview-uniq.asn;\n')
+                '   data dataview-uniq.asn;\n\n')
         inst_x = 0
         instances_x = {}
         for k in g_instances.keys():
+            # set the X position of the instance lines
             instances_x[k] = inst_x
             inst_x += 650
-#           # Declare all instances (corresponding to FV)
-#           if 'timer_manager' not in k:
-#               f.write(f'    inst {k};\n')
 
-        f.write('\n')
         # Declare all messages and type of their parameter(s)
         for msg, paramList in g_messagesDecl.items():
             params = (','.join(paramList)).replace('_', '-')
@@ -57,8 +56,26 @@ def saveMSC():
             f.write(f'   instance {k};\n')
             for idx in index_list:
                 msg, fromId, toId, nb1, nb2 = g_completeMessages[idx]
-                #print(k, msg, fromId, toId)
-                if toId == k:
+                cif = 'MESSAGE'
+                if toId in ('#set', '#reset'):
+                    cif = 'TIMEOUT'
+                    x1 = instances_x[fromId] + 100
+                    y1 = nb1 * 90
+                    x2 = 186
+                    y2 = 39
+                    first = 'starttimer' if toId == '#set' else 'stoptimer'
+                    second = ''
+                    who = ''
+                elif fromId == '#timeout':
+                    cif = 'TIMEOUT'
+                    x1 = instances_x[toId] + 100
+                    y1 = nb1 * 90
+                    x2 = 76
+                    y2 = 39
+                    first = 'timeout'
+                    second = ''
+                    who = ''
+                elif toId == k:
                     first = 'in'
                     second = 'from'
                     who = fromId
@@ -79,7 +96,7 @@ def saveMSC():
                     x2 = instances_x[toId] + 100
                     y2 = nb2 * 90
 
-                f.write(f'      /* CIF MESSAGE ({x1}, {y1}) ({x2}, {y2}) */\n')
+                f.write(f'      /* CIF {cif} ({x1}, {y1}) ({x2}, {y2}) */\n')
                 f.write(f'      {first} {msg} {second} {who};\n')
             f.write('   endinstance;\n\n')
         f.write('   endmsc;\n')
@@ -96,7 +113,8 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
         message = RenderParameterFields(message, ",".join(
                                              [tup[1] for tup in messageData]))
     global g_messageId
-    if "timer_manager" not in receiver:
+
+    if "timer_manager" not in receiver or kind != 'PI':
         g_messageId += 1
 
     if kind == "RI":
@@ -122,6 +140,18 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
                 g_completeMessages.append(
                         (message, "env", receiver, g_messageId, g_messageId))
                 g_instances[receiver].append(len(g_completeMessages) - 1)
+    elif kind == 'SET':
+        g_completeMessages.append(
+                (message, sender, '#set', g_messageId, g_messageId))
+        g_instances[sender].append(len(g_completeMessages) - 1)
+    elif kind == 'RESET':
+        g_completeMessages.append(
+                (message, sender, '#reset', g_messageId, g_messageId))
+        g_instances[sender].append(len(g_completeMessages) - 1)
+    elif kind == 'TIMEOUT':
+        g_completeMessages.append(
+                (message, '#timeout', receiver, g_messageId, g_messageId))
+        g_instances[receiver].append(len(g_completeMessages) - 1)
     else:
         print(f"Tracer: ignoring unsupported event kind {kind}")
 
@@ -162,10 +192,28 @@ def main():
                     # no parameters
                     messageData[ri] = []
                     # Update message declaration (no param)
-                    g_messagesDecl[ri] = []
-                Message("RI", timestamp, ri, messageData[ri], sender, receiver)
+                    if 'timer_manager' not in receiver:
+                        # filter timer 'set' and 'reset' functions
+                        g_messagesDecl[ri] = []
+                if 'timer_manager' in receiver:
+                    # update list of timers
+                    if ri.startswith('reset_'):
+                        preLen = len(f'reset_{sender}_')
+                        kind = 'RESET'
+                    elif ri.startswith('set_'):
+                        preLen = len (f'set_{sender}_')
+                        kind = 'SET'
+                    nameRI = ri[preLen:]
+                    if nameRI not in g_timers:
+                        g_timers.append(nameRI)
+                else:
+                    kind = 'RI'
+                    nameRI = ri
+                Message(kind, timestamp, nameRI, messageData[ri],
+                        sender, receiver)
                 messageData[ri] = []
             elif lline.startswith('INNER_PI: '):
+                # we can't detect timeout messages for now
                 receiver, pi, timestamp = lline[10:].split(',')
                 #print sender, receiver, ri, timestamp
                 if pi not in list(messageData.keys()):
@@ -173,7 +221,11 @@ def main():
                     messageData[pi] = []
                     # Update message declaration (no param)
                     g_messagesDecl[pi] = []
-                Message("PI", timestamp, pi, messageData[pi], 'env', receiver)
+                if pi in g_timers:
+                    kind = 'TIMEOUT'
+                else:
+                    kind = 'PI'
+                Message(kind, timestamp, pi, messageData[pi], 'env', receiver)
                 messageData[pi] = []
             else:
                 sys.stdout.write(lline)
