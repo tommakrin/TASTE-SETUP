@@ -41,7 +41,7 @@ echo 'Trace file were generated. You may now run:
     taste-edit-msc trace.msc'
 
 # Patch the VCD file (if any)
-for f in $(find *.vcd)
+for f in $(find -nowarn -name *.vcd)
 do
     taste-patch-vcd.py ../build/deploymentview_final/"$1"/deployment.h $f
     echo "    gtkwave ./$f.new"
