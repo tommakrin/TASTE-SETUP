@@ -84,6 +84,10 @@ def saveMSC():
                     if fromId != 'env':
                         x1 = instances_x[fromId] + 100
                         y1 = nb1 * 90
+                        if nb2 == nb1 + 1:
+                            # if execution is immediately after sending,
+                            # use a straight line to save space on the diagram
+                            y2 = y1
                     else:
                         x1 = -30
                         y1 = nb2 * 90
@@ -94,7 +98,10 @@ def saveMSC():
                     x1 = instances_x[k] + 100
                     y1 = nb1 * 90
                     x2 = instances_x[toId] + 100
-                    y2 = nb2 * 90
+                    if nb2 == nb1 + 1:
+                        y2 = y1
+                    else:
+                        y2 = nb2 * 90
 
                 f.write(f'      /* CIF {cif} ({x1}, {y1}) ({x2}, {y2}) */\n')
                 f.write(f'      {first} {msg} {second} {who};\n')
