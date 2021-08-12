@@ -22,6 +22,8 @@ g_instances = defaultdict(list)
 g_messagesDecl = defaultdict(list)
 # list of timers
 g_timers = []
+# current state of SDL functions
+g_currentState = defaultdict(str)
 
 g_strMscFilename = "trace.msc"
 
@@ -57,15 +59,19 @@ def saveMSC():
             for idx in index_list:
                 msg, fromId, toId, nb1, nb2 = g_completeMessages[idx]
                 cif = 'MESSAGE'
-                if toId in ('#set', '#reset'):
+                comment = ''
+                if toId == '#reset' or toId.startswith('#set'):
                     cif = 'TIMEOUT'
                     x1 = instances_x[fromId] + 100
                     y1 = nb1 * 90
                     x2 = 186
                     y2 = 39
-                    first = 'starttimer' if toId == '#set' else 'stoptimer'
+                    first = 'starttimer' if toId.startswith('#set') else 'stoptimer'
                     second = ''
                     who = ''
+                    if toId.startswith('#set'):
+                        # Add the timer value in a comment box
+                        comment=f"\n/* CIF COMMENT ({x1+55}, {y1+45}) (110, 35) */\ncomment '{toId.split()[1]} ms'"
                 elif fromId == '#timeout':
                     cif = 'TIMEOUT'
                     x1 = instances_x[toId] + 100
@@ -73,6 +79,17 @@ def saveMSC():
                     x2 = 76
                     y2 = 39
                     first = 'timeout'
+                    second = ''
+                    who = ''
+                elif toId.startswith('#state'):
+                    stateVal = toId.split()[1]
+                    cif = 'CONDITION'
+                    x1 = instances_x[fromId]
+                    y1 = nb1 * 90
+                    x2 = 200
+                    y2 = 35
+                    first = 'condition'
+                    msg = stateVal
                     second = ''
                     who = ''
                 elif toId == k:
@@ -104,7 +121,7 @@ def saveMSC():
                         y2 = nb2 * 90
 
                 f.write(f'      /* CIF {cif} ({x1}, {y1}) ({x2}, {y2}) */\n')
-                f.write(f'      {first} {msg} {second} {who};\n')
+                f.write(f'      {first} {msg} {second} {who}{comment};\n')
             f.write('   endinstance;\n\n')
         f.write('   endmsc;\n')
         f.write('endmscdocument;\n')
@@ -148,8 +165,11 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
                         (message, "env", receiver, g_messageId, g_messageId))
                 g_instances[receiver].append(len(g_completeMessages) - 1)
     elif kind == 'SET':
+        # get the value of the timer
+        _, val = messageData[0]
+        timerValueInMs = val.split()[1]
         g_completeMessages.append(
-                (message, sender, '#set', g_messageId, g_messageId))
+                (message, sender, f'#set {timerValueInMs}', g_messageId, g_messageId))
         g_instances[sender].append(len(g_completeMessages) - 1)
     elif kind == 'RESET':
         g_completeMessages.append(
@@ -159,6 +179,11 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
         g_completeMessages.append(
                 (message, '#timeout', receiver, g_messageId, g_messageId))
         g_instances[receiver].append(len(g_completeMessages) - 1)
+    elif kind == 'STATE':
+        # when SDL state has changed
+        g_completeMessages.append(
+                (message, message, f'#state {messageData}', g_messageId, g_messageId))
+        g_instances[sender].append(len(g_completeMessages) - 1)
     else:
         print(f"Tracer: ignoring unsupported event kind {kind}")
 
@@ -182,7 +207,8 @@ def main():
         tasks = {}
         for line in iter(p.stdout.readline, ''):
             lline = line.decode('utf-8').strip()
-            # print("WORKING ON:", lline)
+            #if "tick" not in lline:
+            #    print("WORKING ON:", lline)
             m = re.match('^INNERDATA: ([^:]*)::(.*)::(.*)$', lline)
             # group(1) = message name, (2) = param type (3) = 'fieldName value'
             if m:
@@ -193,32 +219,31 @@ def main():
                 # Update message declaration with ASN.1 type
                 g_messagesDecl[m.group(1)].append(m.group(2))
             elif lline.startswith('INNER_RI: '):
-                sender, receiver, ri, timestamp = lline[10:].split(',')
-                #print sender, receiver, ri, timestamp
-                if ri not in list(messageData.keys()):
+                sender, receiver, senderRI, remoteRI, timestamp = lline[10:].split(',')
+                if senderRI not in list(messageData.keys()):
                     # no parameters
-                    messageData[ri] = []
+                    messageData[senderRI] = []
                     # Update message declaration (no param)
                     if 'timer_manager' not in receiver:
                         # filter timer 'set' and 'reset' functions
-                        g_messagesDecl[ri] = []
+                        g_messagesDecl[senderRI] = []
                 if 'timer_manager' in receiver:
                     # update list of timers
-                    if ri.startswith('reset_'):
+                    if senderRI.startswith('reset_'):
                         preLen = len(f'reset_{sender}_')
                         kind = 'RESET'
-                    elif ri.startswith('set_'):
+                    elif senderRI.startswith('set_'):
                         preLen = len (f'set_{sender}_')
                         kind = 'SET'
-                    nameRI = ri[preLen:]
+                    nameRI = remoteRI[preLen:]
                     if nameRI not in g_timers:
                         g_timers.append(nameRI)
                 else:
                     kind = 'RI'
-                    nameRI = ri
-                Message(kind, timestamp, nameRI, messageData[ri],
+                    nameRI = remoteRI
+                Message(kind, timestamp, nameRI, messageData[senderRI],
                         sender, receiver)
-                messageData[ri] = []
+                messageData[senderRI] = []
             elif lline.startswith('INNER_PI: '):
                 # we can't detect timeout messages for now
                 receiver, pi, timestamp = lline[10:].split(',')
@@ -234,6 +259,13 @@ def main():
                     kind = 'PI'
                 Message(kind, timestamp, pi, messageData[pi], 'env', receiver)
                 messageData[pi] = []
+            elif lline.startswith('INNER_SDL_STATE: '):
+                fctName, stateValue = lline[17:].split(',')
+                stateValue = stateValue[7:]  # remove asn1scc prefix
+                if stateValue != g_currentState[fctName]:
+                    g_currentState[fctName] = stateValue
+                    Message('STATE', 0, fctName, stateValue, fctName, fctName)
+
             else:
                 sys.stdout.write(lline)
                 sys.stdout.write('\n')
