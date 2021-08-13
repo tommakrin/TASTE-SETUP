@@ -25,7 +25,14 @@ g_timers = []
 # current state of SDL functions
 g_currentState = defaultdict(str)
 
+# filters
+g_instanceFilters = set()
+g_messageFilters = defaultdict(list) # {instance: [pi names]}
+
 g_strMscFilename = "trace.msc"
+
+# vertical distance betwwen two events in the MSC
+INTERDIST = 60
 
 def saveMSC():
     with open(g_strMscFilename, "w") as f:
@@ -51,7 +58,7 @@ def saveMSC():
         f.write('    msc recorded;\n')
 
         for k, index_list in g_instances.items():
-            if 'timer_manager' in k:
+            if 'timer_manager' in k or k.lower() in g_instanceFilters:
                 continue
 
             f.write(f'   /* CIF INSTANCE ({instances_x[k]}, 35) (200, 70) (800, 800) */\n')
@@ -63,7 +70,7 @@ def saveMSC():
                 if toId == '#reset' or toId.startswith('#set'):
                     cif = 'TIMEOUT'
                     x1 = instances_x[fromId] + 100
-                    y1 = nb1 * 90
+                    y1 = nb1 * INTERDIST
                     x2 = 186
                     y2 = 39
                     first = 'starttimer' if toId.startswith('#set') else 'stoptimer'
@@ -75,7 +82,7 @@ def saveMSC():
                 elif fromId == '#timeout':
                     cif = 'TIMEOUT'
                     x1 = instances_x[toId] + 100
-                    y1 = nb1 * 90
+                    y1 = nb1 * INTERDIST
                     x2 = 76
                     y2 = 39
                     first = 'timeout'
@@ -85,7 +92,7 @@ def saveMSC():
                     stateVal = toId.split()[1]
                     cif = 'CONDITION'
                     x1 = instances_x[fromId]
-                    y1 = nb1 * 90
+                    y1 = nb1 * INTERDIST
                     x2 = 200
                     y2 = 35
                     first = 'condition'
@@ -97,28 +104,28 @@ def saveMSC():
                     second = 'from'
                     who = fromId
                     x2 = instances_x[k] + 100
-                    y2 = nb2 * 90
+                    y2 = nb2 * INTERDIST
                     if fromId != 'env':
                         x1 = instances_x[fromId] + 100
-                        y1 = nb1 * 90
+                        y1 = nb1 * INTERDIST
                         if nb2 == nb1 + 1:
                             # if execution is immediately after sending,
                             # use a straight line to save space on the diagram
                             y2 = y1
                     else:
                         x1 = -30
-                        y1 = nb2 * 90
+                        y1 = nb2 * INTERDIST
                 else:
                     first = 'out'
                     second = 'to'
                     who = toId
                     x1 = instances_x[k] + 100
-                    y1 = nb1 * 90
+                    y1 = nb1 * INTERDIST
                     x2 = instances_x[toId] + 100
                     if nb2 == nb1 + 1:
                         y2 = y1
                     else:
-                        y2 = nb2 * 90
+                        y2 = nb2 * INTERDIST
 
                 f.write(f'      /* CIF {cif} ({x1}, {y1}) ({x2}, {y2}) */\n')
                 f.write(f'      {first} {msg} {second} {who}{comment};\n')
@@ -138,12 +145,27 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
                                              [tup[1] for tup in messageData]))
     global g_messageId
 
+    if sender.lower() in g_instanceFilters or receiver.lower() in g_instanceFilters:
+        # if the message is linked to a filtered instance, ignore it
+        return
+
     if "timer_manager" not in receiver or kind != 'PI':
         g_messageId += 1
 
     if kind == "RI":
-        g_pendingRIs.append((message, sender, receiver, g_messageId))
+        if receiver.lower() in list(g_messageFilters.keys()) and \
+                message.lower() in g_messageFilters[receiver.lower()]:
+            # is the message filtered for the receiving instance?
+            g_messageId -= 1
+        else:
+            g_pendingRIs.append((message, sender, receiver, g_messageId))
     elif kind == "PI":
+        filtered = False
+        if receiver.lower() in list(g_messageFilters.keys()) and \
+                message.lower() in g_messageFilters[receiver.lower()]:
+            # if message is filtered, we wont add it to g_instances
+            filtered = True
+            g_messageId -= 1
         for each in g_pendingRIs:
             # find corresponding RI, and store the message with two ids:
             # the RI and PI numbers. This is needed to compute the coordinates
@@ -151,15 +173,16 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
             msg, fromId, toId, msgNb = each
             if msg == message and toId == receiver:
                 g_pendingRIs.remove(each)
-                g_completeMessages.append(
-                        (msg, fromId, toId, msgNb, g_messageId))
-                # For each instance name, point to the message
-                g_instances[fromId].append(len(g_completeMessages) - 1)
-                g_instances[toId].append(len(g_completeMessages) - 1)
+                if not filtered:
+                    g_completeMessages.append(
+                            (msg, fromId, toId, msgNb, g_messageId))
+                    # For each instance name, point to the message
+                    g_instances[fromId].append(len(g_completeMessages) - 1)
+                    g_instances[toId].append(len(g_completeMessages) - 1)
                 break
         else:
             # no break, meaning no correspondig RI (-> cyclic)
-            if "timer_manager" not in receiver:
+            if "timer_manager" not in receiver and not filtered:
                 # (ignore the tick of the timer manager)
                 g_completeMessages.append(
                         (message, "env", receiver, g_messageId, g_messageId))
@@ -188,19 +211,55 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
         print(f"Tracer: ignoring unsupported event kind {kind}")
 
 
+def loadFilters():
+    ''' User can provide an optional file named "filters" and listing
+        the signals names that shall be filtered from the MSC
+        format of the file: one filter per line
+        one line is either:
+        input <name> to <function name>
+        or
+        instance <function name>
+    '''
+    with open('filters', 'r') as f:
+        for line in f:
+            if not line or line.startswith('#') or line.startswith('--'):
+                continue
+            elems = line.split()
+            if elems[0] == 'instance':
+                g_instanceFilters |= elems[1].lower()
+            elif elems[0] == 'input' and len(elems) == 4 and elems[2] == 'to':
+                g_messageFilters[elems[3].lower()].append(elems[1].lower())
+            else:
+                print('[X] Incorrect syntax: ', line)
+
+
 def main():
     if "-noParams" in sys.argv:
         global g_bNoParams
         g_bNoParams = True
         sys.argv.remove("-noParams")
     if len(sys.argv) != 2:
-        print("Usage:", sys.argv[0], "[-noParams] <application>")
+        print("[-] Usage:", sys.argv[0], "[-noParams] <application>")
+        print('[-] You can filter messages and instances by creating a file '
+              ' named "filters" containing a sequence of lines with syntax:')
+        print('     # filter out complete instance:')
+        print('     instance functionName')
+        print('     -- filter individual messages to an instance')
+        print('     input PIname to functionName')
         sys.exit(1)
 
     os.putenv("TASTE_INNER_MSC", "1")
     os.putenv("ASSERT_IGNORE_GUI_ERRORS", "1")
 
     p = None
+
+    try:
+        loadFilters()
+        print('[-] Loaded filters')
+    except IOError:
+        print('[-] No filters file found')
+        pass
+
     try:
         p = subprocess.Popen(sys.argv[1], stdout=subprocess.PIPE)
         messageData = {}
