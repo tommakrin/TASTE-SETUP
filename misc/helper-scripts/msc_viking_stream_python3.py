@@ -15,14 +15,14 @@ from websocket import create_connection
 from distutils import spawn
 import subprocess
 
-path_to_msceditor = spawn.find_executable ("msceditor")
+path_to_msceditor = spawn.find_executable ("spacecreator.AppImage")
 
 if not path_to_msceditor:
     print("[ERROR] msceditor not in the PATH")
     sys.exit(1)
 
 # Open a new window of the MSC Editor
-editor = subprocess.Popen ([path_to_msceditor, "-p", "5116"])
+editor = subprocess.Popen ([path_to_msceditor, "--mscstreaming", "-p", "5116"])
 
 # Prepare a command to the MSC Editor
 cmds = ['{"CommandType": "Instance", "Parameters": {"name": "InstanceA"}}',

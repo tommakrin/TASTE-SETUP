@@ -70,6 +70,7 @@ UUID2="6d650885-2dda-4f6a-b4fa-1fabe64f392b"  # Kit of the AppImage
 
 #  Create the main Makefile
 echo "KAZOO?=kazoo
+SPACECREATOR?=spacecreator.AppImage
 # Here you can specify custom compiler/linker flags, and add folders containing
 # external code you want to compile and link for a specific partition.
 # Use upper case for the partition name:
@@ -104,11 +105,11 @@ work/glue_built:	InterfaceView.aadl DeploymentView.aadl DataView.aadl Concurrenc
 	touch \$@
 
 InterfaceView.aadl:	interfaceview.xml
-	aadlconverter -o \$^ -t \$(shell taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
+	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
 
 DeploymentView.aadl:	interfaceview.xml
 	# Create/update a deployment view for Linux target (to be removed when we have a DV editor)
-	aadlconverter -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
+        \$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
 
 DataView.aadl: \${ASN1_FILES}
 	taste-update-data-view \$^
