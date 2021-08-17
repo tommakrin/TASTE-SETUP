@@ -13,7 +13,7 @@ fi
 INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
-CONVERTER=spacecreator.AppImage --mscconverter
+CONVERTER="spacecreator.AppImage --mscconverter"
 
 echo -e "${INFO} MSC to Python Converter (c) 2020 European Space Agency / Maxime Perrotin"
 
