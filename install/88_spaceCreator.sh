@@ -1,24 +1,25 @@
 #!/bin/bash
-dpkg -l | grep '^ii.*spacecreator.*0.1.4209' > /dev/null || {
-    dpkg -l | grep spacecreator > /dev/null && {
-        echo "[-] Uninstalling previously existing version..."
-        sudo apt remove -y --force-yes spacecreator || exit 1
-    }
-    echo "[-] Installing the latest Space Creator..."
-    NEW_DEB=/tmp/newSpaceCreator.$$.deb
-    if wget -O $NEW_DEB "https://download.tuxfamily.org/taste/SpaceCreator-0.1.4209-Linux.deb" ; then
-        sudo gdebi -n -o=--no-install-recommends $NEW_DEB || {
-            echo "[x] Failed to install $NEW_DEB..."
-            ls -l $NEW_DEB
-            echo "[x] Aborting."
-            exit 1
-        }
-        rm -f $NEW_DEB
-    else
-        echo "[x] Failed to download the new Space Creator... Aborting."
-        exit 1
-    fi
-}
+# with debian11 do not install the .deb, use the .appImage
+#   dpkg -l | grep '^ii.*spacecreator.*0.1.4209' > /dev/null || {
+#       dpkg -l | grep spacecreator > /dev/null && {
+#           echo "[-] Uninstalling previously existing version..."
+#           sudo apt remove -y --force-yes spacecreator || exit 1
+#       }
+#       echo "[-] Installing the latest Space Creator..."
+#       NEW_DEB=/tmp/newSpaceCreator.$$.deb
+#       if wget -O $NEW_DEB "https://download.tuxfamily.org/taste/SpaceCreator-0.1.4209-Linux.deb" ; then
+#           sudo gdebi -n -o=--no-install-recommends $NEW_DEB || {
+#               echo "[x] Failed to install $NEW_DEB..."
+#               ls -l $NEW_DEB
+#               echo "[x] Aborting."
+#               exit 1
+#           }
+#           rm -f $NEW_DEB
+#       else
+#           echo "[x] Failed to download the new Space Creator... Aborting."
+#           exit 1
+#       fi
+#   }
 # install the taste configuration files for Space Creator (color scheme, etc.)
 echo "Installing Space Creator configuration files"
 mkdir -p ~/.local/share/qtcreator/colors || exit 1
@@ -32,7 +33,9 @@ cp -u misc/space-creator/default_attributes.xml ~/.local/share/QtProject/QtCreat
 #cp   -f -u /usr/share/kde4/apps/katepart/syntax/ada.xml ~/.config/QtProject/qtcreator/generic-highlighter
 #sudo cp -f -u /usr/share/kde4/apps/katepart/syntax/ada.xml /usr/share/qtcreator/generic-highlighter
 cp -u misc/space-creator/syntax/*  ~/.config/QtProject/qtcreator/generic-highlighter || :
-#sudo cp -u misc/space-creator/syntax/* /usr/share/kde4/apps/katepart/syntax
+# Configuration of the kits for Qt Creator:
+cp -u misc/space-creator/qtversion.xml  ~/.config/QtProject/qtcreator/ || :
+cp -u misc/space-creator/profiles.xml  ~/.config/QtProject/qtcreator/ || :
 # Update path to ASN1SCC
 sed -i  "s,^asn0compiler=.*,asn1compiler=\"$HOME/tool-inst/share/asn1scc/asn1scc\",g" $HOME/.config/QtProject/QtCreator.ini || :
 # Install the HW library
