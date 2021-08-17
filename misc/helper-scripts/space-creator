@@ -1,4 +1,7 @@
 #!/bin/bash
+
+SPACECREATOR=spacecreator.AppImage
+
 if [ -t 1 ] ; then
     COLORON="\e[1m\e[32m"
     REDCOLORON="\e[1m\e[31m"
@@ -14,18 +17,18 @@ INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
 
-run_qt_creator () {
+run_space_creator () {
     echo -e "${INFO} Running Space Creator with $1"
-    qtcreator $1 interfaceview.xml
+    $SPACECREATOR $1 interfaceview.xml
 
 }
 # To determine if we are in an existing project folder
 PROJECT_FILE=$(find *.pro 2>/dev/null)
 
-# If the project file already exist, directly run qtcreator
+# If the project file already exist, directly run the gui
 if [ -f "$PROJECT_FILE" ]
 then
-    run_qt_creator $PROJECT_FILE
+    run_space_creator $PROJECT_FILE
     exit $?
 fi
 
@@ -62,10 +65,8 @@ fi
 # Define strings to create Spacecrator's .pro.user config file:
 BUILD_DIRECTORY=$(pwd)
 # The UUID are not random, they relate to the version of Qt creator
-UUID1="6eae5ecd-6091-4f71-a6c8-6f8e9ff98645"
-UUID1="3b50e4cf-621c-4917-bd95-57e41dc64b6f"
-#UUID2="a16b9b9f-26ff-440d-8ea6-d1346fe4c67e"
-UUID2="ce6e1740-b935-4eef-b343-b1dd3ac64d5d"
+UUID1="bfe30b91-dafe-4269-b7dc-07a3ac6ce17c"  # AppImage version
+UUID2="6d650885-2dda-4f6a-b4fa-1fabe64f392b"  # Kit of the AppImage
 
 #  Create the main Makefile
 echo "KAZOO?=kazoo
@@ -189,5 +190,5 @@ then
     echo -e "${INFO} Done. You can run 'space-creator' from the project folder to open the editor"
     echo -e "${INFO} 'make skeletons' to create the skeletons or just 'make' to build everything."
 else
-    run_qt_creator $PROJECT_FILE
+    run_space_creator $PROJECT_FILE
 fi

@@ -4,6 +4,8 @@
 # Script (c) Maxime Perrotin / ESA 2021
 # Supported languages: C, Ada, SDL
 # Logging with colors (only in a terminal)
+SPACECREATOR=spacecreator.AppImage
+
 if [ -t 1 ] ; then
     COLORON="\e[1m\e[32m"
     REDCOLORON="\e[1m\e[31m"
@@ -32,16 +34,16 @@ then
     cd work/"${2,,}"/"$1"
     if [[ $1 == "C" ]]
     then
-        qtcreator -client src/"${2,,}".c
+        $SPACECREATOR -client src/"${2,,}".c
     elif [[ $1 == "Ada" ]]
     then
-        qtcreator -client src/"${2,,}".adb
+        $SPACECREATOR -client src/"${2,,}".adb
     elif [[ $1 == "CPP" ]]
     then
-        qtcreator -client src/"${2,,}".cc
+        $SPACECREATOR -client src/"${2,,}".cc
     elif [[ $1 == "GUI" ]]
     then
-        qtcreator -client src/UserWidgets.py
+        $SPACECREATOR -client src/UserWidgets.py
     else
         make edit
     fi
