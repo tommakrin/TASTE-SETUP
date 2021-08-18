@@ -109,7 +109,7 @@ InterfaceView.aadl:	interfaceview.xml
 
 DeploymentView.aadl:	interfaceview.xml
 	# Create/update a deployment view for Linux target (to be removed when we have a DV editor)
-        \$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
+	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
 
 DataView.aadl: \${ASN1_FILES}
 	taste-update-data-view \$^
