@@ -65,7 +65,7 @@ fi
 # Define strings to create Spacecrator's .pro.user config file:
 BUILD_DIRECTORY=$(pwd)
 # The UUID are not random, they relate to the version of Qt creator
-UUID1="bfe30b91-dafe-4269-b7dc-07a3ac6ce17c"  # AppImage version
+UUID1="08272c34-bb80-4e52-942a-1a4d259a3d82"  # AppImage version
 UUID2="6d650885-2dda-4f6a-b4fa-1fabe64f392b"  # Kit of the AppImage
 
 #  Create the main Makefile
@@ -109,7 +109,7 @@ InterfaceView.aadl:	interfaceview.xml
 
 DeploymentView.aadl:	interfaceview.xml
 	# Create/update a deployment view for Linux target (to be removed when we have a DV editor)
-        \$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
+	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
 
 DataView.aadl: \${ASN1_FILES}
 	taste-update-data-view \$^
