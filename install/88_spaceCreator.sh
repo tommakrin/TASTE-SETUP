@@ -29,21 +29,21 @@ fi
 echo "[-] Installing TASTE configuration files for Space Creator"
 mkdir -p ~/.local/share/qtcreator/colors || exit 1
 mkdir -p ~/.local/share/QtProject/QtCreator/contextMenu || exit 1
-cp -u misc/space-creator/default_colors.json ~/.local/share/qtcreator/colors/default_colors.json  || exit 1
-cp -u misc/space-creator/contextmenu.json ~/.local/share/QtProject/QtCreator/contextMenu/ || exit 1
-cp -u misc/space-creator/default_attributes.xml ~/.local/share/QtProject/QtCreator/ || exit 1
+cp -f misc/space-creator/default_colors.json ~/.local/share/qtcreator/colors/default_colors.json  || exit 1
+cp -f misc/space-creator/contextmenu.json ~/.local/share/QtProject/QtCreator/contextMenu/ || exit 1
+cp -f misc/space-creator/default_attributes.xml ~/.local/share/QtProject/QtCreator/ || exit 1
 #echo "Installing Syntax Highlighting files for Qt Creator"
 # The "fallback" folder of Qt Creator may be either Kate or Qt Creator's install folder, depending on
 # the machine setup. We put the files in both locations to be sure it works everywhere
 #cp   -f -u /usr/share/kde4/apps/katepart/syntax/ada.xml ~/.config/QtProject/qtcreator/generic-highlighter
 #sudo cp -f -u /usr/share/kde4/apps/katepart/syntax/ada.xml /usr/share/qtcreator/generic-highlighter
-cp -u misc/space-creator/syntax/*  ~/.config/QtProject/qtcreator/generic-highlighter || :
+cp -f misc/space-creator/syntax/*  ~/.config/QtProject/qtcreator/generic-highlighter || :
 # Configuration of the kits for Qt Creator:
-cp -u misc/space-creator/qtversion.xml  ~/.config/QtProject/qtcreator/ || :
-cp -u misc/space-creator/profiles.xml  ~/.config/QtProject/qtcreator/ || :
+cp -f misc/space-creator/qtversion.xml  ~/.config/QtProject/qtcreator/ || :
+cp -f misc/space-creator/profiles.xml  ~/.config/QtProject/qtcreator/ || :
 # Update path to ASN1SCC
 sed -i  "s,^asn0compiler=.*,asn1compiler=\"$HOME/tool-inst/share/asn1scc/asn1scc\",g" $HOME/.config/QtProject/QtCreator.ini || :
 # Install the HW library
 mkdir -p ~/.local/share/QtProject/QtCreator/HWlibrary
-cp -u misc/space-creator/Board1.xml ~/.local/share/QtProject/QtCreator/HWlibrary || exit 1
+cp -f misc/space-creator/Board1.xml ~/.local/share/QtProject/QtCreator/HWlibrary || exit 1
 
