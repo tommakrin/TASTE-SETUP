@@ -37,7 +37,7 @@ fi
 cp ../dataview/dataview-uniq.asn .
 
 echo '================================================'
-echo 'Trace file were generated. You may now run:
+echo 'Trace file was generated. You may now run:
     taste-edit-msc trace.msc'
 
 # Patch the VCD file (if any)
