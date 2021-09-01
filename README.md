@@ -36,7 +36,7 @@ changes you perform in your container (via `docker commit...`) and create your o
 customized images.
 
 For users where the TASTE VM is a concern for reasons of security *(e.g. uncertainty of what
-exactly is included inside it)* the Docker container is a complete and clear answer: 
+exactly is included inside it)* the Docker container is a complete and clear answer:  
 it is built from source, so there is full visibility on what is inside it.
 
 In Debian-based distributions

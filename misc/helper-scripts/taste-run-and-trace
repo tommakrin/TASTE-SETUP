@@ -21,7 +21,7 @@ You can then open/edit this MSC with the TASTE MSC Editor
 '
 else
     export VCD_ENABLED=1
-    $(taste-config --prefix)/share/AutoGUI/tracer-inner.py 127.0.0.1 27183 "$1"
+    $(taste-config --prefix)/share/AutoGUI/tracer-inner.py $NOPARAMS 127.0.0.1 27183 "$1"
 fi
 
 
