@@ -16,7 +16,7 @@ node                :  |_ Instance of node (see "for node in Nodes")
 node.partitions     :  |   |_ List of partitions (binary) in that node
 partition           :  |   |   |_ Instance of partition (see "for partition in node.partitions")
 partitions.functions:  |   |       |_ List of functions in that partition
-function            :  |   |           |_ Instance of function (see "for function in function in partition.functions")
+function            :  |   |           |_ Instance of function (name of the function)
 node.devices        :  |   |_ List of devices (ports) in that node
 device              :  |       |_ Instance of device (see "for device in node.devices")
 Connections         : List of all available Connections between devices
@@ -29,12 +29,22 @@ message             :          |_ Instance of message/binding (see "for message 
 package deploymentview::DV::{{ node.name }}
 public
 
- with Ocarina_Buses;
- with Ocarina_Drivers;
  with Deployment;
  with TASTE;
  with TASTE_DV_Properties;
 
+ {# Add all the WITH dependencies for each driver #}
+ {% for device in node.devices %}
+  {% for attr in device.attributes %}
+   {% if attr.name == "namespace" %}
+    with {{ attr.value }}; {# e.g. ocarina_drivers #}
+   {% elif attr.name == "bus_namespace" %}
+    with {{ attr.value }}; {# e.g. ocarina_buses #}
+   {% endif %}
+  {% endfor %}
+ {% endfor %}
+
+ --  Declare partition(s) of node "{{ node.name }}".
  {% for partition in node.partitions %}
  process {{ partition.name }}
  end {{ partition.name }};
@@ -42,20 +52,36 @@ public
  process implementation {{ partition.name }}.others
  end {{ partition.name }}.others;
  {% endfor %}
-    
+
  {% for device in node.devices %}
- -- {% for attr in device.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}
  device {{ device.name }}
-    extends ocarina_drivers::generic_sockets_ip  -- XXX missing in model
+  {% for attr in device.attributes %}
+   {% if attr.name == "extends" %}
+    extends {{ attr.value }}; {# e.g. ocarina_drivers::generic_sockets_ip #}
+   {% endif %}
+  {% endfor %}
  features
-    link : refined to requires bus access Ocarina_buses::ip.i; -- XXX
+  {% for attr in device.attributes %}
+   {% if attr.name == "requires_bus_access" %}
+    link : refined to requires bus access {{ attr.value }};
+   {% endif %}
+  {% endfor %}
  properties
-    Deployment::Configuration => "XXX"; -- XXX
-    Deployment::Config => "/path/to/ASN1"; -- XXX
+  {% for attr in device.attributes %}
+   {% if attr.name == "config" %} 
+    Deployment::Configuration => "{{ attr.value }}"; -- XXX not sure it is "config" to look for
+   {% elif attr.name == "asn1file" %}
+    Deployment::Config => "{{ attr.value }}";
+   {% endif %}
+  {% endfor %}
  end {{ device.name }};
 
  device implementation {{ device.name }}.others
-    extends ocarina_drivers::generic_sockets_ip.pohic -- XXX missing in model
+  {% for attr in device.attributes %}
+   {% if attr.name == "extends" %}
+    extends {{ attr.value }}; {# e.g. ocarina_drivers::generic_sockets_ip.pohic #}
+   {% endif %}
+  {% endfor %}
  end {{ device.name }}.others;
 
  {% endfor %}
@@ -69,43 +95,75 @@ public
  with Deployment;
  with Interfaceview::IV;
  with TASTE_DV_Properties;
- with Ocarina_Buses;
 
  {% for node in Nodes %}
+ --  Dependencies of node {{ node.name }}
   {% for partition in node.partitions %}
-   {% for function in function in partition.functions %}
- with interfaceview::IV::{{ function.name }};  -- XXX complete path?
+   {% for function in partition.functions %}
+ with interfaceview::IV::{{ function }};  -- XXX complete path?
    {% endfor %}
   {% endfor %}
- with deploymentview::DV::{{ node.name }};
-
+ {% for device in node.devices %}
+  {% for attr in device.attributes %}
+   {% if attr.name == "bus_namespace" %}
+    with {{ attr.value }}; {# e.g. ocarina_buses #}
+   {% endif %}
+  {% endfor %}
  {% endfor %}
- with ocarina_processors_x86;  -- XXX missing in model per node
+ with deploymentview::DV::{{ node.name }};
+  {% for attr in node.attributes %}
+   {% if attr.name == "namespace" %}
+ with {{ attr.value }};
+   {% endif %}
+  {% endfor %}
+ {% endfor %}
 
  {% for node in Nodes %}
+ --  Node {{ node.name }}
  system {{ node.name }}
  --  XXX if there are connections, add features with requires bus access
+ {% if Connections %} {# assuming that no node is standalone #}
+  features
+   {% for connection in Connections %}
+    {% for attr in connection.attributes %}
+     {% if attr.name == "from_node" and attr.value == node.name or attr.name == "to_node" and attr.value == node.name %}
+      {% for attr2 in connection.attributes %}
+       {% if attr2.name == "to_bus" %}
+        {% for attr3 in connection.attributes %}
+         {% if attr3.name == "from_port" %}
+         {% endif %}
+        {% endfor %}
+       {% endif %}
+      {% endfor %}
+     {% endif %}
+    {% endfor %}
+   {% endfor %}
+ {% endif %}
  end {{ node.name }};
 
  system implementation {{ node.name }}.others
  subcomponents
   {% for partition in node.partitions %}
-   {% for function in function in partition.functions %}
-    IV_{{ function.name }} : system Interfaceview::IV::{{ function.name }}::{{ function.name }}.others {  -- XXX complete path?
-       Taste::FunctionName => "{{ function.name }}";
+   {% for function in partition.functions %}
+    IV_{{ function }} : system Interfaceview::IV::{{ function }}::{{ function }}.others {  -- XXX complete path?
+       Taste::FunctionName => "{{ function }}";
     };
    {% endfor %}
-    {{ partition.name }} : process deploymentview::DV::{{ node.name }}::{{ partition.name }}.others; --  Missing Port_Number, but what is that?
+    {{ partition.name }} : process deploymentview::DV::{{ node.name }}::{{ partition.name }}.others; {# XXX Missing Port_Number, but what is that? #}
   {% endfor %}
-    p1 : processor ocarina_processors_x86::x86.linux; -- XXX
+   {% for attr in node.attributes %}
+    {% if attr.name == "type" %}
+    p1 : processor {{ attr.value }};
+    {% endif %}
+   {% endfor %}
   {% for device in node.devices %}
     {{ device.name }} : device deploymentview::DV::{{ node.name }}::{{ device.name }}.others;
   {% endfor %}
  -- XXX Add the "connections" section if there are buses
  properties
   {% for partition in node.partitions %}
-   {% for function in function in partition.functions %}
-    TASTE::APLC_Binding => (reference ({{ partition.name }})) applies to IV_{{ function.name }};
+   {% for function in partition.functions %}
+    TASTE::APLC_Binding => (reference ({{ partition.name }})) applies to IV_{{ function }};
    {% endfor %}
     Actual_Processor_Binding => (reference (p1)) applies to {{ partition.name }};
   {% endfor %}
