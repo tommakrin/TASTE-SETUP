@@ -151,7 +151,12 @@ public
   {% for device in node.devices %}
     {{ device.name }} : device deploymentview::DV::{{ node.name }}::{{ device.name }}.others;
   {% endfor %}
- -- XXX Add the "connections" section if there are buses
+ {% if node.requiredBusAccesses %}
+ connections
+  {% for access in node.requiredBusAccesses %}
+    {{ access.name }}_link : bus access {{ access.name }} -> {{ access.devicename }}.link; -- XXX devicename is missing for now
+  {% endfor %}
+ {% endif %}
  properties
   {% for partition in node.partitions %}
    {% for function in partition.functions %}
@@ -175,9 +180,9 @@ subcomponents
    {{ node.name }} : system {{ node.name }}.others;
  {% endfor %}
  -- XXX Add the busses (not directly in the model)
+   interfaceview: system interfaceview::IV::interfaceview.others;
  -- XXX Add the CONNECTIONS sections to connect the busses
  -- XXX Add the PROPERTIES with Actual_Connection_Bindings
-   interfaceview: system interfaceview::IV::interfaceview.others;
 end deploymentview.others;
 
 end deploymentview::DV;
