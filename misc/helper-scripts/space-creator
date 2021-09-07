@@ -107,6 +107,11 @@ work/glue_built:	InterfaceView.aadl DeploymentView.aadl DataView.aadl Concurrenc
 InterfaceView.aadl:	interfaceview.xml
 	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
 
+%.o: %.dv.xml
+	# Build using deployment view $^
+	\$(SPACECREATOR) --dvconverter -o \$^ -t  \$(shell taste-config --prefix)/share/dv2aadl/deploymentview.tmplt -x DeploymentView.aadl
+	\$(MAKE)
+
 DeploymentView.aadl:	interfaceview.xml
 	# Create/update a deployment view for Linux target (to be removed when we have a DV editor)
 	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
