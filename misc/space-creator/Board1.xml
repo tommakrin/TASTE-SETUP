@@ -1,6 +1,8 @@
 <Boards>
-   <Board name="Linux on x86" type="ocarina_processors_x86::x86.linux" namespace="ocarina_processors_x86">
+   <Board name="Linux X86 PolyORB-HI-C" type="ocarina_processors_x86::x86.linux" namespace="ocarina_processors_x86">
       <Port name="eth0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
+   </Board>
+   <Board name="RTEMS GR740 PolyORB-HI-C" type="ocarina_processors_leon::leon3.rtems51_posix" namespace="ocarina_processors_leon">
    </Board>
    <Board name="Linux on ARM" type="ocarina_processors_arm::aarch64.linux">
       <Port name="eth0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
