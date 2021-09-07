@@ -21,7 +21,7 @@ node.devices             :  |   |_ List of devices (ports) in that node
 device                   :  |   |   |_ Instance of device (see "for device in node.devices")
 node.requiredBusAccesses :  |   |_ List of devices in the node that are actually used by at least one connection
 device                   :  |       |_ Instance of bus access
-device.longName          :  |       |_ Name of the access being device and port name
+device.fullName          :  |       |_ Name of the access being device and port name
 device.name              :  |       |_ Name of the access device
 device.portName          :  |       |_ Name of the access port
 device.busName           :  |       |_ bus access name (has to match for both connected devices)
@@ -33,8 +33,12 @@ connection.fromPort      :      |_ The source port of this connection
 connection.toNode        :      |_ The target node of this connection
 connection.toDevice      :      |_ The target device of this connection
 connection.toPort        :      |_ The target port of this connection
+connection.busName       :      |_ Name of the bus used by this connection
 connection.messages      :      |_ List of message binding of that connection
 message                  :          |_ Instance of message/binding (see "for message in connection.messages")
+Buses                    : List of all used Buses
+bus                      :  |_ Instance of one bus
+bus.qualifier            :      |_ Quaifier of the bus (see device/connection busName)
 ==================
 {% endcomment %}
 {% for node in Nodes %}
@@ -45,6 +49,7 @@ public
  with TASTE;
  with TASTE_DV_Properties;
 
+{% if node.requiredBusAccessess %}
  {# Add all the WITH dependencies for each driver #}
  {% for device in node.devices %}
   {% for attr in device.attributes %}
@@ -55,6 +60,7 @@ public
    {% endif %}
   {% endfor %}
  {% endfor %}
+{% endif %}
 
  --  Declare partition(s) of node "{{ node.name }}".
  {% for partition in node.partitions %}
@@ -65,11 +71,12 @@ public
  end {{ partition.name }}.others;
  {% endfor %}
 
+{% if node.requiredBusAccessess %}
  {% for device in node.devices %}
  device {{ device.name }}
   {% for attr in device.attributes %}
    {% if attr.name == "extends" %}
-    extends {{ attr.value }}; {# e.g. ocarina_drivers::generic_sockets_ip #}
+    extends {{ attr.value }} {# e.g. ocarina_drivers::generic_sockets_ip #}
    {% endif %}
   {% endfor %}
  features
@@ -90,13 +97,14 @@ public
 
  device implementation {{ device.name }}.others
   {% for attr in device.attributes %}
-   {% if attr.name == "extends" %}
-    extends {{ attr.value }}; {# e.g. ocarina_drivers::generic_sockets_ip.pohic #}
+   {% if attr.name == "impl_extends" %}
+    extends {{ attr.value }} {# e.g. ocarina_drivers::generic_sockets_ip.pohic #}
    {% endif %}
   {% endfor %}
  end {{ device.name }}.others;
 
  {% endfor %}
+{% endif %}
 end deploymentview::DV::{{ node.name }};
 {% endfor %}
 
@@ -115,6 +123,7 @@ public
  with interfaceview::IV::{{ function }};  -- XXX complete path?
    {% endfor %}
   {% endfor %}
+{% if node.requiredBusAccessess %}
  {% for device in node.devices %}
   {% for attr in device.attributes %}
    {% if attr.name == "bus_namespace" %}
@@ -122,6 +131,7 @@ public
    {% endif %}
   {% endfor %}
  {% endfor %}
+{% endif %}
  with deploymentview::DV::{{ node.name }};
   {% for attr in node.attributes %}
    {% if attr.name == "namespace" %}
@@ -136,7 +146,7 @@ public
  {% if node.requiredBusAccesses %}
  features
    {% for access in node.requiredBusAccesses %}
-    {{ access.longName }} : requires bus access {{ access.busName }};
+    {{ access.fullName }} : requires bus access {{ access.busName }};
    {% endfor %}
  {% endif %}
  end {{ node.name }};
@@ -156,13 +166,13 @@ public
     p1 : processor {{ attr.value }};
     {% endif %}
    {% endfor %}
+ {% if node.requiredBusAccesses %}
   {% for device in node.devices %}
     {{ device.name }} : device deploymentview::DV::{{ node.name }}::{{ device.name }}.others;
   {% endfor %}
- {% if node.requiredBusAccesses %}
  connections
   {% for access in node.requiredBusAccesses %}
-    {{ access.longName }}_link : bus access {{ access.longName }} -> {{ access.name }}.link;
+    {{ access.fullName }}_link : bus access {{ access.fullName }} -> {{ access.name }}.link;
   {% endfor %}
  {% endif %}
  properties
@@ -172,14 +182,16 @@ public
    {% endfor %}
     Actual_Processor_Binding => (reference (p1)) applies to {{ partition.name }};
   {% endfor %}
+ {% if node.requiredBusAccesses %}
   {% for device in node.devices %}
     Actual_Processor_Binding => (reference (p1)) applies to {{ device.name }};
   {% endfor %}
+ {% endif %}
  end {{ node.name}}.others;
 
  {% endfor %}
 
-system deploymentview;
+system deploymentview
 end deploymentview;
 
 system implementation deploymentview.others
@@ -198,9 +210,11 @@ subcomponents
  {% endfor %}
  properties
  {% for connection in Connections %}
-  {% for message in connextio.messages % }
+{% comment %}
+  {% for message in connection.messages % }
    Actual_Connection_Binding => (reference ({{ connection.busName }})) applies to interfaceview.{{ message.toFunction }}_PI_{{ message.toInterace }}_{{ message.fromFunction }}_RI_{{ message.fromInterface }};
   {% endfor %}
+{% endcomment %}
  {% endfor %}
  {% endif %}
 end deploymentview.others;
