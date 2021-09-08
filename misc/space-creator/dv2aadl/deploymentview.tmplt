@@ -53,7 +53,7 @@ public
  with TASTE;
  with TASTE_DV_Properties;
 
-{% if node.requiredBusAccessess %}
+{% if node.requiredBusAccesses %}
  {# Add all the WITH dependencies for each driver #}
  {% for device in node.devices %}
   {% for attr in device.attributes %}
@@ -75,7 +75,7 @@ public
  end {{ partition.name }}.others;
  {% endfor %}
 
-{% if node.requiredBusAccessess %}
+{% if node.requiredBusAccesses %}
  {% for device in node.devices %}
  device {{ device.name }}
   {% for attr in device.attributes %}
@@ -127,7 +127,7 @@ public
  with interfaceview::IV::{{ function }};  -- XXX complete path?
    {% endfor %}
   {% endfor %}
-{% if node.requiredBusAccessess %}
+{% if node.requiredBusAccesses %}
  {% for device in node.devices %}
   {% for attr in device.attributes %}
    {% if attr.name == "bus_namespace" %}
@@ -210,12 +210,13 @@ subcomponents
  {% if Connections %}
  connections
  {% for connection in Connections %}
-   {{ connection.name }} : bus access {{ connection.busName }} -> {{ connection.fromNode }}.{{ connection.fromDevice }}_{{ connection.fromPort }};
+   {{ connection.name }}_1 : bus access {{ connection.busName }} -> {{ connection.fromNode }}.{{ connection.fromDevice }}_{{ connection.fromPort }};
+   {{ connection.name }}_2 : bus access {{ connection.busName }} -> {{ connection.toNode }}.{{ connection.toDevice }}_{{ connection.toPort }};
  {% endfor %}
  properties
  {% for connection in Connections %}
   {% for message in connection.messages %}
-   Actual_Connection_Binding => (reference ({{ connection.busName }})) applies to interfaceview.{{ message.toFunction }}_PI_{{ message.toInterface }}_{{ message.fromFunction }}_RI_{{ message.fromInterface }};
+   Actual_Connection_Binding => (reference ({{ connection.busName }})) applies to interfaceview.{{ message.fromFunction }}_RI_{{ message.fromInterface }}_{{ message.toFunction }}_PI_{{ message.toInterface }};
   {% endfor %}
  {% endfor %}
  {% endif %}
