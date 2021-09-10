@@ -14,17 +14,18 @@ The following tags are available in this template:
 Nodes                    : List of all available Nodes (Boards)
 node                     :  |_ Instance of node (see "for node in Nodes")
 node.partitions          :  |   |_ List of partitions (binary) in that node
-partition                :  |   |   |_ Instance of partition (see "for partition in node.partitions")
+partition                :  |   |   |_ Instance of node.partition (see "for partition in node.partitions")
 partitions.functions     :  |   |       |_ List of functions in that partition
-function                 :  |   |           |_ Instance of function (see "for function in function in partition.functions")
+function                 :  |   |           |_ Instance of partitions.function (see "for function in function in partition.functions")
 node.devices             :  |   |_ List of devices (ports) in that node
-device                   :  |   |   |_ Instance of device (see "for device in node.devices")
-device.fullName          :  |   |   |_ Name of the access being device and port name
-device.name              :  |   |   |_ Name of the access device
-device.portName          :  |   |   |_ Name of the access port
+device                   :  |   |   |_ Instance of node.device
+device.fullName          :  |   |   |_ Full name of the device, consisting of name and port
+device.name              :  |   |   |_ Name of the device
+device.portName          :  |   |   |_ Name of the port
 device.qualifier         :  |   |   |_ Qualifier of the bus (see bus.qualifier)
+device.nodeName          :  |   |   |_ Name of the node, this device belongs to
 node.requiredBusAccesses :  |   |_ List of devices in the node that are actually used by at least one connection
-device                   :  |       |_ Instance of bus access (same properties as in node.devices)
+device                   :  |       |_ Instance of node.requiredBusAccesses (same properties as in node.devices)
 Connections              : List of all available Connections between devices
 connection               :  |_ Instance of connection (see "for connection in Connections")
 connection.fromNode      :  |   |_ The source node of this connection
@@ -42,10 +43,17 @@ message.toFunction       :  |           |_ Name of the connected target function
 message.toInterface      :  |           |_ Name of the connected target interface
 Buses                    : List of all used Buses
 bus                      :  |_ Instance of one bus
-bus.qualifier            :      |_ Qualifier of the bus (see device.qualifier)
+bus.qualifier            :  |   |_ Qualifier of the bus (same as device.qualifier of connected devices)
+bus.devices              :  |   |_ List of devices connected to this bus
+device                   :  |       |_ Instance of bus.devices (same properties as in node.devices)
 ==================
 {% endcomment %}
 {% for node in Nodes %}
+--  This file was generated automatically - do not modify it manually
+--  If you wish to modify the template used to create this file, it is located
+--  in ~/tool-src/misc/space-creator/dv2aadl/deploymentview.tmplt
+--  After modifications, install it by running ~/tool-src/install/90_misc
+--  Template written by Maxime Perrotin (maxime.perrotin@esa.int) 2021-09
 package deploymentview::DV::{{ node.name }}
 public
 
@@ -92,7 +100,7 @@ public
  properties
   {% for attr in device.attributes %}
    {% if attr.name == "config" %} 
-    Deployment::Configuration => "{{ attr.value }}"; -- XXX not sure it is "config" to look for
+    Deployment::Configuration => "{{ attr.value|safe }}";
    {% elif attr.name == "asn1file" %}
     Deployment::Config => "{{ attr.value }}";
    {% endif %}
@@ -200,25 +208,26 @@ end deploymentview;
 
 system implementation deploymentview.others
 subcomponents
+   interfaceview: system interfaceview::IV::interfaceview.others;
  {% for node in Nodes %}
    {{ node.name }} : system {{ node.name }}.others;
  {% endfor %}
- {% for bus in Buses %}
+ {% if Buses %}
+  {% for bus in Buses %}
    {{ bus.name }} : bus {{ bus.qualifier }};
- {% endfor %}
-   interfaceview: system interfaceview::IV::interfaceview.others;
- {% if Connections %}
- connections
- {% for connection in Connections %}
-   {{ connection.name }}_1 : bus access {{ connection.busName }} -> {{ connection.fromNode }}.{{ connection.fromDevice }}_{{ connection.fromPort }};
-   {{ connection.name }}_2 : bus access {{ connection.busName }} -> {{ connection.toNode }}.{{ connection.toDevice }}_{{ connection.toPort }};
- {% endfor %}
- properties
- {% for connection in Connections %}
-  {% for message in connection.messages %}
-   Actual_Connection_Binding => (reference ({{ connection.busName }})) applies to interfaceview.{{ message.fromFunction }}_RI_{{ message.fromInterface }}_{{ message.toFunction }}_PI_{{ message.toInterface }};
   {% endfor %}
- {% endfor %}
+ connections
+  {% for bus in Buses %}
+   {% for device in bus.devices %}
+   {{ device.nodeName }}_{{ bus.name }} : bus access {{ bus.name }} -> {{ device.nodeName }}.{{ device.name }}_{{ device.portName }};
+   {% endfor %}
+  {% endfor %}
+ properties
+  {% for connection in Connections %}
+   {% for message in connection.messages %}
+   Actual_Connection_Binding => (reference ({{ connection.busName }})) applies to interfaceview.{{ message.fromFunction }}_RI_{{ message.fromInterface }}_{{ message.toFunction }}_PI_{{ message.toInterface }};
+   {% endfor %}
+  {% endfor %}
  {% endif %}
 end deploymentview.others;
 
