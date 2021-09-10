@@ -100,7 +100,7 @@ public
  properties
   {% for attr in device.attributes %}
    {% if attr.name == "config" %} 
-    Deployment::Configuration => "{{ attr.value|safe }}";
+    Deployment::Configuration => "{{ attr.value }}"; {# may include XML escaping #}
    {% elif attr.name == "asn1file" %}
     Deployment::Config => "{{ attr.value }}";
    {% endif %}
