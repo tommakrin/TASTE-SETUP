@@ -24,15 +24,6 @@ else
     $(taste-config --prefix)/share/AutoGUI/tracer-inner2.py "$1"
 fi
 
-
-# If this script launched the tracer daemon, kill it at the end to write the MSC file
-#   if [ ! -z $tracer_pid ]
-#   then
-#       echo 'Stopping tracer daemon'
-#       # Send Ctrl-C
-#       kill -INT "$tracer_pid"
-#   fi
-
 # In kazoo-based systems, the full dataview is in ../dataview
 cp ../dataview/dataview-uniq.asn .
 

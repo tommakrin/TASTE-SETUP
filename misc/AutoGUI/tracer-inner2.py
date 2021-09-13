@@ -208,7 +208,7 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
                 (message, message, f'#state {messageData}', g_messageId, g_messageId))
         g_instances[sender].append(len(g_completeMessages) - 1)
     else:
-        print(f"Tracer: ignoring unsupported event kind {kind}")
+        print(f"[-] Tracer: ignoring unsupported event kind {kind}")
 
 
 def loadFilters():
@@ -265,6 +265,9 @@ def main():
         messageData = {}
         tasks = {}
         for line in iter(p.stdout.readline, ''):
+            if p.poll() is not None :
+                print ("[-] Application was stopped")
+                break
             lline = line.decode('utf-8').strip()
             #if "tick" not in lline:
             #    print("WORKING ON:", lline)
@@ -331,15 +334,15 @@ def main():
                 sys.stdout.flush()
     except KeyboardInterrupt:
         if p:
-            print("Sending SIGUSR1 to", sys.argv[1]) # to save the VCD in POHIC
+            print("[-] Sending SIGUSR1 to", sys.argv[1]) # to save the VCD in POHIC
             p.send_signal(signal.SIGUSR1) 
             time.sleep(1)
-            print("Sending SIGINT to", sys.argv[1])
+            print("[-] Sending SIGINT to", sys.argv[1])
             p.send_signal(signal.SIGINT)
             saveMSC()
     if p:
         p.wait()
-    print("Clean shutdown")
+    print("[-] Clean shutdown")
 
 if __name__ == "__main__":
     main()
