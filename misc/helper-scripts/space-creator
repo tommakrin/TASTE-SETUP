@@ -167,13 +167,15 @@ DISTFILES += $PROJECT_NAME.asn
 DISTFILES += $PROJECT_NAME.acn
 DISTFILES += $PROJECT_NAME.msc
 DISTFILES += interfaceview.xml
+DISTFILES += work/binaries/*.msc
+DISTFILES += work/binaries/filters
 #include(handleAsn1AcnBuild.pri)
 include(work/taste.pro)
 message(\$\$DISTFILES)
 " > $PROJECT_FILE
 
 # Create default work folder
-mkdir -p work
+mkdir -p work/binaries
 touch work/taste.pro
 
 # Create empty MSC file
@@ -189,6 +191,15 @@ msc $PROJECT_NAME;
 endmsc;
 endmscdocument;
 endmscdocument;" > $PROJECT_NAME.msc
+
+# Create empty filter file for the MSC inner tracing tool
+echo "-- Add your filters here for the MSC tracing tool (list of instances and message names you don't want to trace)
+-- format of the file: one filter per line
+-- one line is either:
+--   input <name> to <function name>
+--      or
+--   instance <function name>
+" > work/binaries/filters
 
 # Create Qt Creator's XML Configuration file
 cp -f $(taste-config --prefix)/bin/space_creator_config.xml $PROJECT_FILE.user

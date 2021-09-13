@@ -225,6 +225,8 @@ def loadFilters():
             if not line or line.startswith('#') or line.startswith('--'):
                 continue
             elems = line.split()
+            if not elems:
+                continue
             if elems[0] == 'instance':
                 g_instanceFilters |= elems[1].lower()
             elif elems[0] == 'input' and len(elems) == 4 and elems[2] == 'to':
@@ -267,6 +269,8 @@ def main():
         for line in iter(p.stdout.readline, ''):
             if p.poll() is not None :
                 print ("[-] Application was stopped")
+                print ("[-] Generating MSC")
+                saveMSC()
                 break
             lline = line.decode('utf-8').strip()
             #if "tick" not in lline:
@@ -339,6 +343,7 @@ def main():
             time.sleep(1)
             print("[-] Sending SIGINT to", sys.argv[1])
             p.send_signal(signal.SIGINT)
+            print ("[-] Generating MSC")
             saveMSC()
     if p:
         p.wait()
