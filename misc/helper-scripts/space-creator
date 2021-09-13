@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# call with "reset" to regenerate the Makefile in the current project folder
 SPACECREATOR=spacecreator.AppImage
 
 if [ -t 1 ] ; then
@@ -22,14 +22,99 @@ run_space_creator () {
     $SPACECREATOR $1 interfaceview.xml
 
 }
+
+generate_makefile() {
+    echo -e "${INFO} Creating project Makefile"
+    echo "KAZOO?=kazoo
+SPACECREATOR?=spacecreator.AppImage
+
+# Here you can specify custom compiler/linker flags, and add folders containing
+# external code you want to compile and link for a specific partition.
+# Use upper case for the partition name:
+#
+# export <PARTITIONNAME>_USER_CFLAGS=...
+# export <PARTITIONNAME>_USER_LDFLAGS=...
+# export <PARTITIONNAME>_EXTERNAL_SOURCE_PATH=
+
+# If you need to reset this Makefile to its original state, run:
+# $ space-creator reset
+
+# Get the list of ASN.1 files from Space Creator project file:
+DISTFILES=\$(shell qmake $PROJECT_FILE -o /tmp/null 2>&1)
+ASN1_FILES=\$(shell find \${DISTFILES} 2>/dev/null | egrep '\.asn\$\$|\.asn1\$\$')
+
+all:	release
+
+release:	work/glue_release
+	\$(MAKE) -C work
+
+debug:	work/glue_debug
+	\$(MAKE) -C work
+
+run:
+	\$(MAKE) -C work run
+
+
+# Simulation target (experimental)
+simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+	\$(KAZOO) -t SIMU --glue --gw
+	\$(MAKE) -C work
+
+skeletons:
+	\$(MAKE) work/skeletons_built
+
+work/skeletons_built:	InterfaceView.aadl DataView.aadl
+	\$(KAZOO) --gw -o work
+	\$(MAKE) -C work dataview
+	touch \$@
+
+work/glue_release:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+	\$(KAZOO) -p --glue --gw -o work
+	touch \$@
+
+work/glue_debug:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+	\$(KAZOO) --debug -p --glue --gw -o work
+	touch \$@
+
+InterfaceView.aadl:	interfaceview.xml
+	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
+
+%.o: %.dv.xml
+	# Build using deployment view $^
+	\$(SPACECREATOR) --dvconverter -o \$^ -t  \$(shell taste-config --prefix)/share/dv2aadl/deploymentview.tmplt -x DeploymentView.aadl
+	\$(MAKE)
+
+DeploymentView.aadl:	interfaceview.xml
+	# Create/update a default deployment view for Linux target, if none other is provided
+	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
+
+DataView.aadl: \${ASN1_FILES}
+	taste-update-data-view \$^
+
+clean:
+	rm -rf work/build
+	rm -f work/glue_release work/glue_debug work/skeletons_built
+	find work -type d -name \"wrappers\" -exec rm -rf {} +
+	find work -type d -name \"*_GUI\" -exec rm -rf {} +
+
+.PHONY: clean release debug skeletons simu run
+" > Makefile
+}
+
 # To determine if we are in an existing project folder
 PROJECT_FILE=$(find *.pro 2>/dev/null)
 
 # If the project file already exist, directly run the gui
 if [ -f "$PROJECT_FILE" ]
 then
-    run_space_creator $PROJECT_FILE
-    exit $?
+    if [ "$1" != "reset" ]
+    then
+        run_space_creator $PROJECT_FILE
+        exit $?
+    else
+        generate_makefile
+        exit 0
+    fi
 fi
 
 # New project: was the script called with "init" ( = don't run any gui just setup the project files)
@@ -68,69 +153,12 @@ BUILD_DIRECTORY=$(pwd)
 UUID1="08272c34-bb80-4e52-942a-1a4d259a3d82"  # AppImage version
 UUID2="6d650885-2dda-4f6a-b4fa-1fabe64f392b"  # Kit of the AppImage
 
-#  Create the main Makefile
-echo "KAZOO?=kazoo
-SPACECREATOR?=spacecreator.AppImage
-# Here you can specify custom compiler/linker flags, and add folders containing
-# external code you want to compile and link for a specific partition.
-# Use upper case for the partition name:
-# export <PARTITIONNAME>_USER_CFLAGS=...
-# export <PARTITIONNAME>_USER_LDFLAGS=...
-# export <PARTITIONNAME>_EXTERNAL_SOURCE_PATH=
-
-# Get the list of ASN.1 files from Space Creator project file:
-DISTFILES=\$(shell qmake $PROJECT_FILE -o /tmp/null 2>&1)
-ASN1_FILES=\$(shell find \${DISTFILES} 2>/dev/null | egrep '\.asn\$\$|\.asn1\$\$')
-
-all:	c
-
-c:	work/glue_built
-	\$(MAKE) -C work
-
-# Simulation target (experimental)
-simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
-	\$(KAZOO) -t SIMU --glue --gw
-	\$(MAKE) -C work
-
-skeletons:
-	\$(MAKE) work/skeletons_built
-
-work/skeletons_built:	InterfaceView.aadl DataView.aadl
-	\$(KAZOO) --gw -o work
-	\$(MAKE) -C work dataview
-	touch \$@
-
-work/glue_built:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
-	\$(KAZOO) -p --glue --gw -o work
-	touch \$@
-
-InterfaceView.aadl:	interfaceview.xml
-	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
-
-%.o: %.dv.xml
-	# Build using deployment view $^
-	\$(SPACECREATOR) --dvconverter -o \$^ -t  \$(shell taste-config --prefix)/share/dv2aadl/deploymentview.tmplt -x DeploymentView.aadl
-	\$(MAKE)
-
-DeploymentView.aadl:	interfaceview.xml
-	# Create/update a deployment view for Linux target (to be removed when we have a DV editor)
-	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
-
-DataView.aadl: \${ASN1_FILES}
-	taste-update-data-view \$^
-
-clean:
-	rm -rf work/build
-	rm -f work/glue_built work/skeletons_built
-	find work -type d -name \"wrappers\" -exec rm -rf {} +
-	find work -type d -name \"*_GUI\" -exec rm -rf {} +
-
-.PHONY: clean skeletons c simu
-" > Makefile
+generate_makefile
 
 # Create Space Creator's project file
 # the message($$DISTFILE) is used to display on screen the list
 # of project files (to get the list of ASN.1 files for taste-update-dataview)
+echo -e "${INFO} Creating Space Creator project files"
 echo "TEMPLATE = lib
 CONFIG -= qt
 CONFIG += generateC
@@ -143,14 +171,6 @@ DISTFILES += interfaceview.xml
 include(work/taste.pro)
 message(\$\$DISTFILES)
 " > $PROJECT_FILE
-
-# Create a default interface view
-echo "<InterfaceView asn1file=\"$PROJECT_NAME.asn\">
-<Comment name=\"Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3\">
-    <Property name=\"Taste::coordinates\" value=\"4800 5100 46100 20700\"/>
-</Comment>
-
-</InterfaceView>" > interfaceview.xml
 
 # Create default work folder
 mkdir -p work
@@ -190,6 +210,13 @@ sed -i "s/MD5ASN/$MD5ASN/" DataView.aadl
 sed -i "s/PROJECTNAME/$PROJECT_NAME/" DataView.aadl
 NONINTERACTIVE=1 ONLY_ASN=1 taste-create-data-view "$PROJECT_NAME"
 
+# Create a default interface view
+echo "<InterfaceView asn1file=\"$PROJECT_NAME.asn\">
+<Comment name=\"Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3\">
+    <Property name=\"Taste::coordinates\" value=\"4800 5100 46100 20700\"/>
+</Comment>
+
+</InterfaceView>" > interfaceview.xml
 
 if [ "$1" == "init" ]
 then
