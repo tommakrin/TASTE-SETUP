@@ -42,6 +42,7 @@ cp -ru msc ${PREFIX}/share
 # Space creator templates to convert XML to AADL
 cp -ru space-creator/xml2aadl ${PREFIX}/share  # interface view to aadl
 cp -ru space-creator/dv2aadl ${PREFIX}/share   # deployment view to aadl
+cp -ru space-creator/iv2dv-coverage ${PREFIX}/share  # same as dv2aadl but with coverage enabled
 cp -ru space-creator/xml2dv ${PREFIX}/share    # interface view to deployment view
 
 # Helper scripts
