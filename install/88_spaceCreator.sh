@@ -11,6 +11,7 @@ then
 	echo "[-] Installing Space Creator version $EXPECTED_VERSION"
         NEWFILE=/tmp/newSpaceCreator.$$.AppImage
         if wget -O $NEWFILE "https://download.tuxfamily.org/taste/$FILENAME" ; then
+            chmod +x $NEWFILE
             mv $NEWFILE ~/.local/bin/spacecreator.AppImage || {
                echo "[x] Failed to install $NEWFILE..."
                echo "[x] Aborting the installation of Space Creator"
