@@ -29,6 +29,7 @@ fi
 echo "[-] Installing TASTE configuration files for Space Creator"
 mkdir -p ~/.local/share/qtcreator/colors || exit 1
 mkdir -p ~/.local/share/QtProject/QtCreator/contextMenu || exit 1
+mkdir -p ~/.config/QtProject/qtcreator/generic-highlighter || exit 1
 cp -f misc/space-creator/default_colors.json ~/.local/share/qtcreator/colors/default_colors.json  || exit 1
 cp -f misc/space-creator/contextmenu.json ~/.local/share/QtProject/QtCreator/contextMenu/ || exit 1
 cp -f misc/space-creator/default_attributes.xml ~/.local/share/QtProject/QtCreator/ || exit 1
@@ -41,6 +42,11 @@ cp -f misc/space-creator/syntax/*  ~/.config/QtProject/qtcreator/generic-highlig
 # Configuration of the kits for Qt Creator:
 cp -f misc/space-creator/qtversion.xml  ~/.config/QtProject/qtcreator/ || :
 cp -f misc/space-creator/profiles.xml  ~/.config/QtProject/qtcreator/ || :
+cp -f misc/space-creator/toolchains.xml  ~/.config/QtProject/qtcreator/ || :
+# Default setting for QtCreator. It contains the UUID1 needed by the kits. It is normally generated
+# by Qt Creator the 1st time it is launched. If there is one already we can keep it (the UUID will be
+# read from the space-creator script when creating a new project)
+cp -n misc/space-creator/QtCreator.ini  ~/.config/QtProject/ || :
 # Update path to ASN1SCC
 sed -i  "s,^asn0compiler=.*,asn1compiler=\"$HOME/tool-inst/share/asn1scc/asn1scc\",g" $HOME/.config/QtProject/QtCreator.ini || :
 # Install the HW library
