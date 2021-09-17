@@ -47,15 +47,21 @@ all:	release
 
 release:	work/glue_release
 	rm -rf work/glue_debug
+	rm -rf work/glue_coverage
 	\$(MAKE) -C work
 
 debug:	work/glue_debug
 	rm -rf work/glue_release
+	rm -rf work/glue_coverage
+	\$(MAKE) -C work
+
+coverage: work/glue_coverage
+	rm -rf work/glue_release
+	rm -rf work/glue_debug
 	\$(MAKE) -C work
 
 run:
 	\$(MAKE) -C work run
-
 
 # Simulation target (experimental)
 simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
@@ -78,10 +84,15 @@ work/glue_debug:	InterfaceView.aadl DeploymentView.aadl DataView.aadl Concurrenc
 	\$(KAZOO) --debug -p --glue --gw -o work
 	touch \$@
 
+work/glue_coverage:	InterfaceView.aadl Default_Deployment.aadl DataView.aadl ConcurrencyView_Properties.aadl
+	rsync --checksum DV_Coverage.aadl DeploymentView.aadl
+	\$(KAZOO) --debug -p --glue --gw -o work
+	touch \$@
+
 InterfaceView.aadl:	interfaceview.xml
 	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
 
-%: %.dv.xml Default_Deployment.aadl
+%: %.dv.xml
 	# Build using deployment view \$^
 	@# We must update the .aadl only if the dv.xml file has changed (more recent timestamp)
 	if [ \$< -nt \$@.aadl ]; then \
@@ -95,6 +106,7 @@ interfaceview: Default_Deployment.aadl
 Default_Deployment.aadl:	interfaceview.xml
 	# Create/update a default deployment view for Linux target, if none other is provided
 	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
+	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/iv2dv-coverage/interfaceview.tmplt -x DV_Coverage.aadl || exit 1
 	rsync --checksum \$@ DeploymentView.aadl
 
 DeploymentView.aadl:	Default_Deployment.aadl
@@ -104,11 +116,11 @@ DataView.aadl: \${ASN1_FILES}
 
 clean:
 	rm -rf work/build
-	rm -f work/glue_release work/glue_debug work/skeletons_built
+	rm -f work/glue_release work/glue_debug work/glue_coverage work/skeletons_built
 	find work -type d -name \"wrappers\" -exec rm -rf {} +
 	find work -type d -name \"*_GUI\" -exec rm -rf {} +
 
-.PHONY: clean release debug skeletons simu run
+.PHONY: clean release debug coverage skeletons simu run
 " > Makefile
 }
 
@@ -179,6 +191,7 @@ DISTFILES += $PROJECT_NAME.acn
 DISTFILES += $PROJECT_NAME.msc
 DISTFILES += interfaceview.xml
 DISTFILES += work/binaries/*.msc
+DISTFILES += work/binaries/coverage/index.html
 DISTFILES += work/binaries/filters
 #include(handleAsn1AcnBuild.pri)
 include(work/taste.pro)
