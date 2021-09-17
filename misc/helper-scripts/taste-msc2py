@@ -15,7 +15,8 @@ ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
 if [ -f /.dockerenv ]
 then
-    CONVERTER="NO_CLEANUP=1 APPIMAGE_EXTRACT_AND_RUN=1 spacecreator.AppImage --mscconverter"
+    export NO_CLEANUP=1
+    export APPIMAGE_EXTRACT_AND_RUN=1
 else
     CONVERTER="spacecreator.AppImage --mscconverter"
 fi
