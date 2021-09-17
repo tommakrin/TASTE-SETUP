@@ -13,7 +13,12 @@ fi
 INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
-CONVERTER="spacecreator.AppImage --mscconverter"
+if [ -f /.dockerenv ]
+then
+    CONVERTER="NO_CLEANUP=1 APPIMAGE_EXTRACT_AND_RUN=1 spacecreator.AppImage --mscconverter"
+else
+    CONVERTER="spacecreator.AppImage --mscconverter"
+fi
 
 echo -e "${INFO} MSC to Python Converter (c) 2020 European Space Agency / Maxime Perrotin"
 
