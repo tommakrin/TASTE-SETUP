@@ -1,7 +1,7 @@
 #!/bin/bash
 # Version neeed by the current TASTE release.
 # Update this number when a new version is uploaded on tuxfamily:
-EXPECTED_VERSION="0.10.5055"
+EXPECTED_VERSION="0.10.5090"
 FILENAME=spacecreator-x86_64-$EXPECTED_VERSION.AppImage
 
 # Check the version of the current insallation, if any
