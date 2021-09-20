@@ -13,6 +13,12 @@ fi
 INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
+if [ -f /.dockerenv ]
+then
+    export NO_CLEANUP=1
+    export APPIMAGE_EXTRACT_AND_RUN=1
+fi
+CONVERTER="spacecreator.AppImage --mscconverter"
 
 echo -e "${INFO} MSC to Python Converter (c) 2020 European Space Agency / Maxime Perrotin"
 
@@ -31,13 +37,13 @@ do
                 backup_filename="${f%.*}.py.bak"
                 cp -f ${python_filename} ${backup_filename}
                 echo -e "${INFO} Replacing existing Python file: ${python_filename} (older saved as ${backup_filename})"
-                mscconverter -m "${msc_filename}" -x "${python_filename}" -t $(taste-config --prefix)/share/msc/msc2py/mscmodel.tmplt
+                $CONVERTER -m "${msc_filename}" -x "${python_filename}" -t $(taste-config --prefix)/share/msc/msc2py/mscmodel.tmplt
             else
                 echo -e "${INFO} Ignoring ${msc_filename} because ${python_filename} is more recent"
             fi
         else
             echo -e "${INFO} Transforming file: ${msc_filename} to ${python_filename}"
-            mscconverter -m "${msc_filename}" -x "${python_filename}" -t $(taste-config --prefix)/share/msc/msc2py/mscmodel.tmplt
+            $CONVERTER -m "${msc_filename}" -x "${python_filename}" -t $(taste-config --prefix)/share/msc/msc2py/mscmodel.tmplt
         fi
     fi
 done

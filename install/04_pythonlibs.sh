@@ -1,4 +1,6 @@
 #!/bin/bash
+@echo "No python2 packages are neeeded anymore"
+exit 0
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . ${DIR}/common.sh
 
