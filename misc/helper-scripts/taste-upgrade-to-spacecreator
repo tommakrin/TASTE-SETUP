@@ -1,0 +1,15 @@
+#!/bin/bash -e
+# Convert a Kazoo-based TASTE legacy project (based on InterfaceView.aadl)
+# to a Space Creator project
+# Run it from the project folder
+
+# Use Kazoo template to generate the script for automatic conversion
+kazoo -t spacecreator
+
+# Make the script executable
+chmod +x work/Dump/spacecreator_conversion/aadl_to_spacecreator.sh
+
+# .. And run it
+./work/Dump/spacecreator_conversion/aadl_to_spacecreator.sh 
+
+echo 'Done'
