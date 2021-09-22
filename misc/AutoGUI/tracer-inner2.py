@@ -28,6 +28,7 @@ g_currentState = defaultdict(str)
 # filters
 g_instanceFilters = set()
 g_messageFilters = defaultdict(list) # {instance: [pi names]}
+g_timestampFilters = defaultdict(list) # {instance : [pi names]}
 
 g_strMscFilename = "trace.msc"
 
@@ -78,7 +79,7 @@ def saveMSC():
                     who = ''
                     if toId.startswith('#set'):
                         # Add the timer value in a comment box
-                        comment=f"\n/* CIF COMMENT ({x1+55}, {y1+45}) (110, 35) */\ncomment '{toId.split()[1]} ms'"
+                        comment=f"\n/* CIF COMMENT ({x1+65}, {y1+55}) (130, 65) */\ncomment '{toId.split()[1]} ms'"
                 elif fromId == '#timeout':
                     cif = 'TIMEOUT'
                     x1 = instances_x[toId] + 100
@@ -228,9 +229,14 @@ def loadFilters():
             if not elems:
                 continue
             if elems[0] == 'instance':
-                g_instanceFilters |= elems[1].lower()
+                g_instanceFilters.add(elems[1].lower())
+                print(f'[-] Filtering instance {elems[1]}')
             elif elems[0] == 'input' and len(elems) == 4 and elems[2] == 'to':
                 g_messageFilters[elems[3].lower()].append(elems[1].lower())
+                print(f'[-] Filtering message {elems[1]} sent to instance {elems[3]}')
+            elif elems[0] == 'timestamp' and elems[1] == 'input' and len(elems) == 5 and elems[3] == 'to':
+                g_timestampFilters[elems[4].lower()].append(elems[2].lower())
+                print(f'[-] Adding execution timestamps when message {elems[2]} is executed by function {elems[4]}')
             else:
                 print('[X] Incorrect syntax: ', line)
 
