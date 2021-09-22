@@ -35,6 +35,6 @@ echo 'Trace file was generated. You may now run:
 for f in $(find -nowarn -name *.vcd)
 do
     taste-patch-vcd.py ../build/deploymentview_final/"$1"/deployment.h $f
-    echo "    gtkwave ./$f.new"
+    echo "    gtkwave $f.new"
 done
 echo '================================================'
