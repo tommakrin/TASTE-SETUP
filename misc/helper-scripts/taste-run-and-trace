@@ -20,7 +20,8 @@ all inner message exchanges in the form of a sequence diagram (MSC).
 You can then open/edit this MSC with the TASTE MSC Editor
 '
 else
-    export VCD_ENABLED=1
+    # Disable VCD, it does not seem to work anymore in POHIC
+    #export VCD_ENABLED=1
     $(taste-config --prefix)/share/AutoGUI/tracer-inner2.py "$1"
 fi
 
