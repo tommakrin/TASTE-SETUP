@@ -21,7 +21,7 @@ MSC_FILENAME=$1
 echo -e "${INFO} Opening MSC Editor..."
 echo -e "${INFO} Filename: ${MSC_FILENAME}"
 
-EDITOR=msceditor
+EDITOR="spacecreator.AppImage --MSCeditor"
 
 
 if [ -z $NONINTERACTIVE ]

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QtCreatorProfiles>
+<!-- Written by QtCreator 4.8.2, 2021-08-31T09:05:05. -->
+<qtcreator>
+ <data>
+  <variable>Profile.0</variable>
+  <valuemap type="QVariantMap">
+   <value type="bool" key="PE.Profile.AutoDetected">false</value>
+   <value type="QString" key="PE.Profile.AutoDetectionSource"></value>
+   <valuemap type="QVariantMap" key="PE.Profile.Data">
+    <value type="QString" key="Android.GdbServer.Information"></value>
+    <value type="QString" key="Asn1Scc.KitInformation.Asn1Exe">/home/taste/tool-inst/share/asn1scc/asn1scc</value>
+    <valuelist type="QVariantList" key="CMake.ConfigurationKitInformation">
+     <value type="QString">QT_QMAKE_EXECUTABLE:STRING=%{Qt:qmakeExecutable}</value>
+     <value type="QString">CMAKE_PREFIX_PATH:STRING=%{Qt:QT_INSTALL_PREFIX}</value>
+     <value type="QString">CMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}</value>
+     <value type="QString">CMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}</value>
+    </valuelist>
+    <valuemap type="QVariantMap" key="CMake.GeneratorKitInformation">
+     <value type="QString" key="ExtraGenerator">CodeBlocks</value>
+     <value type="QString" key="Generator">Unix Makefiles</value>
+     <value type="QString" key="Platform"></value>
+     <value type="QString" key="Toolset"></value>
+    </valuemap>
+    <value type="QString" key="CMakeProjectManager.CMakeKitInformation">{5dfbfafa-646b-41a1-8764-f3d0933d237e}</value>
+    <value type="QString" key="Debugger.Information">{9a61223d-5a83-471e-8888-a03b33f6eae9}</value>
+    <value type="QString" key="PE.Profile.Device">Desktop Device</value>
+    <value type="QByteArray" key="PE.Profile.DeviceType">Desktop</value>
+    <valuelist type="QVariantList" key="PE.Profile.Environment"/>
+    <value type="QString" key="PE.Profile.SysRoot"></value>
+    <valuemap type="QVariantMap" key="PE.Profile.ToolChainsV3">
+     <value type="QByteArray" key="C">{7c93aca7-9b8f-45f1-b7fc-85956235863f}</value>
+     <value type="QByteArray" key="Cxx">{dfb88346-74d1-4f6a-b0c4-c22685fc4a63}</value>
+    </valuemap>
+    <value type="QString" key="Qbs.KitInformation"></value>
+    <value type="QString" key="QtPM4.mkSpecInformation"></value>
+    <value type="int" key="QtSupport.QtInformation">2</value>
+   </valuemap>
+   <value type="QString" key="PE.Profile.Icon"></value>
+   <value type="QString" key="PE.Profile.Id">{6d650885-2dda-4f6a-b4fa-1fabe64f392b}</value>
+   <valuelist type="QVariantList" key="PE.Profile.MutableInfo"/>
+   <value type="QString" key="PE.Profile.Name">Taste_Kit</value>
+   <value type="bool" key="PE.Profile.SDK">false</value>
+   <valuelist type="QVariantList" key="PE.Profile.StickyInfo"/>
+  </valuemap>
+ </data>
+ <data>
+  <variable>Profile.Count</variable>
+  <value type="int">1</value>
+ </data>
+ <data>
+  <variable>Profile.Default</variable>
+  <value type="QString">{6d650885-2dda-4f6a-b4fa-1fabe64f392b}</value>
+ </data>
+ <data>
+  <variable>Version</variable>
+  <value type="int">1</value>
+ </data>
+</qtcreator>
