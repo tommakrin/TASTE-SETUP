@@ -173,6 +173,7 @@ then
         run_space_creator $PROJECT_FILE
         exit $?
     else
+        PROJECT_NAME=${PROJECT_FILE%.*}
         generate_makefile
         generate_pro_file
         generate_pro_user_file
