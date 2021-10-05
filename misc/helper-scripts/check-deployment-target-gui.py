@@ -84,7 +84,8 @@ PLATFORMS = { "crazyflie_v2_gnat"            : lambda: True,
               "leon3_rcc13rc9_posix"         : check_gr740_rcc13rc9_posix,
               "x86_linux"                    : lambda: True,
               "x86_win32"                    : lambda: True,
-              "msp430fr5969_freertos"        : check_msp430_freertos
+              "msp430fr5969_freertos"        : check_msp430_freertos,
+              "x86_generic_linux"            : lambda: True
              }
 
 def query_user(platform):
