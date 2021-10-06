@@ -13,12 +13,22 @@ echo -e "Welcome to ${COLORON}TASTE${COLOROFF}"
 INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
+# check if there is a space creator interface view, in which case invoke
+# space creator script and quit this one
+if [ -f interfaceview.xml ]
+then
+    space-creator "$@"
+    exit $?
+fi
 
-# Check if there is an interface view in the current folder
+# Check if there is a legacy interface view in the current folder
 # and if the init command is not invoked (to create initial Makefile)
 if [ -f InterfaceView.aadl ] && [ "$1" != "init" ]
 then
     echo -e "${INFO} Opening TASTE project in current folder"
+    echo -e "${INFO} This project is using the legacy TASTE tools which will"
+    echo -e "${INFO} soon be deprecated. Consider upgrading by typing:"
+    echo -e "${INFO}    $ taste-upgrade-to-space-creator"
     INTERFACEVIEW=InterfaceView.aadl
 
     # If there is no deployment view, only load interface view
@@ -33,6 +43,10 @@ then
         EXTRA_CMD+=' --load-deployment-view DeploymentView.aadl '
     fi
 else
+    # new projects must use space creator
+    space-creator "$@"
+    exit $?
+
     if [ "$1" == "init" ]
     then
         new_folder="$2"

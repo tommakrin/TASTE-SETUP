@@ -64,7 +64,7 @@ run:
 	\$(MAKE) -C work run
 
 # Simulation target (experimental)
-simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 	\$(KAZOO) -t SIMU --glue --gw
 	\$(MAKE) -C work
 
@@ -76,15 +76,15 @@ work/skeletons_built:	InterfaceView.aadl DataView.aadl
 	\$(MAKE) -C work dataview
 	touch \$@
 
-work/glue_release:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+work/glue_release:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 	\$(KAZOO) -p --glue --gw -o work
 	touch \$@
 
-work/glue_debug:	InterfaceView.aadl DeploymentView.aadl DataView.aadl ConcurrencyView_Properties.aadl
+work/glue_debug:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 	\$(KAZOO) --debug -p --glue --gw -o work
 	touch \$@
 
-work/glue_coverage:	InterfaceView.aadl Default_Deployment.aadl DataView.aadl ConcurrencyView_Properties.aadl
+work/glue_coverage:	InterfaceView.aadl Default_Deployment.aadl DataView.aadl
 	rsync --checksum DV_Coverage.aadl DeploymentView.aadl
 	\$(KAZOO) --debug -p --glue --gw -o work
 	touch \$@
@@ -243,13 +243,6 @@ echo "-- Add your filters here for the MSC tracing tool (list of instances and m
 --      or
 --   instance <function name>
 " > work/binaries/filters
-
-
-# Create mandatory ConcurrencyView_Properties.aadl for kazoo
-if [ ! -f ConcurrencyView_Properties.aadl ]
-then
-    touch ConcurrencyView_Properties.aadl
-fi
 
 # Create a default data view (use pre-made DataView.aadl to speed up)
 echo -e "${INFO} Creating a default ASN.1 data model."

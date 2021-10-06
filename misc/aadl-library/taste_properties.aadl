@@ -261,4 +261,11 @@ FunctionName : aadlstring applies to (system);
 
 Active_Interfaces : enumeration (Enabled,Disabled,Any) => Enabled applies to (system);
 
+-- new properties for space creator
+
+Interface_Priority      : aadlinteger applies to (subprogram);
+Interface_Cyclic_Offset : aadlinteger applies to (subprogram);
+Interface_Stack_Size    : aadlinteger applies to (subprogram);
+
+
 end Taste;

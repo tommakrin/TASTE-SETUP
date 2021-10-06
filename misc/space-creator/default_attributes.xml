@@ -59,7 +59,7 @@
     </Attr>
     <Attr label="Period (in ms)" name="period">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="1000" validator="\d+"/>
         </Type>
         <Scopes>
             <Provided_Interface>
@@ -69,7 +69,7 @@
     </Attr>
     <Attr label="Minimal inter-arrival time (in ms)" name="miat">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="0" validator="\d+"/>
         </Type>
         <Scopes>
             <Provided_Interface>
@@ -77,9 +77,9 @@
             </Provided_Interface>
         </Scopes>
     </Attr>
-    <Attr label="Worse case execution time (in ms)" name="wcet">
+    <Attr label="Worst case execution time (in ms)" name="wcet">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="0" validator="\d+"/>
         </Type>
         <Scopes>
              <Provided_Interface>
@@ -92,10 +92,42 @@
     </Attr>
     <Attr label="Message queue size" name="queue_size">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="1" validator="\d+"/>
         </Type>
         <Scopes>
             <Provided_Interface>
+                <AttrValidator name="kind" value="Sporadic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr label="Priority" name="priority">
+        <Type>
+            <String defaultValue="1" validator="\d+"/>
+        </Type>
+        <Scopes>
+             <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+                <AttrValidator name="kind" value="Sporadic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr label="Offset (ms)" name="dispatch_offset">
+        <Type>
+            <String defaultValue="0" validator="\d+"/>
+        </Type>
+        <Scopes>
+             <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr label="Stack size (kb)" name="stack_size">
+        <Type>
+            <String defaultValue="50" validator="\d+"/>
+        </Type>
+        <Scopes>
+             <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
                 <AttrValidator name="kind" value="Sporadic"/>
             </Provided_Interface>
         </Scopes>
