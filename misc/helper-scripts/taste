@@ -8,8 +8,6 @@ else
     REDCOLORON=""
     COLOROFF=""
 fi
-echo -e "Welcome to ${COLORON}TASTE${COLOROFF}"
-
 INFO="${COLORON}[INFO]${COLOROFF}"
 ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
@@ -25,6 +23,8 @@ fi
 # and if the init command is not invoked (to create initial Makefile)
 if [ -f InterfaceView.aadl ] && [ "$1" != "init" ]
 then
+    echo -e "Welcome to ${COLORON}TASTE${COLOROFF}"
+
     echo -e "${INFO} Opening TASTE project in current folder"
     echo -e "${INFO} This project is using the legacy TASTE tools which will"
     echo -e "${INFO} soon be deprecated. Consider upgrading by typing:"

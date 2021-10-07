@@ -7,7 +7,7 @@ check:
 	ocarina -f -aadlv2 ocarina_components.aadl
 
 install:
-	@echo "Installing AADL libraries in Ocarina"
+	@echo "[-] Installing AADL libraries in Ocarina"
 	@# Patch hardcoded paths on the fly to work with actual install path
 	@cat ocarina_components.aadl | \
 	   sed "s,/home/taste/tool-inst,$(shell taste-config --prefix)," > \
