@@ -10,7 +10,7 @@ if [[ $VERSION != $EXPECTED_VERSION ]]
 then
 	echo "[-] Installing Space Creator version $EXPECTED_VERSION"
         NEWFILE=/tmp/newSpaceCreator.$$.AppImage
-        if wget -O $NEWFILE "https://download.tuxfamily.org/taste/$FILENAME" ; then
+        if wget --no-check-certificate -O $NEWFILE "https://download.tuxfamily.org/taste/$FILENAME" ; then
             chmod +x $NEWFILE
             mv $NEWFILE ~/.local/bin/spacecreator.AppImage || {
                echo "[x] Failed to install $NEWFILE..."
@@ -34,6 +34,7 @@ mkdir -p ~/.config/QtProject/qtcreator/generic-highlighter || exit 1
 cp -f misc/space-creator/default_colors.json ~/.local/share/qtcreator/colors/default_colors.json  || exit 1
 cp -f misc/space-creator/contextmenu.json ~/.local/share/QtProject/QtCreator/contextMenu/ || exit 1
 cp -f misc/space-creator/default_attributes.xml ~/.local/share/QtProject/QtCreator/ || exit 1
+cp -f misc/space-creator/deployment_attributes.xml ~/.local/share/QtProject/QtCreator/ || exit 1
 #echo "Installing Syntax Highlighting files for Qt Creator"
 # The "fallback" folder of Qt Creator may be either Kate or Qt Creator's install folder, depending on
 # the machine setup. We put the files in both locations to be sure it works everywhere
