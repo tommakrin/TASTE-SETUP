@@ -13,10 +13,13 @@ properties.value:  |_ Value of that property
 The following tags are available in this template:
 Nodes                    : List of all available Nodes (Boards)
 node                     :  |_ Instance of node (see "for node in Nodes")
+node.nodeLabel             :    |_ Unique label of this node
 node.partitions          :  |   |_ List of partitions (binary) in that node
 partition                :  |   |   |_ Instance of node.partition (see "for partition in node.partitions")
 partitions.functions     :  |   |       |_ List of functions in that partition
 function                 :  |   |           |_ Instance of partitions.function (see "for function in function in partition.functions")
+function.usedImplementation:    |            |_ The implementation used for this functions
+function.implementation    :    |            |_ Implementation chosen excpilictly by the user (empty if default is used)
 node.devices             :  |   |_ List of devices (ports) in that node
 device                   :  |   |   |_ Instance of node.device
 device.fullName          :  |   |   |_ Full name of the device, consisting of name and port
@@ -24,8 +27,25 @@ device.name              :  |   |   |_ Name of the device
 device.portName          :  |   |   |_ Name of the port
 device.qualifier         :  |   |   |_ Qualifier of the bus (see bus.qualifier)
 device.nodeName          :  |   |   |_ Name of the node, this device belongs to
+device.nodeLabel           :    |  |_ Label of the node, this device belongs to
 node.requiredBusAccesses :  |   |_ List of devices in the node that are actually used by at least one connection
 device                   :  |       |_ Instance of node.requiredBusAccesses (same properties as in node.devices)
+node.systemFunctions       :    |_ List of functions provided by the system/board
+function                   :       |_ Instance of node.systemFunctions
+function.interfaces        :          |_ List of functions provided by the system/board
+interface                  :             |_ Instance of function.interfaces
+interface.isProvided       :                |_ Is true if the interface type is "provided"
+interface.isRequired       :                |_ Is true if the interface type is "required"
+interface.params           :                |_ List of interface parameters
+param                      :                   |_ Instance of param (has no attributes and properties)
+param.isIn                 :                      |_ Whether param is IN
+param.isOut                :                      |_ Whether param is OUT
+param.name                 :                      |_ Name of param
+param.underscoredName      :                      |_ Name of param with " " replaced by "_" (spaces repladed with underscore)
+param.type                 :                      |_ Type of param
+param.underscoredType      :                      |_ Type of param with "-" replaced by "_" (dashes repladed with underscore)
+param.encoding             :                      |_ Encoding of param
+
 Connections              : List of all available Connections between devices
 connection               :  |_ Instance of connection (see "for connection in Connections")
 connection.fromNode      :  |   |_ The source node of this connection
@@ -41,6 +61,7 @@ message.fromFunction     :  |           |_ Name of the connected source function
 message.fromInterface    :  |           |_ Name of the connected source interface
 message.toFunction       :  |           |_ Name of the connected target function
 message.toInterface      :  |           |_ Name of the connected target interface
+
 Buses                    : List of all used Buses
 bus                      :  |_ Instance of one bus
 bus.qualifier            :  |   |_ Qualifier of the bus (same as device.qualifier of connected devices)
@@ -54,7 +75,7 @@ device                   :  |       |_ Instance of bus.devices (same properties 
 --  in ~/tool-src/misc/space-creator/dv2aadl/deploymentview.tmplt
 --  After modifications, install it by running ~/tool-src/install/90_misc
 --  Template written by Maxime Perrotin (maxime.perrotin@esa.int) 2021-09
-package deploymentview::DV::{{ node.name }}
+package deploymentview::DV::{{ node.nodeLabel }}
 public
 
  with Deployment;
@@ -74,7 +95,7 @@ public
  {% endfor %}
 {% endif %}
 
- --  Declare partition(s) of node "{{ node.name }}".
+ --  Declare partition(s) of node "{{ node.nodeLabel }}" (aka "{{ node.name }}").
  {% for partition in node.partitions %}
  process {{ partition.name }}
  end {{ partition.name }};
@@ -117,7 +138,7 @@ public
 
  {% endfor %}
 {% endif %}
-end deploymentview::DV::{{ node.name }};
+end deploymentview::DV::{{ node.nodeLabel }};
 {% endfor %}
 
 package deploymentview::DV
@@ -129,7 +150,7 @@ public
  with TASTE_DV_Properties;
 
  {% for node in Nodes %}
- --  Dependencies of node {{ node.name }}
+ --  Dependencies of node {{ node.nodeLabel }}
   {% for partition in node.partitions %}
    {% for function in partition.functions %}
  with interfaceview::IV::{{ function }};  -- XXX complete path?
@@ -144,7 +165,7 @@ public
   {% endfor %}
  {% endfor %}
 {% endif %}
- with deploymentview::DV::{{ node.name }};
+ with deploymentview::DV::{{ node.nodeLabel }};
   {% for attr in node.attributes %}
    {% if attr.name == "namespace" %}
  with {{ attr.value }};
@@ -153,17 +174,17 @@ public
  {% endfor %}
 
  {% for node in Nodes %}
- --  Node {{ node.name }}
- system {{ node.name }}
+ --  Node {{ node.nodeLabel }}
+ system {{ node.nodeLabel }}
  {% if node.requiredBusAccesses %}
  features
    {% for access in node.requiredBusAccesses %}
     {{ access.fullName }} : requires bus access {{ access.qualifier }};
    {% endfor %}
  {% endif %}
- end {{ node.name }};
+ end {{ node.nodeLabel }};
 
- system implementation {{ node.name }}.others
+ system implementation {{ node.nodeLabel }}.others
  subcomponents
   {% for partition in node.partitions %}
    {% for function in partition.functions %}
@@ -171,7 +192,7 @@ public
        Taste::FunctionName => "{{ function }}";
     };
    {% endfor %}
-    {{ partition.name }} : process deploymentview::DV::{{ node.name }}::{{ partition.name }}.others; {# XXX Missing Port_Number, but what is that? #}
+    {{ partition.name }} : process deploymentview::DV::{{ node.nodeLabel }}::{{ partition.name }}.others; {# XXX Missing Port_Number, but what is that? #}
   {% endfor %}
    {% for attr in node.attributes %}
     {% if attr.name == "type" %}
@@ -180,7 +201,7 @@ public
    {% endfor %}
  {% if node.requiredBusAccesses %}
   {% for device in node.devices %}
-    {{ device.name }} : device deploymentview::DV::{{ node.name }}::{{ device.name }}.others;
+    {{ device.name }} : device deploymentview::DV::{{ node.nodeLabel }}::{{ device.name }}.others;
   {% endfor %}
  connections
   {% for access in node.requiredBusAccesses %}
@@ -199,7 +220,7 @@ public
     Actual_Processor_Binding => (reference (p1)) applies to {{ device.name }};
   {% endfor %}
  {% endif %}
- end {{ node.name}}.others;
+ end {{ node.nodeLabel}}.others;
 
  {% endfor %}
 
@@ -210,7 +231,7 @@ system implementation deploymentview.others
 subcomponents
    interfaceview: system interfaceview::IV::interfaceview.others;
  {% for node in Nodes %}
-   {{ node.name }} : system {{ node.name }}.others;
+   {{ node.nodeLabel }} : system {{ node.nodeLabel }}.others;
  {% endfor %}
  {% if Buses %}
   {% for bus in Buses %}
@@ -219,7 +240,7 @@ subcomponents
  connections
   {% for bus in Buses %}
    {% for device in bus.devices %}
-   {{ device.nodeName }}_{{ bus.name }} : bus access {{ bus.name }} -> {{ device.nodeName }}.{{ device.name }}_{{ device.portName }};
+   {{ device.nodeLabel }}_{{ bus.name }} : bus access {{ bus.name }} -> {{ device.nodeLabel }}.{{ device.name }}_{{ device.portName }};
    {% endfor %}
   {% endfor %}
  properties
