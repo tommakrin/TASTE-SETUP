@@ -49,8 +49,10 @@ case "$VERSION" in
         ;;
     *Debian*bullseye* | Debian*bullseye*Dockerized )
 	# removed after buster: pgadmin3 gnat-gps, python3-antlr3, python-pip
-        sudo apt-get install --no-install-recommends -y --force-yes evince gdebi wget autoconf automake curl exuberant-ctags gcc git gnat gtkwave lcov libacl1 libacl1-dev libarchive-dev libattr1 libattr1-dev libglib2.0-0 libgraphviz-dev libsqlite3-dev libtool libxml2-dev libxslt1-dev net-tools postgresql postgresql-client postgresql-client-common postgresql-common expect python3-pip sqlite3 sudo tree vim-gtk wmctrl xmldiff xterm zip openjdk-17-jre python3-lxml bash-completion strace libusb-1.0-0-dev cmake dfu-util gnuplot libstdc++-10-dev gprbuild python3-singledispatch python3-stringtemplate3 python3-numpy python3-pyside2.* python3-pygraphviz python3-ply python3-matplotlib python3-lxml python3-sqlalchemy python3-pexpect python3-psycopg2 python3-antlr python3-websocket  make python3-setuptools g++ psmisc bzip2 bsdmainutils unzip rsync libncurses5:i386 libgmp10:i386 xdg-utils qt5-qmake qtbase5-dev python3-mako || exit 1
-        python3 -m pip install --user wheel || exit 1
+        sudo apt-get install --no-install-recommends -y --force-yes evince gdebi wget autoconf automake curl exuberant-ctags gcc git gnat gtkwave lcov libacl1 libacl1-dev libarchive-dev libattr1 libattr1-dev libglib2.0-0 libgraphviz-dev libsqlite3-dev libtool libxml2-dev libxslt1-dev net-tools postgresql postgresql-client postgresql-client-common postgresql-common expect python3-pip sqlite3 sudo tree vim-gtk wmctrl xmldiff xterm zip openjdk-17-jre python3-lxml bash-completion strace libusb-1.0-0-dev cmake dfu-util gnuplot libstdc++-10-dev gprbuild python3-singledispatch python3-stringtemplate3 python3-numpy python3-pygraphviz python3-ply python3-matplotlib python3-lxml python3-sqlalchemy python3-pexpect python3-psycopg2 python3-antlr python3-websocket  make python3-setuptools g++ psmisc bzip2 bsdmainutils unzip rsync libncurses5:i386 libgmp10:i386 xdg-utils qt5-qmake qtbase5-dev python3-mako || exit 1
+	python3 -m pip install --user wheel || exit 1
+	# bullseye version of pyside2 is buggy for qml support, we need the pip version
+	python3 -m pip install --user --upgrade pyside2 || exit 1
 	# pip2 is not available in debian 11 and Python2 is not installed by default
 	# Install them manually until we don't need them anymore
 	sudo apt install -y python2
