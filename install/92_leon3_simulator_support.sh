@@ -2,7 +2,7 @@
 [ -d /usr/lib/python3.5 ] || {
     echo "[-] Installing support files from old Debian for Leon3 simulation..."
     OLD_PY=/tmp/python3.5.tar.gz
-    if wget -O $OLD_PY "https://download.tuxfamily.org/taste/python3.5.tar.bz2" ; then
+    if wget --no-check-certificate -O $OLD_PY "https://download.tuxfamily.org/taste/python3.5.tar.bz2" ; then
         cd /usr/lib
         sudo tar xpvf $OLD_PY || {
             echo "[x] Failed to install $OLD_PY..."

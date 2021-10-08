@@ -1,0 +1,27 @@
+<DeploymentView>
+    <Node name="pb1" type="ocarina_processors_x86::x86.linux" namespace="ocarina_processors_x86">
+        <Property name="Taste::coordinates" value="138800 57200 154800 73200"/>
+        <Partition name="pinger">
+            <Property name="Taste::coordinates" value="143200 61600 151200 69600"/>
+            <function>A</function>
+        </Partition>
+        <Device name="eth0" requires_bus_access="ocarina_buses::ip.i" port="eth0" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1type="IP-Conf-T" asn1module="POHICDRIVER-IP" extends="ocarina_drivers::generic_sockets_ip" namespace="ocarina_drivers" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" bus_namespace="ocarina_buses">
+            <Property name="Taste::coordinates" value="150000 73200"/>
+        </Device>
+    </Node>
+    <Node name="pb2" type="ocarina_processors_x86::x86.linux" namespace="ocarina_processors_x86">
+        <Property name="Taste::coordinates" value="170100 80800 186100 96800"/>
+        <Partition name="pingee">
+            <Property name="Taste::coordinates" value="174500 85200 182500 93200"/>
+            <function>B</function>
+        </Partition>
+        <Device name="eth0" requires_bus_access="ocarina_buses::ip.i" port="eth0" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1type="IP-Conf-T" asn1module="POHICDRIVER-IP" extends="ocarina_drivers::generic_sockets_ip" namespace="ocarina_drivers" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" bus_namespace="ocarina_buses">
+            <Property name="Taste::coordinates" value="170100 82000"/>
+        </Device>
+    </Node>
+    <Connection name="Connection_1" from_node="pb1" from_port="eth0" to_bus="ocarina_buses::ip.i" to_node="pb2" to_port="eth0">
+            <Property name="Taste::coordinates" value="150000 74200 150000 82000 169100 82000"/>
+            <Message name="Message_1" from_function="A" from_interface="ping" to_function="B" to_interface="ping"/>
+            <Message name="Message_2" from_function="B" from_interface="pong" to_function="A" to_interface="pong"/>
+    </Connection>
+</DeploymentView>
