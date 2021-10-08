@@ -1,5 +1,5 @@
 <Boards>
-   <Board name="C++ Linux Runtime" type="ocarina_processors_x86::x86.generic_linux" namespace="ocarina_processors_x86">
+   <Board name="CPP Linux Runtime" type="ocarina_processors_x86::x86.generic_linux" namespace="ocarina_processors_x86">
 	  <Port name="eth0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::ip_socket" impl_extends="ocarina_drivers::ip_socket.linux" asn1file="/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-socket-ip-driver.asn" asn1module="LINUX-SOCKET-IP-DRIVER" asn1type="Socket-IP-Conf-T" requiresBusAccess="ocarina_buses::ip.generic"/>
    </Board>
    <Board name="C Linux Runtime (POHIC)" type="ocarina_processors_x86::x86.linux" namespace="ocarina_processors_x86">
