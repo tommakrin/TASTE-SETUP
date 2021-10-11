@@ -153,7 +153,7 @@ public
  --  Dependencies of node {{ node.nodeLabel }}
   {% for partition in node.partitions %}
    {% for function in partition.functions %}
- with interfaceview::IV::{{ function }};  -- XXX complete path?
+ with interfaceview::IV::{{ function.name }};  -- XXX complete path?
    {% endfor %}
   {% endfor %}
 {% if node.requiredBusAccesses %}
@@ -188,7 +188,7 @@ public
  subcomponents
   {% for partition in node.partitions %}
    {% for function in partition.functions %}
-    IV_{{ function }} : system Interfaceview::IV::{{ function }}::{{ function }}.others {  -- XXX complete path?
+    IV_{{ function.name }} : system Interfaceview::IV::{{ function.name }}::{{ function.name }}.others {  -- XXX complete path?
        Taste::FunctionName => "{{ function }}";
     };
    {% endfor %}
@@ -211,7 +211,7 @@ public
  properties
   {% for partition in node.partitions %}
    {% for function in partition.functions %}
-    TASTE::APLC_Binding => (reference ({{ partition.name }})) applies to IV_{{ function }};
+    TASTE::APLC_Binding => (reference ({{ partition.name }})) applies to IV_{{ function.name }};
    {% endfor %}
     Actual_Processor_Binding => (reference (p1)) applies to {{ partition.name }};
   {% endfor %}
