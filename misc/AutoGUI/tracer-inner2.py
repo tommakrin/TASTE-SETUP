@@ -105,7 +105,7 @@ def saveMSC():
                     x2 = 200
                     y2 = 35
                     first = 'condition'
-                    msg = stateVal
+                    msg = stateVal.replace('_0_', '.').title()
                     second = ''
                     who = ''
                 elif toId == k:
@@ -152,9 +152,12 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
         messageData is a list of tuples (ASN.1 Type, FieldName Value).
         kind is "RI" or "PI"
     '''
-    if not g_bNoParams:
-        message = RenderParameterFields(message, ",".join(
+    #messageWithParams = RenderParameterFields(message, ",".join(
                                              [tup[1] for tup in messageData]))
+    #if not g_bNoParams:
+    #    message = messageWithParams
+    #print(messageWithParams)
+
     global g_messageId
 
     if sender.lower() in g_instanceFilters or receiver.lower() in g_instanceFilters:
