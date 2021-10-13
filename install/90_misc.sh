@@ -62,17 +62,17 @@ make -C aadl-library install
 # Ellidiss - point the PATH to the repo
 # REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-linux/bin")
 echo "[-] Setting up the PATH to Ellidiss tools"
-REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-v1-linux/bin")
-PATH_CMD='export PATH=$PATH:'"${REAL_ELLIDISS}"
-UpdatePATH
+#    REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-v1-linux/bin")
+#    PATH_CMD='export PATH=$PATH:'"${REAL_ELLIDISS}"
+#    UpdatePATH
 
-REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-v1-linux")
-PATH_CMD='export PATH=$PATH:'"${REAL_ELLIDISS}"
-UpdatePATH
+#    REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-v1-linux")
+#    PATH_CMD='export PATH=$PATH:'"${REAL_ELLIDISS}"
+#    UpdatePATH
 
-REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-linux/bin")
-PATH_CMD='export PATH=$PATH:'"${REAL_ELLIDISS}"
-UpdatePATH
+#    REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-linux/bin")
+#    PATH_CMD='export PATH=$PATH:'"${REAL_ELLIDISS}"
+#    UpdatePATH
 
 # 64-bits version
 REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-linux64/bin")

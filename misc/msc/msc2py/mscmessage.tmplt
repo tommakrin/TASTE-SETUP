@@ -11,7 +11,7 @@
 ,{{ event.messageInstanceName }}
 {% endif %}
 {% endblock %}
-{% block params %}{% if event.parameterString %}'''{{ event.parameterString }}'''{% endif %}{% endblock %}
+{% block params %}{% if event.parameterString %}'''{{ event.parameterString }}'''{% else %}'{}'{% endif %}{% endblock %}
 {% block direction2 %}{% if event.sourceInstance == instance %}{% else %}, ignoreOther=False{% endif %}{% endblock %}
 {% block target %}
 {% if event.sourceInstance == instance %}
