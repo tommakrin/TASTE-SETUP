@@ -24,7 +24,7 @@ fi
 
 # Unfortunately, the --upgrade DOES NOT ALWAYS WORK.
 # Uninstall first...
-echo y | pip3 uninstall asn1-value-editor
+echo y | python3 -m pip uninstall asn1-value-editor
 echo y | pip2 uninstall asn1-value-editor
 make install || exit 1
 

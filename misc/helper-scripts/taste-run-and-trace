@@ -20,30 +20,22 @@ all inner message exchanges in the form of a sequence diagram (MSC).
 You can then open/edit this MSC with the TASTE MSC Editor
 '
 else
-    export VCD_ENABLED=1
+    # Disable VCD, it does not seem to work anymore in POHIC
+    #export VCD_ENABLED=1
     $(taste-config --prefix)/share/AutoGUI/tracer-inner2.py "$1"
 fi
-
-
-# If this script launched the tracer daemon, kill it at the end to write the MSC file
-#   if [ ! -z $tracer_pid ]
-#   then
-#       echo 'Stopping tracer daemon'
-#       # Send Ctrl-C
-#       kill -INT "$tracer_pid"
-#   fi
 
 # In kazoo-based systems, the full dataview is in ../dataview
 cp ../dataview/dataview-uniq.asn .
 
 echo '================================================'
-echo 'Trace file were generated. You may now run:
+echo 'Trace file was generated. You may now run:
     taste-edit-msc trace.msc'
 
 # Patch the VCD file (if any)
 for f in $(find -nowarn -name *.vcd)
 do
     taste-patch-vcd.py ../build/deploymentview_final/"$1"/deployment.h $f
-    echo "    gtkwave ./$f.new"
+    echo "    gtkwave $f.new"
 done
 echo '================================================'

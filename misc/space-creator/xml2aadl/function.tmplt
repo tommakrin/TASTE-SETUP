@@ -90,26 +90,32 @@ FEATURES
 {% endif %}
 {% for ifprop in iface.properties %}
       {% if ifprop.name == "Taste::InheritPI" %}
-      Taste::labelInheritance => "{{ ifprop.value }}";
+      Taste::labelInheritance        => "{{ ifprop.value }}";
       {% elif ifprop.name == "Taste::Autonamed" %}
       {% elif ifprop.name == "Taste::InnerCoordinates" %}
       {% elif ifprop.name == "Taste::RootCoordinates" %}
       {% elif ifprop.name == "Taste::coordinates" %}
       {% else %}
-      {{ ifprop.name }} => "{{ ifprop.value }}";
+      {{ ifprop.name }}              => "{{ ifprop.value }}";
       {% endif %}
 {% endfor %}
 {% for attr in iface.attributes %}
       {% if attr.name == "kind" %}      
-      Taste::RCMoperationKind => {{ attr.value|lower }};
-      {% elif attr.name == "period" %}
-      Taste::RCMperiod => {% if attr.value %}{{ attr.value }} {% else %} 0 {% endif %}ms;
+      Taste::RCMoperationKind        => {{ attr.value|lower }};
+      {% elif attr.name == "period" or attr.name == "miat" %}
+      Taste::RCMperiod               => {% if attr.value %}{{ attr.value }} {% else %} 0 {% endif %}ms;
       {% elif attr.name == "wcet" %}
       Compute_Execution_Time => {% if attr.value %}{{ attr.value }} ms .. {{ attr.value }} {% else %} 0 ms .. 0 {% endif %}ms;
       {% elif attr.name == "queue_size" %}
-      Taste::Associated_Queue_Size => {% if attr.value %}{{ attr.value }}{% else %}1{% endif %};
+      Taste::Associated_Queue_Size   => {% if attr.value %}{{ attr.value }}{% else %}1{% endif %};
       {% elif attr.name == "name" %}
-      Taste::InterfaceName => "{{ attr.value }}";
+      Taste::InterfaceName           => "{{ attr.value }}";
+      {% elif attr.name == "stack_size" %}
+      Taste::Interface_Stack_Size    => {{ attr.value }};
+      {% elif attr.name == "priority" %}
+      Taste::Interface_Priority      => {{ attr.value }};
+      {% elif attr.name == "dispatch_offset" %}
+      Taste::Interface_Cyclic_Offset => {{ attr.value }};
       {% else %}
       -- Unrecognized property: {{ attr.name }} => {{ attr.value }}
       {% endif %}      

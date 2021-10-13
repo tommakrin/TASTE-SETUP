@@ -9,7 +9,7 @@ cd "$DIR/../speedometer/python3" || exit 1
 HEAD="$(grep version speedometer/speedometer.py  | head -1 | awk -F\" '{print $(NF-1)}')"
 # This is much slower than a --version option would be...
 # But there's no such functionality in speedometer :-(
-VERSION_INSTALLED="$(pip3 freeze | grep speedometer | awk -F= '{print $NF}')"
+VERSION_INSTALLED="$(python3 -m pip freeze | grep speedometer | awk -F= '{print $NF}')"
 GIT_OUTPUT=$(git status --porcelain)
 if [ "${GIT_OUTPUT}" == "" ] ; then
     TREE_DIRTY=0
@@ -25,8 +25,8 @@ fi
 # Unfortunately, the --upgrade DOES NOT ALWAYS WORK.
 # Uninstall first...
 echo y | pip2 uninstall speedometer
-echo y | pip3 uninstall speedometer
-pip3 install --user --upgrade . || exit 1
+echo y | python3 -m pip uninstall speedometer
+python3 -m pip install --user --upgrade . || exit 1
 
 # Add .local/bin to PATH
 PATH_CMD='export PATH=$PATH:$HOME/.local/bin'

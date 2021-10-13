@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProfiles>
-<!-- Written by QtCreator 4.8.2, 2021-08-17T10:09:41. -->
+<!-- Written by QtCreator 4.8.2, 2021-08-31T09:05:05. -->
 <qtcreator>
  <data>
   <variable>Profile.0</variable>
@@ -22,15 +22,15 @@
      <value type="QString" key="Platform"></value>
      <value type="QString" key="Toolset"></value>
     </valuemap>
-    <value type="QString" key="CMakeProjectManager.CMakeKitInformation">{daa14e74-2cac-4ec2-878b-d56935fd0157}</value>
-    <value type="QString" key="Debugger.Information">{9a1153d7-4d50-4e71-af0f-cb730becc54c}</value>
+    <value type="QString" key="CMakeProjectManager.CMakeKitInformation">{5dfbfafa-646b-41a1-8764-f3d0933d237e}</value>
+    <value type="QString" key="Debugger.Information">{9a61223d-5a83-471e-8888-a03b33f6eae9}</value>
     <value type="QString" key="PE.Profile.Device">Desktop Device</value>
     <value type="QByteArray" key="PE.Profile.DeviceType">Desktop</value>
     <valuelist type="QVariantList" key="PE.Profile.Environment"/>
     <value type="QString" key="PE.Profile.SysRoot"></value>
     <valuemap type="QVariantMap" key="PE.Profile.ToolChainsV3">
-     <value type="QByteArray" key="C">{24296267-7875-4837-b728-521a3dfadf4e}</value>
-     <value type="QByteArray" key="Cxx">{2f629cb4-9ff3-48d7-8e88-a3e969ca6e62}</value>
+     <value type="QByteArray" key="C">{7c93aca7-9b8f-45f1-b7fc-85956235863f}</value>
+     <value type="QByteArray" key="Cxx">{dfb88346-74d1-4f6a-b0c4-c22685fc4a63}</value>
     </valuemap>
     <value type="QString" key="Qbs.KitInformation"></value>
     <value type="QString" key="QtPM4.mkSpecInformation"></value>
@@ -39,7 +39,7 @@
    <value type="QString" key="PE.Profile.Icon"></value>
    <value type="QString" key="PE.Profile.Id">{6d650885-2dda-4f6a-b4fa-1fabe64f392b}</value>
    <valuelist type="QVariantList" key="PE.Profile.MutableInfo"/>
-   <value type="QString" key="PE.Profile.Name">Desktop</value>
+   <value type="QString" key="PE.Profile.Name">Taste_Kit</value>
    <value type="bool" key="PE.Profile.SDK">false</value>
    <valuelist type="QVariantList" key="PE.Profile.StickyInfo"/>
   </valuemap>

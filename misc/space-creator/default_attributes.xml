@@ -1,13 +1,9 @@
 <Attrs>
-    <Attr label="Name" name="name">
-        <Type>
-            <String defaultValue="AAAA" validator="[a-zA-Z0-9_]+"/>
-        </Type>
-        <Scopes/>
-    </Attr>
-    <Attr label="Implementation language" name="language">
+    <Attr label="Language" name="language" visible="false">
         <Scopes>
-            <Function/>
+            <Function>
+                <AttrValidator name="is_type" value="NO"/>
+            </Function>
         </Scopes>
         <Type>
             <Enumeration defaultValue="SDL">
@@ -19,12 +15,23 @@
                 <Entry value="Simulink"/>
                 <Entry value="Blackbox_Device"/>
                 <Entry value="VHDL"/>
+                <Entry value="Pseudo function"/>
             </Enumeration>
+        </Type>
+    </Attr>
+    <Attr label="Implementation" name="default_implementation" visible="false">
+        <Scopes>
+            <Function>
+                <AttrValidator name="is_type" value="NO"/>
+            </Function>
+        </Scopes>
+        <Type>
+            <String validator="[a-zA-Z0-9_]+"/>
         </Type>
     </Attr>
     <Attr label="Function Type" name="is_type">
         <Type>
-            <Enumeration>
+            <Enumeration defaultValue="NO">
                 <Entry value="YES"/>
                 <Entry value="NO"/>
             </Enumeration>
@@ -33,33 +40,33 @@
             <Function/>
         </Scopes>
     </Attr>
+    <Attr label="Language" name="type_language">
+        <Scopes>
+            <Function>
+                <AttrValidator name="is_type" value="YES"/>
+            </Function>
+        </Scopes>
+        <Type>
+            <Enumeration defaultValue="SDL">
+                <Entry value="Ada"/>
+                <Entry value="CPP"/>
+                <Entry value="SDL"/>
+            </Enumeration>
+        </Type>
+    </Attr>
     <Attr label="Instance of" name="instance_of">
         <Type>
             <String validator="[a-zA-Z0-9_]+"/>
         </Type>
         <Scopes>
             <Function>
-                <AttrValidator name="is_type" value="False"/>
+                <AttrValidator name="is_type" value="NO"/>
             </Function>
         </Scopes>
     </Attr>
-    <Attr label="Kind" name="kind">
-        <Scopes>
-            <Required_Interface/>
-            <Provided_Interface/>
-        </Scopes>
-        <Type>
-            <Enumeration>
-                <Entry value="Cyclic"/>
-                <Entry value="Sporadic"/>
-                <Entry value="Protected"/>
-                <Entry value="Unprotected"/>
-            </Enumeration>
-        </Type>
-    </Attr>
     <Attr label="Period (in ms)" name="period">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="1000" validator="\d+"/>
         </Type>
         <Scopes>
             <Provided_Interface>
@@ -69,7 +76,7 @@
     </Attr>
     <Attr label="Minimal inter-arrival time (in ms)" name="miat">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="0" validator="\d+"/>
         </Type>
         <Scopes>
             <Provided_Interface>
@@ -77,9 +84,9 @@
             </Provided_Interface>
         </Scopes>
     </Attr>
-    <Attr label="Worse case execution time (in ms)" name="wcet">
+    <Attr label="Worst case execution time (in ms)" name="wcet">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="0" validator="\d+"/>
         </Type>
         <Scopes>
              <Provided_Interface>
@@ -92,7 +99,7 @@
     </Attr>
     <Attr label="Message queue size" name="queue_size">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="1" validator="\d+"/>
         </Type>
         <Scopes>
             <Provided_Interface>
@@ -100,24 +107,36 @@
             </Provided_Interface>
         </Scopes>
     </Attr>
-    <Attr name="Taste::coordinates" type="property" visible="false">
+    <Attr label="Priority" name="priority">
         <Type>
-            <String validator="[0-9 ]+"/>
-        </Type>
-        <Scopes/>
-    </Attr>
-    <Attr name="Taste::InnerCoordinates" type="property" visible="false">
-        <Type>
-            <String validator="[0-9 ]+"/>
-        </Type>
-        <Scopes/>
-    </Attr>
-    <Attr label="SomeLabel" name="Taste::RootCoordinates" type="property" visible="false">
-        <Type>
-            <String validator="[0-9 ]+"/>
+            <String defaultValue="1" validator="\d+"/>
         </Type>
         <Scopes>
-            <Function/>
+             <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+                <AttrValidator name="kind" value="Sporadic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr label="Offset (ms)" name="dispatch_offset">
+        <Type>
+            <String defaultValue="0" validator="\d+"/>
+        </Type>
+        <Scopes>
+             <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr label="Stack size (kb)" name="stack_size">
+        <Type>
+            <String defaultValue="50" validator="\d+"/>
+        </Type>
+        <Scopes>
+             <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+                <AttrValidator name="kind" value="Sporadic"/>
+            </Provided_Interface>
         </Scopes>
     </Attr>
     <Attr name="Taste::InheritPI" type="property">
@@ -130,10 +149,18 @@
     </Attr>
     <Attr name="Taste::Autonamed" type="property">
         <Type>
-            <Boolean/>
+            <Boolean defaultValue="True"/>
         </Type>
         <Scopes>
             <Required_Interface/>
+        </Scopes>
+    </Attr>
+    <Attr label="UIText" name="LabelTest" type="property">
+        <Type>
+            <Boolean/>
+        </Type>
+        <Scopes>
+            <Function/>
         </Scopes>
     </Attr>
 </Attrs>
