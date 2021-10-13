@@ -153,7 +153,7 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
         kind is "RI" or "PI"
     '''
     #messageWithParams = RenderParameterFields(message, ",".join(
-                                             [tup[1] for tup in messageData]))
+    #                                         [tup[1] for tup in messageData]))
     #if not g_bNoParams:
     #    message = messageWithParams
     #print(messageWithParams)
