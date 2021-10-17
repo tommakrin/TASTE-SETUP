@@ -189,10 +189,12 @@ public
   {% for partition in node.partitions %}
    {% for function in partition.functions %}
     IV_{{ function.name }} : system Interfaceview::IV::{{ function.name }}::{{ function.name }}.others {  -- XXX complete path?
-       Taste::FunctionName => "{{ function }}";
+       Taste::FunctionName => "{{ function.name }}";
     };
    {% endfor %}
-    {{ partition.name }} : process deploymentview::DV::{{ node.nodeLabel }}::{{ partition.name }}.others; {# XXX Missing Port_Number, but what is that? #}
+    {{ partition.name }} : process deploymentview::DV::{{ node.nodeLabel }}::{{ partition.name }}.others { {# XXX Missing Port_Number, but what is that? #}
+       TASTE_DV_Properties::CoverageEnabled => false;
+    };
   {% endfor %}
    {% for attr in node.attributes %}
     {% if attr.name == "type" %}
