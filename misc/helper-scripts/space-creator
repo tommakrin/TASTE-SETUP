@@ -116,7 +116,6 @@ DataView.aadl: \${ASN1_FILES}
 	taste-update-data-view \$^
 
 clean:
-	\$(MAKE) -C work clean
 	rm -rf work/build work/dataview/built
 	rm -f *.aadl  # Interface and Deployment views in AADL are generated
 	rm -f work/glue_release work/glue_debug work/glue_coverage work/skeletons_built
