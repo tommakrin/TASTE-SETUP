@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Install the scripts
 cd ${DIR}
-for i in checkStackUsage.py patchAPLCs.py
+for i in checkStackUsage.py patchAPLCs.py GCC-based/checkStackUsageGCCBased.py
 do
     cp -a ../orchestrator/orchestrator/$i ${PREFIX}/bin/
 done

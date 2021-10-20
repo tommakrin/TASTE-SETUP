@@ -7,6 +7,8 @@ if [ -z "${CONF_FILE}" ] ; then
 else
     echo '[-]     Good, found config file under '"${CONF_FILE}"
 fi
+echo "[-] Starting postgres service..."
+sudo service postgresql start
 echo "[-] Checking whether local connections to PostgreSQL are trusted..."
 if ! sudo grep '^local.*trust$' "${CONF_FILE}" >/dev/null 2>&1 ; then
     echo "[-] Setting local connections to PostgreSQL as trusted..."

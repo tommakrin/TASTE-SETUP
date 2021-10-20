@@ -77,22 +77,24 @@ work/skeletons_built:	InterfaceView.aadl DataView.aadl
 	touch \$@
 
 work/glue_release:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
+	sed -i 's/CoverageEnabled => true/CoverageEnabled => false/g' DeploymentView.aadl || :
 	\$(KAZOO) -p --glue --gw -o work
 	touch \$@
 
 work/glue_debug:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
+	sed -i 's/CoverageEnabled => true/CoverageEnabled => false/g' DeploymentView.aadl || :
 	\$(KAZOO) --debug -p --glue --gw -o work
 	touch \$@
 
-work/glue_coverage:	InterfaceView.aadl Default_Deployment.aadl DataView.aadl
-	rsync --checksum DV_Coverage.aadl DeploymentView.aadl
+work/glue_coverage:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
+	sed -i 's/CoverageEnabled => false/CoverageEnabled => true/g' DeploymentView.aadl || :
 	\$(KAZOO) --debug -p --glue --gw -o work
 	touch \$@
 
 InterfaceView.aadl:	interfaceview.xml
 	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2aadl/interfaceview.tmplt -x \$@
 
-%: %.dv.xml
+%: %.dv.xml Default_Deployment.aadl
 	# Build using deployment view \$^
 	@# We must update the .aadl only if the dv.xml file has changed (more recent timestamp)
 	if [ \$< -nt \$@.aadl ]; then \
@@ -106,7 +108,6 @@ interfaceview: Default_Deployment.aadl
 Default_Deployment.aadl:	interfaceview.xml
 	# Create/update a default deployment view for Linux target, if none other is provided
 	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x \$@ || exit 1
-	\$(SPACECREATOR) --aadlconverter  -o \$^ -t \$(shell taste-config --prefix)/share/iv2dv-coverage/interfaceview.tmplt -x DV_Coverage.aadl || exit 1
 	rsync --checksum \$@ DeploymentView.aadl
 
 DeploymentView.aadl:	Default_Deployment.aadl
@@ -115,7 +116,6 @@ DataView.aadl: \${ASN1_FILES}
 	taste-update-data-view \$^
 
 clean:
-	\$(MAKE) -C work clean
 	rm -rf work/build work/dataview/built
 	rm -f *.aadl  # Interface and Deployment views in AADL are generated
 	rm -f work/glue_release work/glue_debug work/glue_coverage work/skeletons_built
