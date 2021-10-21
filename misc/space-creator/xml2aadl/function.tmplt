@@ -101,7 +101,11 @@ FEATURES
 {% endfor %}
 {% for attr in iface.attributes %}
       {% if attr.name == "kind" %}      
+       {% if attr.value|lower == "any_operation" %}
+      Taste::RCMoperationKind        => any;
+       {% else %}
       Taste::RCMoperationKind        => {{ attr.value|lower }};
+       {% endif %}
       {% elif attr.name == "period" or attr.name == "miat" %}
       Taste::RCMperiod               => {% if attr.value %}{{ attr.value }} {% else %} 0 {% endif %}ms;
       {% elif attr.name == "wcet" %}
