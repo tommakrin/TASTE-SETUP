@@ -23,12 +23,11 @@ if [ ${TREE_DIRTY} -eq 0 ] && [ "${HEAD}" == "${VERSION_INSTALLED}" ] ; then
     exit 0
 fi
 
-# Unfortunately, the --upgrade DOES NOT ALWAYS WORK.
 # Uninstall first...
 echo y | pip2 uninstall opengeode
 echo y | python3 -m pip uninstall opengeode
 
-python3 -m pip install --user --upgrade . || exit 1
+make install || exit 1
 
 # Add .local/bin to PATH
 PATH_CMD='export PATH=$PATH:$HOME/.local/bin'
