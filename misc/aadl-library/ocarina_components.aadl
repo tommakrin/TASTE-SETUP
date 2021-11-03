@@ -2414,7 +2414,14 @@ properties
    Cheddar_Properties::Preemptive_Scheduler => true;
 end stm32f429_discovery.gnat2020;
 
+processor samv71 extends arm
+end samv71;
 
+processor implementation samv71.freertos
+properties
+  Deployment::Execution_Platform => SAMV71_FREERTOS;
+  Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+end samv71.freertos;
 
 end ocarina_processors_arm;
 property set Processor_Properties is
