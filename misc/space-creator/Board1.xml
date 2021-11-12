@@ -1,8 +1,10 @@
 <Boards>
    <Board name="CPP Linux Runtime" type="ocarina_processors_x86::x86.generic_linux" namespace="ocarina_processors_x86">
 	  <Port name="eth0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::ip_socket" impl_extends="ocarina_drivers::ip_socket.linux" asn1file="/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-socket-ip-driver.asn" asn1module="LINUX-SOCKET-IP-DRIVER" asn1type="Socket-IP-Conf-T" requiresBusAccess="ocarina_buses::ip.generic"/>
+	  <Port name="uart0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::serial_ccsds" impl_extends="ocarina_drivers::serial_ccsds.linux" asn1file="/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/linux-serial-ccsds-driver.asn" asn1module="LINUX-SERIAL-CCSDS-DRIVER" asn1type="Serial-CCSDS-Linux-Conf-T" requiresBusAccess="ocarina_buses::serial.ccsds"/>
    </Board>
-   <Board name="SAM V71" type="ocarina_processors_arm::samv71.freertos" namespace="ocarina_processors_arm">
+   <Board name="SAM V71 Runtime" type="ocarina_processors_arm::samv71.freertos" namespace="ocarina_processors_arm">
+	  <Port name="uart0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::serial_ccsds" impl_extends="ocarina_drivers::serial_ccsds.samv71" asn1file="/home/taste/tool-inst/include/TASTE-SAMV71-Drivers/configurations/samv71-serial-ccsds-driver.asn" asn1module="SAMV71-SERIAL-CCSDS-DRIVER" asn1type="Serial-CCSDS-SamV71-Conf-T" requiresBusAccess="ocarina_buses::serial.ccsds"/>
    </Board>
    <Board name="C Linux Runtime (POHIC)" type="ocarina_processors_x86::x86.linux" namespace="ocarina_processors_x86">
       <Port name="eth0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
