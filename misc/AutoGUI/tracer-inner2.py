@@ -69,7 +69,18 @@ def saveMSC():
 
             f.write(f'   /* CIF INSTANCE ({instances_x[k]}, 35) (200, 70) (800, 800) */\n')
             f.write(f'   instance {k};\n')
+
+            content = {}
             for idx in index_list:
+                # Compute the full CIF coordinates of each event and generate
+                # the event string. However do not emit immediately in the file
+                # because some ordering based on the y position will be needed
+                # first.
+                # depending of the event (PI, RI, timer, condition) the y value
+                # that is used for the ordering can be the one of the event
+                # start or end. We put the vaue we need in "y_sort"
+                y_sort = 0
+
                 msg, fromId, toId, nb1, nb2, timestamp = g_completeMessages[idx]
                 cif = 'MESSAGE'
                 comment = ''
@@ -77,7 +88,7 @@ def saveMSC():
                     cif = 'TIMEOUT'
                     x1 = instances_x[fromId] + 100
                     #Y_OFFSET += 50
-                    y1 = (nb1 * INTERDIST) + Y_OFFSET
+                    y_sort = y1 = (nb1 * INTERDIST) + Y_OFFSET
                     x2 = 186
                     y2 = 39
                     first = 'starttimer' if toId.startswith('#set') else 'stoptimer'
@@ -85,12 +96,12 @@ def saveMSC():
                     who = ''
                     if toId.startswith('#set'):
                         # Add the timer value in a comment box
-                        comment=f"\n/* CIF COMMENT ({x1+95}, {y1+75}) (190, 65) */\ncomment '{toId.split()[1]} ms'"
+                        comment=f"\n/* CIF COMMENT ({x1+115}, {y1+75}) (220, 65) */\ncomment '{toId.split()[1]} ms'"
                 elif fromId == '#timeout':
                     cif = 'TIMEOUT'
                     x1 = instances_x[toId] + 100
                     #Y_OFFSET += 50
-                    y1 = (nb1 * INTERDIST) + Y_OFFSET
+                    y_sort = y1 = (nb1 * INTERDIST) + Y_OFFSET
                     x2 = 76
                     y2 = 39
                     first = 'timeout'
@@ -101,7 +112,7 @@ def saveMSC():
                     cif = 'CONDITION'
                     x1 = instances_x[fromId]
                     #Y_OFFSET += 40
-                    y1 = (nb1 * INTERDIST) + Y_OFFSET
+                    y_sort = y1 = (nb1 * INTERDIST) + Y_OFFSET
                     x2 = 200
                     y2 = 35
                     first = 'condition'
@@ -113,34 +124,39 @@ def saveMSC():
                     second = 'from'
                     who = fromId
                     x2 = instances_x[k] + 100
-                    y2 = (nb2 * INTERDIST) + Y_OFFSET
+                    y_sort = y2 = (nb2 * INTERDIST) + Y_OFFSET
                     if fromId != 'env':
                         x1 = instances_x[fromId] + 100
                         y1 = (nb1 * INTERDIST) + Y_OFFSET
                         if nb2 == nb1 + 1:
                             # if execution is immediately after sending,
                             # use a straight line to save space on the diagram
-                            y2 = y1
+                            y_sort = y2 = y1
                     else:
                         x1 = -30
                         y1 = (nb2 * INTERDIST) + Y_OFFSET
                     if k.lower() in list(g_timestampFilters.keys()) \
                             and msg in g_timestampFilters[k.lower()]:
                         # Add timestamp for this message
-                        comment=f"\n/* CIF COMMENT ({x2+200}, {y2}) (200, 65) */\ncomment 'at {timestamp} ms'"
+                        comment=f"\n/* CIF COMMENT ({x2+100}, {y2-35}) (328, 70) */\ncomment 'at {timestamp} ms'"
                 else:
                     first = 'out'
                     second = 'to'
                     who = toId
                     x1 = instances_x[k] + 100
-                    y1 = (nb1 * INTERDIST) + Y_OFFSET
+                    y_sort = y1 = (nb1 * INTERDIST) + Y_OFFSET
                     x2 = instances_x[toId] + 100
                     if nb2 == nb1 + 1:
                         y2 = y1
                     else:
                         y2 = (nb2 * INTERDIST) + Y_OFFSET
-                f.write(f'      /* CIF {cif} ({x1}, {y1}) ({x2}, {y2}) */\n')
-                f.write(f'      {first} {msg} {second} {who}{comment};\n')
+                content[y_sort] = [
+                     f'      /* CIF {cif} ({x1}, {y1}) ({x2}, {y2}) */\n',
+                     f'      {first} {msg} {second} {who}{comment};\n']
+            # sort the elements based on y position
+            for cif, event in dict(sorted(content.items())).values():
+                f.write(cif)
+                f.write(event)
             f.write('   endinstance;\n\n')
         f.write('   endmsc;\n')
         f.write('endmscdocument;\n')
@@ -271,6 +287,8 @@ def main():
         print('     instance functionName')
         print('     -- filter individual messages to an instance')
         print('     input PIname to functionName')
+        print('     -- Add timestamp to a specific message')
+        print('     timestamp input PIname to functionName')
         sys.exit(1)
 
     os.putenv("TASTE_INNER_MSC", "1")
@@ -360,7 +378,6 @@ def main():
                 if stateValue != g_currentState[fctName]:
                     g_currentState[fctName] = stateValue
                     Message('STATE', 0, fctName, stateValue, fctName, fctName)
-
             else:
                 sys.stdout.write(lline)
                 sys.stdout.write('\n')
