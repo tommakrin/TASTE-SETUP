@@ -41,10 +41,12 @@ INTERDIST = 90
 def saveMSC():
     global Y_OFFSET
     with open(g_strMscFilename, "w") as f:
-        f.write(f'/* CIF MSCDOCUMENT (0, 0) ({len(list(g_instances))*700+300}, {len(list(g_completeMessages))*45}) */\n' )
-        f.write('mscdocument automade;\n'
+        # Add 2 mscdocuments (and and leaf), needed for the end-to-end view in space creator
+        f.write('mscdocument taste_recorded /* MSC AND */;\n'
                 '   language ASN.1;\n'
                 '   data dataview-uniq.asn;\n\n')
+        f.write(f'/* CIF MSCDOCUMENT (0, 0) ({len(list(g_instances))*700+300}, {len(list(g_completeMessages))*45}) */\n' )
+        f.write('mscdocument automade;\n')
         inst_x = 500
         instances_x = {}
         for k in g_instances.keys():
@@ -159,6 +161,7 @@ def saveMSC():
                 f.write(event)
             f.write('   endinstance;\n\n')
         f.write('   endmsc;\n')
+        f.write('endmscdocument;\n')
         f.write('endmscdocument;\n')
         f.close()
 
