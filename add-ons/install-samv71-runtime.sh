@@ -21,3 +21,4 @@ rm -rf "${PREFIX}"/include/TASTE-SAMV71-Runtime/*
 cp -r FreeRTOS-Kernel "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp -r SAMV71-BSP "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp -r src/Init "${PREFIX}"/include/TASTE-SAMV71-Runtime/
+cp -r src/Hal "${PREFIX}"/include/TASTE-SAMV71-Runtime/
