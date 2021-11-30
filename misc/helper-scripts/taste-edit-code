@@ -34,16 +34,16 @@ then
     cd work/"${2,,}"/"$1"
     if [[ $1 == "C" ]]
     then
-        $SPACECREATOR -client src/"${2,,}".c
+        $SPACECREATOR -pid $PPID src/"${2,,}".c
     elif [[ $1 == "Ada" ]]
     then
-        $SPACECREATOR -client src/"${2,,}".adb
+        $SPACECREATOR -pid $PPID src/"${2,,}".adb
     elif [[ $1 == "CPP" ]]
     then
-        $SPACECREATOR -client src/"${2,,}".cc
+        $SPACECREATOR -pid $PPID src/"${2,,}".cc
     elif [[ $1 == "GUI" ]]
     then
-        $SPACECREATOR -client src/UserWidgets.py
+        $SPACECREATOR -pid $PPID src/UserWidgets.py
     else
         make edit
     fi
