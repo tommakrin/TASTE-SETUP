@@ -23,3 +23,17 @@ cp FreeRTOS/FreeRTOSConfig.h "${PREFIX}"/include/TASTE-SAMV71-Runtime/FreeRTOS-K
 cp -r SAMV71-BSP "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp -r src/Init "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp -r src/Hal "${PREFIX}"/include/TASTE-SAMV71-Runtime/
+
+echo "Installing TASTE-SAMV71-Drivers"
+
+cd "$DIR"/../TASTE-SAMV71-Drivers || exit 1
+
+git submodule init
+git submodule update
+
+mkdir -p "${PREFIX}"/include/TASTE-SAMV71-Drivers
+# delete old files
+rm -rf "${PREFIX}"/include/TASTE-SAMV71-Drivers/*
+# install
+cp -r src/samv71_serial_ccsds "${PREFIX}"/include/TASTE-SAMV71-Drivers
+cp -r configurations "${PREFIX}"/include/TASTE-SAMV71-Drivers
