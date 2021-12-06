@@ -12,6 +12,7 @@
                 <Entry value="C"/>
                 <Entry value="GUI"/>
                 <Entry value="SDL"/>
+                <Entry value="Slim"/>
                 <Entry value="Simulink"/>
                 <Entry value="Blackbox_Device"/>
                 <Entry value="VHDL"/>
