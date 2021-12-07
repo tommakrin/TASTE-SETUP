@@ -21,6 +21,7 @@ rm -rf "${PREFIX}"/include/TASTE-SAMV71-Runtime/*
 cp -r FreeRTOS/FreeRTOS-Kernel "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp FreeRTOS/FreeRTOSConfig.h "${PREFIX}"/include/TASTE-SAMV71-Runtime/FreeRTOS-Kernel/include
 cp -r SAMV71-BSP "${PREFIX}"/include/TASTE-SAMV71-Runtime/
+cp -r src/BrokerLock "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp -r src/Init "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp -r src/Hal "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 
