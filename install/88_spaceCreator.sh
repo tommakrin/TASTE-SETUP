@@ -1,7 +1,7 @@
 #!/bin/bash
 # Version neeed by the current TASTE release.
 # Update this number when a new version is uploaded on tuxfamily:
-EXPECTED_VERSION="0.12.5750"
+EXPECTED_VERSION="0.12.7038"
 FILENAME=spacecreator-x86_64-$EXPECTED_VERSION.AppImage
 
 # Check the version of the current insallation, if any
@@ -45,6 +45,7 @@ cp -f misc/space-creator/syntax/*  ~/.config/QtProject/qtcreator/generic-highlig
 cp -f misc/space-creator/qtversion.xml  ~/.config/QtProject/qtcreator/ || :
 cp -f misc/space-creator/profiles.xml  ~/.config/QtProject/qtcreator/ || :
 cp -f misc/space-creator/toolchains.xml  ~/.config/QtProject/qtcreator/ || :
+cp -f misc/space-creator/forbidden_names.txt ~/.local/share/QtProject/QtCreator/ || :
 # Default setting for QtCreator. It contains the UUID1 needed by the kits. It is normally generated
 # by Qt Creator the 1st time it is launched. If there is one already we can keep it (the UUID will be
 # read from the space-creator script when creating a new project)

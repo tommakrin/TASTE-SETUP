@@ -60,8 +60,13 @@ coverage: work/glue_coverage
 	rm -rf work/glue_debug
 	\$(MAKE) -C work
 
+# To build and run the system type e.g. 'make debug run'
 run:
 	\$(MAKE) -C work run
+
+# To run Cheddar/Marzhin for scheduling analysis, type 'make edit_cv'
+edit_cv:
+	\$(MAKE) -C work run_cv
 
 # Simulation target (experimental)
 simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl

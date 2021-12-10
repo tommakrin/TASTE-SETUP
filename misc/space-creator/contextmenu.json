@@ -50,14 +50,16 @@
                     "itemType": "Function"
                 }
             ],
-            "title": "Edit"
+            "title": "Edit implementation"
         },
         {
             "action": "",
             "app": "make",
             "appArgs": [
                 "-C",
-                "$PRJ_FOLDER"
+                "$PRJ_FOLDER",
+                "interfaceview",
+                "debug"
             ],
             "appCwd": "$PRJ_FOLDER",
             "conditions": [
@@ -67,22 +69,7 @@
                     "itemType": "*"
                 }
             ],
-            "title": "Build system"
-        },
-        {
-            "action": "Asn1",
-            "app": "",
-            "appArgs": [
-            ],
-            "appCwd": "",
-            "conditions": [
-                {
-                    "attributes": [
-                    ],
-                    "itemType": "*"
-                }
-            ],
-            "title": "Edit ASN.1"
+            "title": "Debug build for Linux"
         },
         {
             "action": "",
@@ -102,9 +89,9 @@
         },
         {
             "action": "",
-            "app": "make",
+            "app": "taste-create-database",
             "appArgs": [
-                "skeletons"
+                ""
             ],
             "appCwd": "$PRJ_FOLDER",
             "conditions": [
@@ -115,6 +102,24 @@
                 }
             ],
             "title": "Generate/update code skeletons"
+        },
+        {
+            "action": "",
+            "app": "make",
+            "appArgs": [
+                "-C",
+                "$PRJ_FOLDER",
+                "edit-cv"
+            ],
+            "appCwd": "$PRJ_FOLDER",
+            "conditions": [
+                {
+                    "attributes": [
+                    ],
+                    "itemType": "*"
+                }
+            ],
+            "title": "Scheduling Analysis"
         }
     ],
     "version": "1.0"
