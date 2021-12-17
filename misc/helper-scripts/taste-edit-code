@@ -20,17 +20,29 @@ ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
 taste-xml-to-aadl || exit 1
 
-
-if [[ $1 != "C" && $1 != "Ada" && $1 != "SDL" && $1 != "CPP" && $1 != "GUI" && "$1" != "Blackbox_Device" ]]
+# Space Creator uses 2 attributes to set the language depending if it is
+# a normal function ($1) or a function type ($2). The other argument will be
+# an empty string, which has to be skipped. We use the shift operator for that.
+LANG=$1
+if [[ $LANG == "" ]]
 then
-    echo  -e "${ERROR} First argument must be C, CPP, Ada, SDL, GUI or Blackbox_C"
+    shift
+    LANG=$1
+    FNAME=$2
+else
+    FNAME=$3
+fi
+
+if [[ $LANG != "C" && $LANG != "Ada" && $LANG != "SDL" && $LANG != "CPP" && $LANG != "GUI" && "$LANG" != "Blackbox_Device" ]]
+then
+    echo  -e "${ERROR} First argument must be C, CPP, Ada, SDL, GUI or Blackbox_C, and not \"$LANG\""
     exit 1
 fi
 
 # Check if the project works with kazoo. If so, use the makefile rule to edit the code
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
-    FOLDER=work/"${2,,}"/"$1"
+    FOLDER=work/"${FNAME,,}"/"$LANG"
     if [ ! -d "${FOLDER}" ]
     then
         echo -e "${ERROR} Folder missing: ${FOLDER} (skeleton generation failed?!)"
@@ -39,16 +51,16 @@ then
 
     # Text source code can be edited directly from within space creator
     cd "${FOLDER}"
-    if [[ $1 == "C" ]]
+    if [[ $LANG == "C" ]]
     then
-        SOURCE_FILE=src/"${2,,}".c
-    elif [[ $1 == "Ada" ]]
+        SOURCE_FILE=src/"${FNAME,,}".c
+    elif [[ $LANG == "Ada" ]]
     then
-        SOURCE_FILE=src/"${2,,}".adb
-    elif [[ $1 == "CPP" ]]
+        SOURCE_FILE=src/"${FNAME,,}".adb
+    elif [[ $LANG == "CPP" ]]
     then
-        SOURCE_FILE=src/"${2,,}".cc
-    elif [[ $1 == "GUI" ]]
+        SOURCE_FILE=src/"${FNAME,,}".cc
+    elif [[ $LANG == "GUI" ]]
     then
         SOURCE_FILE=src/UserWidgets.py
     else
