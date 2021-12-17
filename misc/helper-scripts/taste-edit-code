@@ -2,7 +2,7 @@
 # TASTE User Code Editor
 # Depending on the implementation language, launch the corresponding code editor
 # Script (c) Maxime Perrotin / ESA 2021
-# Supported languages: C, Ada, SDL
+# Supported languages: C, Ada, SDL, C++, GUI (Python)
 # Logging with colors (only in a terminal)
 SPACECREATOR=spacecreator.AppImage
 
@@ -30,25 +30,43 @@ fi
 # Check if the project works with kazoo. If so, use the makefile rule to edit the code
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
+    FOLDER=work/"${2,,}"/"$1"
+    if [ ! -d "${FOLDER}" ]
+    then
+        echo -e "${ERROR} Folder missing: ${FOLDER} (skeleton generation failed?!)"
+        exit 1
+    fi
+
     # Text source code can be edited directly from within space creator
-    cd work/"${2,,}"/"$1"
+    cd "${FOLDER}"
     if [[ $1 == "C" ]]
     then
-        $SPACECREATOR -pid $PPID src/"${2,,}".c
+        SOURCE_FILE=src/"${2,,}".c
     elif [[ $1 == "Ada" ]]
     then
-        $SPACECREATOR -pid $PPID src/"${2,,}".adb
+        SOURCE_FILE=src/"${2,,}".adb
     elif [[ $1 == "CPP" ]]
     then
-        $SPACECREATOR -pid $PPID src/"${2,,}".cc
+        SOURCE_FILE=src/"${2,,}".cc
     elif [[ $1 == "GUI" ]]
     then
-        $SPACECREATOR -pid $PPID src/UserWidgets.py
+        SOURCE_FILE=src/UserWidgets.py
     else
-        make edit
+        make edit || exit 1
+        exit 0
     fi
-    exit 0
+
+    # Check that source code actually exists, then edit in Qt Creator
+    if [ ! -f "${SOURCE_FILE}" ]
+    then
+        echo -e "${ERROR} File missing: ${SOURCE_FILE} (skeleton generation failed?!)"
+        exit 1
+    else
+        $SPACECREATOR -pid $PPID ${SOURCE_FILE}
+        exit 0
+    fi
 else
-    echo -e "${ERROR} Code skeleton generation failed"
+    echo -e "${ERROR} Missing Makefile or project not supported by Kazoo"
+    exit 1 
 fi
 
