@@ -48,6 +48,15 @@
                     "attributes": [
                     ],
                     "itemType": "Function"
+                },
+                {
+                    "attributes": [
+                        {
+                            "title": "instance_of",
+                            "value": ""
+                        }
+                    ],
+                    "itemType": "Function"
                 }
             ],
             "title": "Edit implementation"
