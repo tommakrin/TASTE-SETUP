@@ -267,5 +267,10 @@ Interface_Priority      : aadlinteger applies to (subprogram);
 Interface_Cyclic_Offset : aadlinteger applies to (subprogram);
 Interface_Stack_Size    : aadlinteger applies to (subprogram);
 
+--  Cflags/Ldflags added by user on partitions (process) of the deployment view
+--  also applicable to nodes (system)
+
+cflags : aadlstring applies to (system, process);
+ldflags : aadlstring applies to (system, process);
 
 end Taste;

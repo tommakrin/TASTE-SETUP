@@ -195,6 +195,13 @@ public
    {% endfor %}
     {{ partition.name }} : process deploymentview::DV::{{ node.nodeLabel }}::{{ partition.name }}.others { {# XXX Missing Port_Number, but what is that? #}
        TASTE_DV_Properties::CoverageEnabled => false;
+     {% for attr in partition.attributes %}
+      {% if attr.name == "cflags" %}
+       TASTE::CFlags => "{{ attr.value }}";
+      {% elif attr.name == "ldflags" %}
+       TASTE::LDFlags => "{{ attr.value }}";
+      {% endif %}
+     {% endfor %}
     };
   {% endfor %}
    {% for attr in node.attributes %}
