@@ -30,13 +30,20 @@ then
     LANG=$1
     FNAME=$2
 else
-    FNAME=$3
+    FNAME=$2 # why 3, I have got some errors if it is $3.
 fi
 
-if [[ $LANG != "C" && $LANG != "Ada" && $LANG != "SDL" && $LANG != "CPP" && $LANG != "GUI" && "$LANG" != "Blackbox_Device" ]]
+if [[ $LANG != "C" && $LANG != "Ada" && $LANG != "SDL" && $LANG != "CPP" && $LANG != "GUI" && "$LANG" != "Blackbox_Device" && "$LANG" != "QGenC" && "$LANG" != "QGenAda" && "$LANG" != "Simulink" ]]
 then
     echo  -e "${ERROR} First argument must be C, CPP, Ada, SDL, GUI or Blackbox_C, and not \"$LANG\""
     exit 1
+fi
+
+# Simulink functions source and wrappers are in SIMULINK directory,
+# in upper case.
+if [[ "$LANG" == "Simulink" ]]
+then
+    LANG=$(echo ${LANG^^})
 fi
 
 # Check if the project works with kazoo. If so, use the makefile rule to edit the code
