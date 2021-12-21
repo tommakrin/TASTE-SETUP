@@ -12,7 +12,7 @@
             <Function/>
         </Scopes>
         <Type>
-            <String defaultValue="-fno-pie"/>
+            <String/>
         </Type>
     </Attr>
    <Attr label="Extra linker flags" name="ldflags" visible="true" optional="true">
@@ -20,7 +20,7 @@
             <Function/>
         </Scopes>
         <Type>
-            <String defaultValue="-fno-pie"/>
+            <String/>
         </Type>
     </Attr>
 </Attrs>
