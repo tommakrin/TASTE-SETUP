@@ -19,6 +19,14 @@
             </Enumeration>
         </Type>
     </Attr>
+    <Attr label="FPGA Configuration" name="FPGA_Configurations" visible="true">
+        <Scopes>
+            <Function/>
+        </Scopes>
+        <Type>
+            <String defaultValue="AllModes"/>
+        </Type>
+    </Attr>
     <Attr label="Implementation" name="default_implementation" visible="false">
         <Scopes>
             <Function>
