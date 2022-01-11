@@ -134,6 +134,8 @@ PROPERTIES
    TASTE::Is_Component_Type => {% if attr.value == "YES" %}true{% else %}false{% endif %};
    {% elif attr.name == "instance_of" and attr.value != "" %}
    TASTE_IV_Properties::is_instance_of => "{{ attr.value }}";
+   {% elif attr.name == "FPGA_Configurations" and attr.value != "" %}
+   TASTE_IV_Properties::FPGA_Configurations => "{{ attr.value }}";
    {% else %}
    -- unsupported property found: name: "{{ attr.name }}"  value: "{{ attr.value }}"
    {% endif %}

@@ -30,7 +30,7 @@ then
     LANG=$1
     FNAME=$2
 else
-    FNAME=$2 # why 3, I have got some errors if it is $3.
+    FNAME=$3
 fi
 
 if [[ $LANG != "C" && $LANG != "Ada" && $LANG != "SDL" && $LANG != "CPP" && $LANG != "GUI" && "$LANG" != "Blackbox_Device" && "$LANG" != "QGenC" && "$LANG" != "QGenAda" && "$LANG" != "Simulink" ]]
