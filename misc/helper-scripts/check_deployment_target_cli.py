@@ -95,7 +95,7 @@ PLATFORMS = { "crazyflie_v2_gnat"            : lambda: True,
 
 
 def cli_query_user(platform):
-    print(f"[-] This plaform is not installed: {platform}")
+    print(f"[-] This platform is not installed: {platform}")
     if not sys.stdout.isatty():
         # When not running from a terminal, just exit with error
         return False
