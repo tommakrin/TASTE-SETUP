@@ -111,11 +111,11 @@ def main():
         platform = sys.argv[1]
         PLATFORMS[platform.replace('.', '_')]()
     except (KeyError, IndexError):
-        print(f"[X] Unknown or unspecified platform")
+        print(f"[X] Unknown or unspecified platform {platform or ''}")
         print("[-] This is the list of supported platforms:")
         for each in PLATFORMS.keys():
             print(f"   {each}")
-        return 1
+        sys.exit(1)
     except NotImplementedError as exc:
         install_it, = exc.args
         if cli_query_user(platform):
@@ -123,7 +123,7 @@ def main():
         else:
             print("[-] You can install the platform later by typing:\n   "
                               + str(install_it.__doc__))
-            return 0
+            sys.exit(0)
 
     else:
         print(f"[-] Platform {platform} is installed")
