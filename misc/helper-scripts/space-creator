@@ -48,16 +48,19 @@ all:	release
 release:	work/glue_release
 	rm -rf work/glue_debug
 	rm -rf work/glue_coverage
+	\$(MAKE) -C work check_targets
 	\$(MAKE) -C work
 
 debug:	work/glue_debug
 	rm -rf work/glue_release
 	rm -rf work/glue_coverage
+	\$(MAKE) -C work check_targets
 	\$(MAKE) -C work
 
 coverage: work/glue_coverage
 	rm -rf work/glue_release
 	rm -rf work/glue_debug
+	\$(MAKE) -C work check_targets
 	\$(MAKE) -C work
 
 # To build and run the system type e.g. 'make debug run'
