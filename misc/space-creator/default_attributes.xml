@@ -24,7 +24,7 @@
             <Function/>
         </Scopes>
         <Type>
-            <String defaultValue="AllModes"/>
+            <String defaultValue=""/>
         </Type>
     </Attr>
     <Attr label="Implementation" name="default_implementation" visible="false">
