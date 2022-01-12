@@ -33,6 +33,10 @@ def install_rpi_posix():
     """$ sudo apt install gcc-arm-linux-gnueabihf"""
     os.system("xterm -e sudo apt install -y gcc-arm-linux-gnueabihf gnat-8-arm-linux-gnueabihf g++-arm-linux-gnueabihf")
 
+def install_zynq7000_rtems():
+    """ $ /home/taste/tool-src/add-ons/install-zynqrtems-5.1.sh """
+    os.system("xterm -e /home/taste/tool-src/add-ons/install-zynqrtems-5.1.sh")
+
 def check_rpi_posix():
     if not os.path.isfile("/usr/bin/arm-linux-gnueabihf-gcc"):
         raise NotImplementedError(install_rpi_posix)
@@ -58,6 +62,10 @@ def check_msp430_freertos():
 def check_gnat2020_arm():
     if not os.path.isdir("/opt/GNAT/gnat-arm-2020/bin/"):
         raise NotImplementedError(install_gnat2020_arm)
+
+def check_zynq7000_rtems():
+    if not os.path.isdir("/opt/rtems-5.1-2020.04.29/"):
+        raise NotImplementedError(install_zynq7000_rtems)
 
 # When editing, replace dot (.) with underscore (_)
 # the TASTE GUI mixes them up if there is more than one underscore
@@ -85,7 +93,8 @@ PLATFORMS = { "crazyflie_v2_gnat"            : lambda: True,
               "x86_linux"                    : lambda: True,
               "x86_win32"                    : lambda: True,
               "msp430fr5969_freertos"        : check_msp430_freertos,
-              "x86_generic_linux"            : lambda: True
+              "x86_generic_linux"            : lambda: True,
+              "zynqzc706_rtems_posix"        : check_zynq7000_rtems,
              }
 
 def query_user(platform):
