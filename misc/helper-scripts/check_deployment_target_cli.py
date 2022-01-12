@@ -2,10 +2,6 @@
 
 import sys
 import os
-from PySide2.QtGui import *
-from PySide2.QtCore import *
-from PySide2.QtWidgets import *
-from PySide2.QtUiTools import *
 
 def install_gr740_rtems410_gaisler_posix():
     """ $ $HOME/tool-src/add-ons/install-gaisler-4.10.sh """
@@ -33,6 +29,10 @@ def install_rpi_posix():
     """$ sudo apt install gcc-arm-linux-gnueabihf"""
     os.system("xterm -e sudo apt install -y gcc-arm-linux-gnueabihf gnat-8-arm-linux-gnueabihf g++-arm-linux-gnueabihf")
 
+def install_zynq7000_rtems():
+    """ $ /home/taste/tool-src/add-ons/install-zynqrtems-5.1.sh """
+    os.system("xterm -e /home/taste/tool-src/add-ons/install-zynqrtems-5.1.sh")
+
 def check_rpi_posix():
     if not os.path.isfile("/usr/bin/arm-linux-gnueabihf-gcc"):
         raise NotImplementedError(install_rpi_posix)
@@ -58,6 +58,10 @@ def check_msp430_freertos():
 def check_gnat2020_arm():
     if not os.path.isdir("/opt/GNAT/gnat-arm-2020/bin/"):
         raise NotImplementedError(install_gnat2020_arm)
+
+def check_zynq7000_rtems():
+    if not os.path.isdir("/opt/rtems-5.1-2020.04.29/"):
+        raise NotImplementedError(install_zynq7000_rtems)
 
 # When editing, replace dot (.) with underscore (_)
 # the TASTE GUI mixes them up if there is more than one underscore
@@ -85,48 +89,44 @@ PLATFORMS = { "crazyflie_v2_gnat"            : lambda: True,
               "x86_linux"                    : lambda: True,
               "x86_win32"                    : lambda: True,
               "msp430fr5969_freertos"        : check_msp430_freertos,
-              "x86_generic_linux"            : lambda: True
+              "x86_generic_linux"            : lambda: True,
+              "zynqzc706_rtems_posix"        : check_zynq7000_rtems,
              }
 
-def query_user(platform):
-    msg_box = QMessageBox()
-    msg_box.setWindowTitle("This plaform is not installed!")
-    ok    = msg_box.addButton("Install now",   QMessageBox.AcceptRole)
-    later = msg_box.addButton("Install later", QMessageBox.RejectRole)
-    msg_box.setEscapeButton(later)
-    msg_box.setDefaultButton(ok)
-    msg_box.setIcon(QMessageBox.Warning)
-    msg_box.setText("Do you want to install target\n{} ?".format(platform))
-    msg_box.exec_()
-    return msg_box.clickedButton() == ok
+
+def cli_query_user(platform):
+    print(f"[-] This plaform is not installed: {platform}")
+    if not sys.stdout.isatty():
+        # When not running from a terminal, just exit with error
+        return False
+    resp = input(f"[?] Do you want to install target {platform} ? [Y/n]")
+    if not resp or resp.lower() == 'y':
+        return True
+    else:
+        return False
 
 def main():
-    app = QApplication(sys.argv)
     # check if the target in supported
     try:
         platform = sys.argv[1]
         PLATFORMS[platform.replace('.', '_')]()
-    except KeyError:
-        warn_box = QMessageBox()
-        warn_box.setIcon(QMessageBox.Information)
-        warn_box.setText("Unknown platform: {}".format(platform))
-        warn_box.exec_()
-        return 1
-    except IndexError:
-        print("You must specify the target in the command line")
+    except (KeyError, IndexError):
+        print(f"[X] Unknown or unspecified platform {platform or ''}")
+        print("[-] This is the list of supported platforms:")
+        for each in PLATFORMS.keys():
+            print(f"   {each}")
+        sys.exit(1)
     except NotImplementedError as exc:
         install_it, = exc.args
-        if query_user(platform):
+        if cli_query_user(platform):
             install_it()
         else:
-            warn_box = QMessageBox()
-            warn_box.setIcon(QMessageBox.Information)
-            warn_box.setText("You can install the platform later by typing:\n"
+            print("[-] You can install the platform later by typing:\n   "
                               + str(install_it.__doc__))
-            warn_box.exec_()
+            sys.exit(0)
 
     else:
-        print("Platform {} is installed".format(platform))
+        print(f"[-] Platform {platform} is installed")
         sys.exit(0)
 
 if __name__ == '__main__':
