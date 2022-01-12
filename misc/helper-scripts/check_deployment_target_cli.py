@@ -60,7 +60,8 @@ def check_gnat2020_arm():
         raise NotImplementedError(install_gnat2020_arm)
 
 def check_zynq7000_rtems():
-    if not os.path.isdir("/opt/rtems-5.1-2020.04.29/"):
+    if not os.path.isdir("/opt/rtems-5.1-2020.04.29/") or \
+            not os.path.isdir("/opt/bambu/"):
         raise NotImplementedError(install_zynq7000_rtems)
 
 # When editing, replace dot (.) with underscore (_)
