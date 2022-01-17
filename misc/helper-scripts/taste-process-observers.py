@@ -20,12 +20,12 @@ all: modelcheck
 modelcheck:{adb} mcsrc/modelcheck.adb mcsrc/properties.adb mcsrc/mc.adb mcsrc/mc.ads
 	ADA_PROJECT_PATH=~/.local/share/gpr:${{ADA_PROJECT_PATH}} gprbuild -p -P mc
 
-libsimulator.so:{adb} mcsrc/modelcheck.adb mcsrc/properties.adb mcsrc/mc.adb mcsrc/mc.ads mc.py
+libsimulator.so:{adb} mcsrc/modelcheck.adb mcsrc/properties.adb mcsrc/mc.adb mcsrc/mc.ads
 	#  make a library version for python interfacing
 	ADA_PROJECT_PATH=~/.local/share/gpr:${{ADA_PROJECT_PATH}} gprbuild -p -P mc_lib.gpr
 
 simu: libsimulator.so
-	./mc.py
+	taste-interactive-simulator
 
 {build}
 

@@ -1,0 +1,755 @@
+#!/usr/bin/env python3
+
+# TASTE Interactive Simulator module
+# Designed and implemented by Maxime Perrotin
+# (c) 2022 European Space Agency
+# License : LGPL
+# Contact: maxime.perrotin@esa.int
+
+import optparse
+import signal
+import sys
+import os
+import logging
+from collections import defaultdict
+from functools import partial
+
+import ctypes
+
+import opengeode
+from opengeode import Asn1scc
+from opengeode import undoCommands as undo   # for undo macros
+from asn1_value_editor import (vn, standalone_editor, mscHandler, resources,
+        TasteMainWindow, plotmanager)
+
+from asn1_value_editor.asn1_value_editor import asn1Editor, asn1Viewer
+
+from PySide2.QtWidgets import *
+from PySide2.QtGui import *
+from PySide2.QtCore import *
+from PySide2.QtUiTools import QUiLoader
+
+# the logger is initialized by the asn1 value editor
+LOG = None
+
+dll = ctypes.CDLL ("libsimulator.so")
+
+SEPARATOR=opengeode.AdaGenerator.SEPARATOR
+CleanName = lambda name: name.replace(SEPARATOR, '.')
+AdaName = lambda name: name.replace('.', SEPARATOR)
+
+# ASN.1 AST from python.stg (set in the initialize() function)
+ASN1_AST = None
+# ctypes module
+ASN1_CTYPES = None
+
+__version__ = "0.1"
+
+# it is possible to run the model checker:
+#dll.mc_run_exhaustive()
+
+# The following class is needed to interact with C functions that return
+# a pointer to a data structure.
+class ReturnPointer(ctypes.Structure): pass
+ReturnHandle = ctypes.POINTER(ReturnPointer)
+
+def get_system_state():
+    ''' Return the ASN.1 ctypes value of the current system state '''
+    systemState = ASN1_CTYPES.System_State()
+    get_state = dll.global_state
+    get_state.restype = ReturnHandle
+    systemState.SetData(get_state())
+    return systemState
+
+def get_global_event_queue():
+    ''' Return and ctytpes instance of Events_Ty containing the global event
+    queue before they have been dispatched in the input queues of functions '''
+    eventQueue = ASN1_CTYPES.Events_Ty()
+    get_queue = dll.get_event_queue
+    get_queue.restype = ReturnHandle
+    eventQueue.SetData(get_queue())
+    return eventQueue
+
+def set_system_state(new_state):
+    ''' Use API from simulator_interface.ads to update the system state '''
+    dll.set_global_state(new_state._ptr)
+
+
+def send_gser_event(gser_event : str) -> None:
+    ''' Send an event (input or output) to the TASTE system '''
+    evt = ASN1_CTYPES.Observable_Event()
+    # Convert the GSER input into the C instance of the type (evt)
+    vn.valueNotationToCTypes(gser_event,
+                             evt,
+                             ASN1_AST["Observable-Event"].type,
+                             ASN1_CTYPES,
+                             ASN1_AST)
+    evt.Reset()
+    # Send the event to the DLL
+    send_ctype_event(evt)
+
+
+def send_ctype_event(asn1_instance) -> None:
+    ''' Send an event from the ctypes form to the running system'''
+    dll.send_event(asn1_instance._ptr)
+
+
+class Send_Event_With_Undo(QUndoCommand):
+    ''' Undo command to send a message to the running system '''
+    def __init__(self, handler, old_state):
+        ''' Init: save the current and old states '''
+        super().__init__()
+        self.handler = handler
+        self.new_state = handler.current_hash
+        self.old_state = old_state
+
+    def undo(self):
+        ''' Undo an event: Restore the system state as it was before the event
+        was sent - setting back all global variables and internal state '''
+        self.handler.restore_global_state(self.old_state)
+
+    def redo(self):
+        ''' Set the internal variables to the new state '''
+        if self.new_state != self.handler.current_hash:
+            self.handler.restore_global_state(self.new_state)
+
+
+class Taste_Simulator(QObject):
+    ''' Main simulation engine '''
+    msc = Signal(str, str, str, str)
+    msc_macro_start = Signal()
+    msc_macro_stop = Signal()
+    msc_undo = Signal()
+    msc_redo = Signal()
+
+    def __init__(self, parent, state_editor):
+        super().__init__()
+        self.parent = parent
+        self.state_editor = state_editor
+        # Keep a state graph to allow undo/redo and state exploration
+        self.state_graph = {}   # {hash: uPER-encoded state}
+        self.current_hash = None
+        # Create a stack for handling undo/redo commands
+        self.undo_stack = QUndoStack(self)
+        # Keep track of the current state of each SDL process
+        # { 'sdlProcess': {'state': value }
+        # (there can be multiple states in case of parallel states)
+        self.states = {}
+        # List of GUIS in the system
+        # { 'guiName' : { 'output name': ASN1_AST type of parameters } }
+        self.guis = {}
+        # Pointers to the SDL models rendered as statecharts (view, scene)
+        self.models = {}
+        # List of periodic events
+        self.periodics = defaultdict(list)
+
+    def reset_simulation(self):
+        ''' Jump back to the first step of simulation '''
+        while self.undo_stack.canUndo():
+            self.undo()
+
+    def undo(self):
+        ''' Called when the undo button is pressed '''
+        self.undo_stack.undo()
+        self.msc_undo.emit()
+
+    def redo(self):
+        ''' Called when the redo button is pressed '''
+        self.undo_stack.redo()
+        self.msc_redo.emit()
+
+    def restore_global_state(self, statehash):
+        ''' From a hashcode, restore a global state in the DLL '''
+        import Stubs
+        as_uper = self.state_graph[statehash]  # uPER-encoded state
+        system_state = ASN1_CTYPES.System_State()
+        size = ASN1_CTYPES.DV.System_State_REQUIRED_BYTES_FOR_ENCODING
+        buf = Stubs.DataStream(size)
+        buf.SetFromPyString(as_uper)
+        system_state.Decode(buf)
+        set_system_state(system_state)
+        self.state_editor.asn1Instance = system_state
+        self.state_editor.updateVariable()
+        self.current_hash = statehash
+        # Make sure statecharts display the current state
+        _ = self.check_sdl_states(system_state)
+        #self.check_state()  (hightlight SDL state)
+
+    def encode_state_to_uper(self, state):
+        ''' Return uPER string for graph state storage '''
+        size = ASN1_CTYPES.DV.System_State_REQUIRED_BYTES_FOR_ENCODING
+        import Stubs
+        #buf = ASN1_CTYPES.DataStream(size) NO, for some reasons it uses a different Stubs
+        buf = Stubs.DataStream(size)
+        state.Encode(buf)
+        uper = buf.GetPyString()
+        return uper, hash(frozenset(uper))
+
+    def change_internal_state(self, new_state):
+        ''' Called when user manually changes the system state
+            Encode the state in uPER, create a hash, update state graph
+            and create an undo action '''
+        self.on_event(events=[], newstate_ctypes=new_state)
+
+    def check_sdl_states(self, system_state):
+        ''' Detect changes in SDL states to report them in the MSCs
+        in condition boxes. system_state is in ctypes form '''
+        msc_events = []
+        # get a Python-parsable object of the system state
+        s = vn.fromValueNotationToPySide('s', system_state.GSER())
+        for f in self.states.keys():
+            try:
+                # Main state only - TODO = parallel states
+                main_state = s['s'][f]['state']['Enum']
+                if main_state != self.states[f]['state']:
+                    msc_events.append(('condition', main_state, f, ''))
+                    self.states[f]['state'] = main_state
+                    # Also update the graphical statechart
+                    no_dash = main_state.replace('-', '_')
+                    _, scene = self.models[f]
+                    scene.clear_highlight()
+                    composition = no_dash.split(SEPARATOR)
+                    for each in composition:
+                        for symb in scene.find_text(f'\\b{each}\\b'):
+                           scene.highlight(symb.parentItem())
+
+            except (KeyError, AttributeError):
+                # non-SDL functions such as GUIS. ignore.
+                pass
+        return msc_events
+
+    def on_event(self, events, newstate_ctypes):
+        ''' Called after an event or state change has occured. There can
+        be multiple messages in the event, as there can be messages to GUIs '''
+
+        uper, new_hash = self.encode_state_to_uper(newstate_ctypes)
+        self.state_graph[new_hash] = uper
+        old_hash = self.current_hash or new_hash
+        self.current_hash = new_hash
+        # create Undo action based on the event
+        self.msc_macro_start.emit()
+        with undo.UndoMacro(self.undo_stack, 'Send Event'):
+            for event in events:
+                kind, src, dst, instance, kind2, name, paramsAsGSER = event
+                if kind2 == "msg-in":
+                   cmd = 'in'
+                   if paramsAsGSER.replace(' ', '') == "{}":
+                       # No param, clean up the output
+                       self.msc.emit(cmd, f"{name}", src, dst)
+                   else:
+                       self.msc.emit(cmd, f"{name}({paramsAsGSER.strip()})", src, dst)
+            state_events = self.check_sdl_states(newstate_ctypes)
+            for e in state_events:
+                self.msc.emit(*e)
+
+            # Create the Undo command to restore the previous state
+            undo_command = Send_Event_With_Undo(self, old_hash)
+            self.undo_stack.push(undo_command)
+            self.msc_macro_stop.emit()
+
+
+def initialize():
+    # Exit app on Ctrl-C
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    global LOG
+    LOG = standalone_editor.logger
+
+    usage = 'usage: taste-simulator -a file.asn -t type [-d default value]'
+    version = 'ASN.1 Value Editor version ' + __version__
+
+    LOG.info('TASTE Simulator')
+
+    # Parse the command line
+    parser = optparse.OptionParser(usage=usage, version=version)
+    parser.add_option('-v', '--verbose',
+                       action='store_true',
+                       default=False,
+                       help='Display debug information')
+
+    parser.add_option('-r', '--reset',
+                      action='store_true',
+                      default=False,
+                      help='Do not try to restore windows layout')
+
+    options, args = parser.parse_args()
+    if options.verbose:
+        LOG.setLevel(logging.DEBUG)
+    else:
+        LOG.setLevel(logging.INFO)
+
+    asn1_filename = "observer.asn"
+
+    # Create a Qt application (mandatory)
+    app = QApplication(sys.argv)
+
+    # Select a nice style for uniform rendering across all platforms
+    app.setStyle("cleanlooks")
+
+    # Initialize the editor with a dictionary of pairs ParamName/ParamType:
+    s = standalone_editor.SingleValueEditor(asn1_filename)
+    global ASN1_AST
+    global ASN1_STG_MODULE
+    ASN1_AST = s.ASN1_AST
+    ASN1_STG_MODULE = s.dataView
+    global ASN1_CTYPES
+    ASN1_CTYPES = s.asn1ctypes
+
+    # Load the main TASTE GUI
+    loader = QUiLoader()
+    loader.registerCustomWidget(asn1Editor)
+    loader.registerCustomWidget(asn1Viewer)
+    loader.registerCustomWidget(TasteMainWindow.TasteMainWindow)
+    mainWidget = loader.load(QFile('guilayout.ui'))
+
+    # find QStatusBar widget
+    statusbar = mainWidget.findChildren(QStatusBar)[0]
+    statusbar.showMessage('Welcome to the TASTE Simulator')
+    logo = ':/tasteLogo_white.png'
+    msclist_enable = False
+    # find TASTE logo and get width of the picture
+    tasteLogo = mainWidget.findChild(QLabel, 'tasteLogo')
+    pix = QPixmap (logo)
+    pix = pix.scaled(pix.size() / 2)
+    tasteLogo.setPixmap(pix) # logo)
+    logoWidth = tasteLogo.pixmap().width() + 20
+    # find Central widget and set maximum size to width of the logo
+    centralWidget = mainWidget.findChild(QWidget, 'centralWidget')
+    centralWidget.setMaximumWidth(logoWidth)
+    # find dockable widgets (containing TM and TC editors)
+    docks = mainWidget.findChildren(QDockWidget)
+
+
+    # Create an instance of the Plot/Meter manager
+    plotter = plotmanager.PlotManager(parent=mainWidget, log=LOG)
+
+    # Associate the plotter manager to the main app
+    mainWidget.plotter = plotter
+
+    # setupEdit returns a dict with "widget", "editor", "okButton" and "cancelButton"
+    Observable_Event = s.setupEdit("Observable-Event")
+    System_State     = s.setupEdit("System-State")
+
+    qtwidget_Observable_Event = Observable_Event['widget']
+    qtwidget_System_State     = System_State['widget']
+
+    dock = QDockWidget('System State', parent=mainWidget)
+    dock.setObjectName("System State")
+    dock.setFloating(False)
+    mainWidget.addDockWidget(Qt.RightDockWidgetArea, dock)
+    dock.setWidget(qtwidget_System_State)
+    dock.show()
+    docks.append(dock)
+
+
+    dock = QDockWidget('Full Event', parent=mainWidget)
+    dock.setObjectName("Full Event")
+    dock.setFloating(False)
+    mainWidget.addDockWidget(Qt.RightDockWidgetArea, dock)
+    dock.setWidget(qtwidget_Observable_Event)
+    dock.show()
+    docks.append(dock)
+
+    simulator = Taste_Simulator(mainWidget, System_State['editor'])
+
+
+    # Load the UI file with the log area and Undo/Redo/Reset buttons
+    simuWidget = QUiLoader().load(QFile(':/simulation.ui'), parent=mainWidget)
+    dock = QDockWidget('Simulation bay', mainWidget)
+    dock.setFloating(False)
+    dock.setObjectName("Simulation")
+    mainWidget.addDockWidget(Qt.BottomDockWidgetArea, dock)
+    dock.setWidget(simuWidget)
+    dock.show()
+    docks.append(dock)
+    simuWidget.show()
+    undoButton = simuWidget.findChild(QToolButton, 'undoButton')
+    redoButton = simuWidget.findChild(QToolButton, 'redoButton')
+    resetButton = simuWidget.findChild(QToolButton, 'resetButton')
+    resetButton.clicked.connect(simulator.reset_simulation)
+    undoButton.clicked.connect(simulator.undo)
+    redoButton.clicked.connect(simulator.redo)
+
+    # setup the MSC streamer
+    msc_handler = mscHandler.mscHandler (
+            parent=mainWidget,
+            log=LOG,
+            ivpath=None,
+            msc_list=[],
+            fv_name=None,
+            msgs=[],   # could be added for saving the MSC
+            udpController=None,
+            instance_name=None)
+    simulator.msc_undo.connect(msc_handler.undo)
+    simulator.msc_redo.connect(msc_handler.redo)
+    simulator.msc_macro_start.connect(msc_handler.start_undo_macro)
+    simulator.msc_macro_stop.connect(msc_handler.stop_undo_macro)
+    simulator.msc.connect(msc_handler.addToMsc)
+
+    # Create a widget to allow a quick direct access to send events
+    # from the GUIs of the TASTE system - faster than filling in all the
+    # fieldsof the complete Observable-Event structure
+    quickEventList = QListWidget(mainWidget)
+
+    # When an event is selected, copy it to the Event sending window so that
+    # user can fill in the parameters and send it to the system
+    def quickEvent(item : QListWidgetItem):
+        instance = item.data(Qt.UserRole).replace('-', '_')
+        name     = item.data(Qt.UserRole + 1)
+        direction = item.data(Qt.UserRole + 2) # in or out
+        gser      = item.data(Qt.UserRole + 3) # prefilled GSER string if "in"
+        # Create a GSER string of an Observable-Event to pre-fill
+        # the event ASN.1 editor. Read the value from the editor, so that
+        # the default values will be within allowed constraints.
+        evt = foo = ASN1_CTYPES.Observable_Event()
+        if direction == 'out':
+            Observable_Event['editor'].getVariable(dest=evt)
+            evt.kind.Set(ASN1_CTYPES.DV.output_event_PRESENT)
+            evt.output_event.source.Set(ASN1_CTYPES.DV.env)
+            evt.output_event.dest.Set(ASN1_CTYPES.DV.env)
+            evt.output_event.event.kind.Set(
+                getattr(ASN1_CTYPES.DV, f'{instance}_PRESENT'))
+            getattr(evt.output_event.event, instance).kind.Set(
+                    getattr(ASN1_CTYPES.DV,
+                        f'{instance.title()}_Event_msg_out_PRESENT'))
+            getattr(foo.output_event.event, instance).msg_out.kind.Set(
+            getattr(ASN1_CTYPES.DV, f'msg_out_{name}_PRESENT'))
+        else:
+            # IN events are already GSER pre-filled
+            vn.valueNotationToCTypes(
+                    gser,
+                    evt,
+                    ASN1_AST["Observable-Event"].type,
+                    ASN1_CTYPES,
+                    ASN1_AST)
+            evt.Reset()
+        Observable_Event['editor'].asn1Instance = evt
+        Observable_Event['editor'].updateVariable()
+
+    quickEventList.itemClicked.connect(quickEvent)
+
+    dock = QDockWidget('Send messages', parent=mainWidget)
+    dock.setObjectName("Send messages")
+    dock.setFloating(False)
+    mainWidget.addDockWidget(Qt.RightDockWidgetArea, dock)
+    dock.setWidget(quickEventList)
+    dock.show()
+    docks.append(dock)
+
+
+    for instance in ASN1_AST['PID'].type.EnumValues.keys():
+        if instance != 'env':
+            msc_handler.addInstance(instance)
+            if f'{instance}-queue' in ASN1_AST['System-State'].type.Children:
+                # Filter out GUI functions: they have no internal state
+                simulator.states[instance] = {'state': '_unset'}
+            else:
+                #instanceItem = QTableWidgetItem(instance.title())
+                # But keep the guis separately as they will be used to
+                # provide user-friendly list of events to send to the system
+                # Retrive the type name to get the list of OUT events
+                for t in ASN1_AST.keys():
+                    if t.lower() == f'{instance}-event':
+                        spelling = t
+                        break
+                else:
+                    LOG.error(f'Event type not found for {instance}')
+                    sys.exit(1)
+                try:
+                    msgOut = ASN1_AST[f'{spelling}-msg-out'].type.Children
+                    for name, sort in msgOut.items():
+                        nameItem = QListWidgetItem(f'{instance.title()}.{name.title()}')
+                        nameItem.setData (Qt.UserRole, instance)
+                        nameItem.setData (Qt.UserRole + 1, name)
+                        nameItem.setData (Qt.UserRole + 2,"out")
+                        nameItem.setData (Qt.UserRole + 3,"")  # no GSER pre-fill
+                        quickEventList.addItem(nameItem)
+
+                except KeyError:
+                    # Perhaps the GUI has no out message...
+                    pass
+                simulator.guis[instance] = msgOut
+    msc_handler.startStop()
+
+    def process_event():
+        ''' This function is called when the send button is pressed '''
+        # get the ctypes event from the asn1 value editor
+        evt = ASN1_CTYPES.Observable_Event()
+        Observable_Event['editor'].getVariable(dest=evt)
+        # Decode the event to extract the source/dest/params..
+        d = vn.fromValueNotationToPySide('evt', evt.GSER())
+        kind = d['evt']['Choice']
+        if kind in ('input-event', 'output-event'):
+            # Send only input and output events
+            src = d['evt'][kind]['source']['Enum']
+
+            # For convenience, output events from the environment (simulator)
+            # are directly executed, instead of first being placed in the
+            # input queue of the recipient and requiring the user to execute
+            # them manually by draining the queues. However at simualtor level
+            # the receiver is not know. We have to check all the input queues
+            # after the output event has been executed to find the recipent.
+            # To do that we compare the system state before and after the
+            # output event has been processed and we look for a newly added
+            # input event (there should be only one until multicast is there).
+            if kind == 'output-event' and src == 'env':
+                old_state = get_system_state()
+
+            # Execute the event in the system itself (output events will
+            # at this point only result in placing a corresponding input
+            # event in the recipient input queue, via the call to dispatch_events)
+            send_ctype_event(evt)
+            gui_events = process_events_to_guis()
+            dll.dispatch_events()
+
+            state_ctypes = get_system_state()
+
+            if kind == 'output-event' and src == 'env':
+                # Find the corresponding input event and execute it
+                evt = find_new_input_event(old_state, state_ctypes)
+                # Remove the event by putting back the old state
+                set_system_state(old_state)
+                send_ctype_event(evt)
+                process_events_to_guis()
+                gui_events = process_events_to_guis()
+                dll.dispatch_events()
+                state_ctypes = get_system_state()
+                d = vn.fromValueNotationToPySide('evt', evt.GSER())
+                kind = 'input-event'
+                # set proper source (not "env" but actual GUI name)
+                src = d['evt'][kind]['source']['Enum']
+
+            dst      = d['evt'][kind]['dest']['Enum']
+            instance = d['evt'][kind]['event']['Choice']
+            kind2    = d['evt'][kind]['event'][instance]['Choice'] # msg-in/out
+            name     = d['evt'][kind]['event'][instance][kind2]['Choice']
+            params   = d['evt'][kind]['event'][instance][kind2][name]
+            paramsAsGSER = vn.toASN1ValueNotation(params)
+            events = [(kind, src, dst, instance, kind2, name, paramsAsGSER)]
+            events.extend(gui_events)
+
+            # update the system state editor
+            System_State['editor'].asn1Instance = state_ctypes
+            System_State['editor'].updateVariable()
+
+            simulator.on_event(events, state_ctypes)
+
+    def find_new_input_event(old_state, new_state):
+        ''' Compare all input queues of processes between two global states
+        and find the first occurence of an input event in the new state that
+        was not in the old state - to execute it (more explanations in the
+        process_event() function '''
+        old = vn.fromValueNotationToPySide('old', old_state.GSER())
+        new = vn.fromValueNotationToPySide('new', new_state.GSER())
+        for f in simulator.states.keys():
+            # If queue sizes are different, it is the one we are looking for
+            if len(new['new'][f'{f}-queue']) != len(old['old'][f'{f}-queue']):
+                # Just Pick the last event
+                in_event = new['new'][f'{f}-queue'][-1]
+                # And convert it to actual event. First to GSER:
+                #eventAsGSER = vn.toASN1ValueNotation(in_event)
+                # Then to ctypes
+                eventAsCtypes = ASN1_CTYPES.Observable_Event()
+                vn.valueNotationToCTypes(
+                        gser=None,
+                        dest=eventAsCtypes,
+                        sort=ASN1_AST["Observable-Event"].type,
+                        ASN1Mod=ASN1_CTYPES,
+                        ASN1_AST=ASN1_AST,
+                        var=in_event)
+                eventAsCtypes.Reset()
+                return eventAsCtypes
+        raise TypeError("New input event not found")
+
+    def process_events_to_guis():
+        ''' After sending an event, the global queue may contain events sent
+        to the GUIs, however since the GUIs have no input queues, they would
+        not be processed by the Dispatch_Event mechanism. This function
+        handles them by ensuring that they are reported (on MSC) '''
+        events = []
+        # get queue ef all events from the dll (before dispatching)
+        all_events = get_global_event_queue()
+        guis = list(simulator.guis.keys())
+        # get a Python-parsable object of the queue
+        q = vn.fromValueNotationToPySide('q', all_events.GSER())
+        for evt in q['q']:
+            if (evt['Choice'] == 'output-event'
+                    and evt['output-event']['dest']['Enum'] in guis):
+                kind = 'output-event'
+                src      = evt[kind]['source']['Enum']
+                dst      = evt[kind]['dest']['Enum']
+                instance = evt[kind]['event']['Choice']
+                kind2    = 'msg-out'
+                name     = evt[kind]['event'][instance][kind2]['Choice']
+                params   = evt[kind]['event'][instance][kind2][name]
+                paramsAsGSER = vn.toASN1ValueNotation(params)
+                # only msg-in messages are displayed on the MSC
+                kind2    = 'msg-in'
+                event = (kind, src, dst, instance, kind2, name, paramsAsGSER)
+                events.append(event)
+                #print ("Event to GUI: ", evt)
+        return events
+
+    def update_state():
+        # this function is called when the "Update state" button is pressed
+        # it updates the state of the running system
+        new_state = ASN1_CTYPES.System_State()
+        System_State['editor'].getVariable(dest=new_state)
+        set_system_state(new_state)
+        simulator.change_internal_state(new_state)
+
+    def setEvent(sortName : str, index: QModelIndex):
+        # When user double clicks on a element of type Observable-Event,
+        # get the content and copy it to the Event window for the user
+        # to send it to the system, and remove the event from the
+        # queue were it was
+        if sortName == "Observable_Event":
+            item = index.model().itemFromIndex(index)
+            evt = ASN1_CTYPES.Observable_Event()
+            System_State['editor'].getVariable2(root=item, dest=evt)
+            Observable_Event['editor'].asn1Instance = evt
+            Observable_Event['editor'].updateVariable()
+            # Then we have to remove it from the source model
+            # 1) get every individual element in gser
+            # 2) get row number of the one extracted
+            # 3) create a new gser string without the removed element
+            # 4) update the element in the source model
+            parentIndex = index.parent()
+            numberOfElements = parentIndex.siblingAtColumn(3).data()
+            parentItem = item.parent()
+            elementNumber = item.row() # relative to parent
+            listOfElements = []
+            # Extract pending events except the one that was used
+            for i in range(int(numberOfElements)):
+                if i == elementNumber:
+                    continue
+                evt = ASN1_CTYPES.Observable_Event()
+                itemChild = parentItem.child(i)
+                System_State['editor'].getVariable2(root=itemChild, dest=evt)
+                listOfElements.append(evt.GSER())
+            # form a GSER string with the sub-list of events
+            newValue = '{' + ','.join(listOfElements) + '}'
+            # convert it to ASN1/Ctypes to update the GUI model
+            newListOfEvent = ASN1_CTYPES.Events_Ty()
+            vn.valueNotationToCTypes(newValue,
+                                     newListOfEvent,
+                                     ASN1_AST["Events-Ty"].type,
+                                     ASN1_CTYPES,
+                                     ASN1_AST)
+            # Then update the editor with this value
+            System_State['editor'].updateVariable2(root=parentItem,
+                                                   asn1Var=newListOfEvent)
+            # And finally update the actual state in Ada
+            update_state()
+
+
+    # Parse SDL models and render them as statecharts
+    sys.argv.append('--toC')
+    for function in simulator.states.keys():
+        f = function.replace('-', '_')
+        LOG.info(f'Parsing SDL model of function {function}')
+        prefix = f'../{f}/SDL/src'
+        pr_files = [f'{prefix}/system_structure.pr', f'{prefix}/{f}.pr']
+        ast = opengeode.parse(pr_files)
+        try:
+            root_ast = ast[0]
+            proc = root_ast.processes[0]
+        except IndexError:
+            raise IOError(f'Could not parse SDL model of function {f}')
+        graph = opengeode.Statechart.create_dot_graph(proc, basic=True)
+        # Flatten the model to have the nested states names in process.mapping
+        opengeode.Helper.flatten(proc, sep='.')
+        sdl_scene = opengeode.SDL_Scene('statechart')
+        sdl_view = opengeode.SDL_View(sdl_scene)
+        opengeode.Statechart.render_statechart(sdl_scene, graph)
+        sdl_view.refresh()
+        dock = QDockWidget(f, mainWidget)
+        dock.setFloating(True)
+        dock.resize(400, 400)
+        dock.setObjectName(f)
+        mainWidget.addDockWidget(Qt.RightDockWidgetArea, dock)
+        dock.setAllowedAreas(Qt.NoDockWidgetArea)
+        sdl_view.show()
+        dock.setWidget(sdl_view)
+        docks.append(dock)
+        simulator.models[function] = (sdl_view, sdl_scene)
+
+    # Get list of periodic PIs
+    for function in simulator.states.keys():
+        try:
+            events = ASN1_STG_MODULE.variables[f'{function.lower()}-periodic-events'].value
+            # build a list of all periodics to enable/disable the events
+            # depending on the current time
+            periodics = defaultdict(list)
+            if type(events) is not tuple:
+                # due to an issue in python.stg - make sure it works with all versions
+                events = (events, )
+            for event in events:
+                pi_name = event['event']['msg-in']['choice']
+                period = event['period']
+                evt = f"input-event: {{source env, dest {function.lower()}, event {function.lower()}: msg-in: {pi_name}: {{}}}}"
+                simulator.periodics[function].append((event['period'], evt))
+                # Add periodics to the Quick Event list
+                item = QListWidgetItem(f'{function.title()}.{pi_name.title()} (periodic {period} ms)')
+                item.setData (Qt.UserRole, function)     # instance
+                item.setData (Qt.UserRole + 1, pi_name) # message name
+                item.setData (Qt.UserRole + 2, "in")
+                item.setData (Qt.UserRole + 3, evt)   # GSER pre-fill
+                quickEventList.addItem(item)
+                periodics[period].append(item)
+        except KeyError:
+            # not all functions have periodic PIs
+            pass
+    number_of_periods=len(periodics) # to be continued
+
+    print(simulator.periodics)
+
+    # Update the behavior of the OK/Cancel buttons in both editors
+    send_event_button = Observable_Event["okButton"]
+    send_event_button.setText("Send Event")
+    send_event_button.clicked.disconnect()
+    send_event_button.clicked.connect(process_event)
+    Observable_Event["cancelButton"].hide()
+
+    System_State["okButton"].setText("Update state")
+    System_State["okButton"].clicked.disconnect()
+    System_State["okButton"].clicked.connect(update_state)
+    System_State["cancelButton"].hide()
+    System_State["editor"].doubleClick.connect(setEvent)
+
+    qtwidget_System_State.show()
+    qtwidget_Observable_Event.show()
+
+    # Get the initial system state (after Startup functions have run)
+    state_ctypes = get_system_state()
+
+    System_State['editor'].asn1Instance = state_ctypes
+    System_State['editor'].updateVariable()
+
+    # Set initial state hash in the simulator
+    simulator.change_internal_state(state_ctypes)
+
+    # If applicable, restore window geometry from a previous session
+    if not options.reset:
+        LOG.info('Restoring windows layout (use --reset to discard)')
+        mainWidget.restoreApplicationState()
+    else:
+        LOG.info('Ignoring and deleting previously stored windows layout')
+
+    mainWidget.show()
+
+    app.exec_()
+    # stop the MSC
+    msc_handler.startStop()
+
+
+initialize()
+# out events's effect is to create a corresponding input event in the receivers's queue
+# testEvent = "output-event: {source simulator-gui, dest orchestrator, event simulator-gui: msg-out: pulse: {p1 4}}"
+# send_gser_event(testEvent)
+# print(get_system_state().GSER())
+
+# in events are calling the actual PI, so it is better (out events make sense if observers are called between 
+# the out and in)
+# testEvent = "input-event: {source simulator-gui, dest orchestrator, event orchestrator: msg-in: pulse: {p1 4}}"
+# send_gser_event(testEvent)
+# print(get_system_state().GSER())
