@@ -279,6 +279,6 @@ def main():
     else:
         print("[-] No change in properties.adb, ignoring")
 
-    print("[-] Done. Now you can run `make -f Makefile.simulation [modelcheck|simu]`")
+    print("[-] Done. Now you can run `make -f Makefile.Simulation [modelcheck|simu]`")
 
 main()
