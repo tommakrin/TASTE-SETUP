@@ -36,8 +36,7 @@ observers/gser.ads:
 clean:
 	ADA_PROJECT_PATH=~/.local/share/gpr:${{ADA_PROJECT_PATH}} gprclean -P mc_lib || :
 	ADA_PROJECT_PATH=~/.local/share/gpr:${{ADA_PROJECT_PATH}} gprclean -P mc || :
-	rm -f observers/*.ad?
-	rm -f *.ali *.[cho] *.so *.ad[bs] *.cfg
+	rm -rf observers/*.ad? *.ali *.[cho] *.so *.ad[bs] *.cfg obj
 
 .PHONY: simu clean all modelcheck
 '''
@@ -76,7 +75,7 @@ library project mc_lib is
        "observers"
    );
 
-   for Object_Dir use "../build/node1/demo_simu_obj";
+   for Object_Dir use "obj";
    package Compiler is
       for Default_Switches ("Ada") use (
          "-Wall",
