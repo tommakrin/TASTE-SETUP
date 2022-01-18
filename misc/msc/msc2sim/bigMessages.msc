@@ -1,0 +1,47 @@
+mscdocument bigMessages /* MSC AND */;
+    language ASN.1;
+    data bigMessages.asn;
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+mscdocument Nominal /* MSC LEAF */;
+    language ASN.1;
+    data bigMessages.asn;
+msc bigMessages;
+/* CIF INSTANCE (12, 55) (172, 87) (800, 2133) */
+instance Camera;
+/* CIF MESSAGE (98, 238) (680, 309) */
+out Update_Picture(pic:42) to MassMemory;
+endinstance;
+/* CIF INSTANCE (552, 55) (256, 87) (800, 2133) */
+instance MassMemory;
+/* CIF MESSAGE (98, 238) (680, 309) */
+in Update_Picture(pic:42) from Camera;
+/* CIF MESSAGE (680, 444) (1412, 540) */
+out New_Picture_Arrived({p1 4}) to System_Manager;
+/* CIF MESSAGE (1412, 675) (680, 826) */
+in Compress_Picture from System_Manager;
+/* CIF MESSAGE (680, 1030) (1412, 1137) */
+out Ready to System_Manager;
+/* CIF MESSAGE (1412, 1311) (680, 1483) */
+in Send_to_Ground from System_Manager;
+/* CIF MESSAGE (680, 1673) (2188, 1789) */
+out Download_Picture to Ground;
+endinstance;
+/* CIF INSTANCE (1251, 55) (319, 87) (800, 2133) */
+instance System_Manager;
+/* CIF MESSAGE (680, 444) (1412, 540) */
+in New_Picture_Arrived({p1 4}) from MassMemory;
+/* CIF MESSAGE (1412, 675) (680, 826) */
+out Compress_Picture to MassMemory;
+/* CIF MESSAGE (680, 1030) (1412, 1137) */
+in Ready from MassMemory;
+/* CIF MESSAGE (1412, 1311) (680, 1483) */
+out Send_to_Ground to MassMemory;
+endinstance;
+/* CIF INSTANCE (2107, 55) (163, 87) (800, 2133) */
+instance Ground;
+/* CIF MESSAGE (680, 1673) (2188, 1789) */
+in Download_Picture from MassMemory;
+endinstance;
+endmsc;
+endmscdocument;
+endmscdocument;

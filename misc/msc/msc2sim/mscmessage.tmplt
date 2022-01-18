@@ -1,0 +1,5 @@
+{% if event.sourceInstance == instance %}
+   output-event: { source {{ event.sourceInstance }}, dest {{ event.targetInstance }}, event {{ event.sourceInstance }}: msg-out: {{ event.name }}:{% if event.parameterString %}{{ event.parameterString }}{% else %}{}{% endif %}
+{% else %}
+   input-event: { source {{ event.sourceInstance }}, dest {{ event.targetInstance }}, event {{ event.targetInstance }}: msg-in: {{ event.name }}:{% if event.parameterString %}{{ event.parameterString }}{% else %}{}{% endif %}
+{% endif %}

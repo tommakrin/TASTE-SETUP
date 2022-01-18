@@ -1,0 +1,16 @@
+# Camera
+   output-event: { source , dest , event : msg-out: Update_Picture:pic:42
+# MassMemory
+   input-event: { source , dest , event : msg-in: Update_Picture:pic:42
+   output-event: { source , dest , event : msg-out: New_Picture_Arrived:{p1 4}
+   input-event: { source , dest , event : msg-in: Compress_Picture:{}
+   output-event: { source , dest , event : msg-out: Ready:{}
+   input-event: { source , dest , event : msg-in: Send_to_Ground:{}
+   output-event: { source , dest , event : msg-out: Download_Picture:{}
+# System_Manager
+   input-event: { source , dest , event : msg-in: New_Picture_Arrived:{p1 4}
+   output-event: { source , dest , event : msg-out: Compress_Picture:{}
+   input-event: { source , dest , event : msg-in: Ready:{}
+   output-event: { source , dest , event : msg-out: Send_to_Ground:{}
+# Ground
+   input-event: { source , dest , event : msg-in: Download_Picture:{}
