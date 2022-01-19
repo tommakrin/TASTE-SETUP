@@ -254,14 +254,14 @@ def initialize():
     global LOG
     LOG = standalone_editor.logger
 
-    usage = 'usage: taste-simulator -a file.asn -t type [-d default value]'
-    version = 'ASN.1 Value Editor version ' + __version__
+    usage = 'usage: taste-simulator [-g] [--reset]'
+    version = 'TASTE Interactive Simulator version ' + __version__
 
-    LOG.info('TASTE Simulator')
+    LOG.info(version)
 
     # Parse the command line
     parser = optparse.OptionParser(usage=usage, version=version)
-    parser.add_option('-v', '--verbose',
+    parser.add_option('-g', '--debug',
                        action='store_true',
                        default=False,
                        help='Display debug information')
@@ -272,7 +272,7 @@ def initialize():
                       help='Do not try to restore windows layout')
 
     options, args = parser.parse_args()
-    if options.verbose:
+    if options.debug:
         LOG.setLevel(logging.DEBUG)
     else:
         LOG.setLevel(logging.INFO)
@@ -701,7 +701,7 @@ def initialize():
             pass
     number_of_periods=len(periodics) # to be continued
 
-    print(simulator.periodics)
+    #print(simulator.periodics)
 
     # Update the behavior of the OK/Cancel buttons in both editors
     send_event_button = Observable_Event["okButton"]
