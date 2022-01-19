@@ -1,0 +1,29 @@
+{% comment %}
+one single instance -> basis for a scenario
+Ignore instances named "TASTE_System"
+{% endcomment %}
+# {{ instance.name }}
+
+{% for event in instance.events %}
+{% if event.entityType == event.Action %}
+{% include "mscaction.tmplt" %}
+{% endif %}
+{% if event.entityType == event.Condition %}
+{% include "msccondition.tmplt" %}
+{% endif %}
+{% if event.entityType == event.Coregion %}
+{% include "msccoregion.tmplt" %}
+{% endif %}
+{% if event.entityType == event.Create %}
+{% include "msccreate.tmplt" %}
+{% endif %}
+{% if event.entityType == event.Message %}
+{% include "mscmessage.tmplt" %}
+{% endif %}
+{% if event.entityType == event.Timer %}
+{% include "msctimer.tmplt" %}
+{% endif %}
+{% endfor %}
+{% if instance.explicitStop %}
+{% endif %}
+
