@@ -66,23 +66,46 @@ asn2dataModel -toSqlalchemy $DBNAME.asn
 # Build the Python interface
 make -f Makefile.python 
 
-# (5) Create postgresql database
-echo -e "${INFO} If you are prompted for the taste password, enter 'tastedb'"
-echo "drop database if exists $DBNAME; create database $DBNAME;" | psql -h localhost -U taste postgres
+# (5) Create database, use sqlite unless USE_POSTGRES environment variable is set
+if [ ! -z $USE_POSTGRES ]
+then
 
-cat > initdb.py <<OEF
+    echo -e "${INFO} Target is Postgresql. In case of server error run '/etc/init.d/postgresql restart'"
+    echo -e "${INFO} If you are prompted for the taste password, enter 'tastedb'"
+    echo "drop database if exists $DBNAME; create database $DBNAME;" | psql -h localhost -U taste postgres
+
+    cat > initdb.py <<OEF
 from sqlalchemy import create_engine
 from ${DBNAME}_model import Base
 engine = create_engine(
     'postgresql+psycopg2://taste:tastedb@localhost/${DBNAME}', echo=False)
 Base.metadata.create_all(engine)
 OEF
-python3 initdb.py
+    python3 initdb.py
 
-cat > db.info << OEF2
+    cat > db.info << OEF2
 postgresql+psycopg2://taste:tastedb@localhost/${DBNAME}
 ${DBNAME}
 OEF2
+
+else
+    echo -e "${INFO} Target is SQLite. Run 'export USE_POSTGRES=1' to use Postgresql instead."
+    rm -f ${DBNAME}.sqlite
+
+    cat > initdb.py <<OEF
+from sqlalchemy import create_engine
+from ${DBNAME}_model import Base
+engine = create_engine(
+    'sqlite:///${DBNAME}.sqlite', echo=False)
+Base.metadata.create_all(engine)
+OEF
+    python3 initdb.py
+
+    cat > db.info << OEF2
+sqlite:///sql_db/${DBNAME}.sqlite
+${DBNAME}
+OEF2
+fi
 
 # (6) Create a diagram of the database
 echo -e "${INFO} Creating a diagram with the database schema in work/doc/database/${DBNAME}.png"
