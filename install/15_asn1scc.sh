@@ -6,8 +6,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 mkdir -p "${PREFIX}/share/asn1scc/" || exit 1
 cd "${PREFIX}/share/" || exit 1
 VER=$(~/tool-inst/share/asn1scc/asn1scc -v |  head -1 | awk '{print $NF}')
-if [ "${VER}" != "4.2.4.8f" ] ; then
-    wget --no-check-certificate -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.8f/asn1scc-bin-4.2.4.8f.tar.bz2 \
+if [ "${VER}" != "4.2.5.0f" ] ; then
+    wget --no-check-certificate -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.5.0f/asn1scc-bin-4.2.5.0f.tar.bz2 \
         | tar jxvf -
 fi
 # Delete the AST cache folder in case the new version of the compiler generates different XML/Python output
