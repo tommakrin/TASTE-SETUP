@@ -71,16 +71,21 @@ run:
 edit_cv:
 	\$(MAKE) -C work run_cv
 
-# Simulation target (experimental)
-simu:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
-	\$(KAZOO) -t SIMU --glue --gw
+# Simulation target (experimental - for systems made of SDL functions only)
+simu:	work/glue_simu
 	\$(MAKE) -C work
+	\$(MAKE) -C work/simulation -f Makefile.Simulation simu
 
 skeletons:
 	\$(MAKE) work/skeletons_built
 
 work/skeletons_built:	InterfaceView.aadl DataView.aadl
 	\$(KAZOO) --gw -o work
+	\$(MAKE) -C work dataview
+	touch \$@
+
+work/glue_simu:	InterfaceView.aadl DataView.aadl
+	\$(KAZOO) -t SIMU --glue --gw
 	\$(MAKE) -C work dataview
 	touch \$@
 
@@ -124,7 +129,7 @@ DataView.aadl: \${ASN1_FILES}
 	taste-update-data-view \$^
 
 clean:
-	rm -rf work/build work/dataview/built
+	rm -rf work/build work/dataview/built work/glue_simu
 	rm -f *.aadl  # Interface and Deployment views in AADL are generated
 	rm -f work/glue_release work/glue_debug work/glue_coverage work/skeletons_built
 	find work -type d -name \"wrappers\" -exec rm -rf {} +

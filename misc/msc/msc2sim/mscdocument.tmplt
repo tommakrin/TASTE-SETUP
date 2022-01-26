@@ -1,0 +1,4 @@
+{% comment %}
+one msc document
+{% endcomment %}
+{% include "documentBody.tmplt" %}

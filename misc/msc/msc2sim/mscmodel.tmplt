@@ -1,0 +1,15 @@
+{% comment %}
+Convert MSC messages to set of Observable Events in GSER format
+{% endcomment %}
+{% for document in model.documents %}
+    {% if forloop.first %}
+        {% with model as mscModel %}
+            {% include "mscdocument.tmplt" %}
+        {% endwith %}
+    {% else %}
+        {% include "mscdocument.tmplt" %}
+    {% endif %}
+{% endfor %}
+{% for chart in model.charts %}
+    {% include "mscchart.tmplt" %}
+{% endfor %}
