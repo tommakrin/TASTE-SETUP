@@ -144,3 +144,16 @@ void *memset(void *p, int c, size_t count)
 		*pc++ = c;
 	}
 }
+
+__attribute__ ((persistent)) StaticTask_t xTimerTaskTCB = {0};
+__attribute__ ((persistent)) StackType_t xTimerTaskStack[configMINIMAL_STACK_SIZE] = {0};
+
+void vApplicationGetTimerTaskMemory(StaticTask_t** ppxTimerTaskPCBBuffer,
+                                   StackType_t** ppxTimerTaskStackBuffer,
+                                   uint32_t* pulTimerTaskStackSize)
+{
+
+    *ppxTimerTaskPCBBuffer = &xTimerTaskTCB;
+    *ppxTimerTaskStackBuffer = xTimerTaskStack;
+    *pulTimerTaskStackSize = configMINIMAL_STACK_SIZE;
+}
