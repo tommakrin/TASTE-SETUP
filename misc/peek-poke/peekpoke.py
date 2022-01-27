@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys, os, re, threading, time, signal, ctypes
 
@@ -17,20 +17,22 @@ sizePerType = {
     DV.octet_string:0
 }
 
-try:
-    import pygtk, gobject
-    pygtk.require("2.0")
-except:
-    pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+import gi
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GObject
+
+#try:
+#    from gi.repository import Gtk
+#    import Gtk.glade
+#except ImportError as e:
+#    print((str(e)))
+#    sys.exit(1)
 
 def inform(format, *args):
     if g_Debug:
-        print format % args
+        print(format % args)
 
 class Matcher:
     '''Helper class to ease the matching of regular expressions.'''
@@ -79,10 +81,10 @@ class Poll_taste_probe_console(threading.Thread):
         # First, open the queue:
         while True:
             inform("Attempting to open msgQ %s", self.msgQname)
-            self._msgQueue = PA.OpenMsgQueueForReading(self.msgQname)
+            self._msgQueue = PA.OpenMsgQueueForReading(self.msgQname.encode('utf-8'))
             if (self._msgQueue != -1):
                 break
-            print "Communication channel over", self.msgQname, "not established yet...\n"
+            print("Communication channel over", self.msgQname, "not established yet...\n")
             time.sleep(1)
             if self._bDie:
                 return
@@ -100,14 +102,14 @@ class Poll_taste_probe_console(threading.Thread):
 
     def UpdateGridAndSendToFIFOs(self, actualOffset, strValueMonitor, strValuePlot):
         '''Function that updates the grid and sends to FIFOs'''
-        gtk.gdk.threads_enter()
+        Gdk.threads_enter()
         try:
             # Update GTK control in thread-safe way
             self.window.UpdateMonitoredVariable(
                 actualOffset, strValueMonitor)
         finally:
-            gtk.gdk.threads_leave()
-        if self.plottedVariables.has_key(actualOffset):
+            Gdk.threads_leave()
+        if actualOffset in self.plottedVariables:
             plot = self.plottedVariables[actualOffset]
             if plot._fifoGnuPlot: plot._fifoGnuPlot.write('0:'+strValuePlot+'\n')
             if plot._fifoMeter:   plot._fifoMeter.write(strValuePlot+'\n')
@@ -144,7 +146,7 @@ class Poll_taste_probe_console(threading.Thread):
         var_monitorings = dataview_uniq_asn.TASTE_Monitoring_list()
         var_monitorings.SetData(self._pMem)
         # for each one of the entries in the list
-        for i in xrange(0, var_monitorings.GetLength()):
+        for i in range(0, var_monitorings.GetLength()):
             monitoring = var_monitorings[i]
             iden = str(monitoring.id.Get())
             inform("Arrived values for %s are...", iden)
@@ -211,12 +213,12 @@ class Poll_taste_probe_console(threading.Thread):
                     if self._savingFile and fullGridLineName:
                         self._savingFile.write(octetStringV.replace(";","\;")+"\n")
                 else:
-                    print "For now, only int32, int64, single and double are supported."
+                    print("For now, only int32, int64, single and double are supported.")
             # and the size from the type:
             if symbolType != DV.octet_string:
                 symbolTypeSize = sizePerType[symbolType]
                 # for each one of the elements for this id
-                for j in xrange(0, var_monitorings[i].values.GetLength()):
+                for j in range(0, var_monitorings[i].values.GetLength()):
                     HandleElement(j,symbolTypeSize)
             else:
                 symbolTypeSize = var_monitorings[i].values.GetLength()
@@ -226,21 +228,21 @@ class PeekPoker:
     '''Main GTK window class'''
     def on_About_activate(self, _):
         '''Shows the About dialog box'''
-        about = gtk.AboutDialog()
+        about = Gtk.AboutDialog()
         about.set_program_name("PeekAndPoker")
         about.set_version("0.6")
         about.set_copyright("(c) Semantix Information Technologies")
         about.set_comments("Real-time monitoring and modification\nof variables in TASTE-generated systems")
         about.set_website("http://www.semantix.gr/taste")
-        gtk.about_dialog_set_url_hook(lambda _,url,__: os.system("luakit \"%s\"" % url), None)
+        Gtk.about_dialog_set_url_hook(lambda _,url,__: os.system("luakit \"%s\"" % url), None)
         about.run()
         about.destroy()
 
-    def ShowError(self, title, text, type=gtk.MESSAGE_ERROR):
+    def ShowError(self, title, text, type=Gtk.MessageType.ERROR):
         '''Shows an error message dialog'''
-        md = gtk.MessageDialog(parent=None, 
-            flags=gtk.DIALOG_DESTROY_WITH_PARENT, type=type, 
-            buttons=gtk.BUTTONS_CLOSE, 
+        md = Gtk.MessageDialog(parent=None, 
+            flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, type=type, 
+            buttons=Gtk.ButtonsType.CLOSE, 
             message_format=title)
         md.format_secondary_text(text)
         md.run()
@@ -311,7 +313,7 @@ class PeekPoker:
         self.symbolChosenTypeMap["%s(%s)" % (name,offset)] = dvVariableType
         # Add lines to the grid - as many as the elementsNo
         if dvVariableType != DV.octet_string:
-            for _ in xrange(0, elementsNo):
+            for _ in range(0, elementsNo):
                 self.AddToMonitorList(name, offset, elementsNo, dvVariableType)
         else:
             self.AddToMonitorList(name, offset, 1, dvVariableType)
@@ -331,7 +333,7 @@ class PeekPoker:
         #
         # This actual offset will be the key used to decide which FIFO to send data to
         # (FIFOs that drive GnuPlots)
-        for elm in xrange(0,elementsNo):
+        for elm in range(0,elementsNo):
             actualOffset = \
                 self.symbolTable[name][0] + int(offset) + sizePerType[dvVariableType]*elm
             # mark as non-plotted (pid,fifo)
@@ -394,7 +396,7 @@ class PeekPoker:
         # Can't re-use LabelAndTypeAndActualOffsetOfSelectedLine,
         # since we need to find the element 0 for the selected variable
         name = self.listOfMonitoredStore[selected[0]]
-        it = model.get_iter_root()
+        it = model.get_iter_first()
         firstElementRowPath = None
         numberOfElements = 0
         while it:
@@ -413,7 +415,7 @@ class PeekPoker:
             it = model.iter_next(it)
         # to erase all lines (elements) of this variable,
         # repeatedly delete line index of the first element
-        for i in xrange(0,numberOfElements):
+        for i in range(0,numberOfElements):
             del self.listOfMonitoredStore[firstElementRowPath]
             try:
                 off = actualOffset + sizePerType[symbolType]*i
@@ -499,17 +501,17 @@ class PeekPoker:
 
     def on_buttonChooseFilename_clicked(self, _):
         '''Spawns File/SaveAs dialog for choosing the recorded .csv filename'''
-        self.filew = gtk.FileChooserDialog(
-            action=gtk.FILE_CHOOSER_ACTION_SAVE,
+        self.filew = Gtk.FileChooserDialog(
+            action=Gtk.FileChooserAction.SAVE,
             buttons=(
-                gtk.STOCK_CANCEL,
-                gtk.RESPONSE_CANCEL,
-                gtk.STOCK_SAVE_AS,
-                gtk.RESPONSE_OK))
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_SAVE_AS,
+                Gtk.ResponseType.OK))
         self.filew.connect("destroy", lambda _: self.filew.destroy())
         self.filew.set_current_name("recordedMonitorings.csv")
         response = self.filew.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             self.entryFilenameMonitorings.set_text(os.path.relpath(self.filew.get_filename()))
         self.filew.destroy()
 
@@ -519,9 +521,9 @@ class PeekPoker:
         symbolTypeSize = sizePerType[symbolType]
         fullname = name + "(" + offset + ")"
         # for each of the elements desired (i.e. 0 .. elementsNo-1)
-        for i in xrange(0, elementsNo):
+        for i in range(0, elementsNo):
             # check that it doesn't already exist there
-            it = model.get_iter_root()
+            it = model.get_iter_first()
             exists = False
             while it:
                 row = model[model.get_path(it)]
@@ -537,7 +539,7 @@ class PeekPoker:
     def UpdateMonitoredVariable(self, incomingOffset, strValue):
         '''Called from the listening thread to update grid with new values'''
         model = self.listOfMonitoredStore
-        it = model.get_iter_root()
+        it = model.get_iter_first()
         while it:
             row = model[model.get_path(it)]
             symbolType = self.symbolChosenTypeMap[row[0]]
@@ -563,7 +565,7 @@ class PeekPoker:
     def idleFunc(self):
         '''Controls the GUI controls state - enables/disables accordingly.'''
         # The button to add to list will only be enabled if...
-        if self.entryVariable.get_text() not in self.symbolTable.keys() \
+        if self.entryVariable.get_text() not in list(self.symbolTable.keys()) \
                 or self.comboboxType.get_active_text() == None \
                 or self.entrySeconds.get_text() == "" \
                 or self.entryElements.get_text() == "":
@@ -648,39 +650,43 @@ class PeekPoker:
 
     def RemoveAllMonitorings(self):
         '''Removes all from grid - called on destruction and on loading'''
-        selection = self.treeviewMonitored.get_selection()
-        for i in xrange(0,len(self.listOfMonitoredStore)):
-            selection.unselect_path(i)
+        # First unselect any previously selected lines
+        treeView = self.treeviewMonitored
+        selection = treeView.get_selection()
+        # selection is of type Gtk.TreeSelection
+        selection.unselect_all()
+        # Then select one at a time and remove it
         while True:
             l =  len(self.listOfMonitoredStore)
             if 0 == l: break
-            selection.select_path(0)
+            path, _, _, _ = treeView.get_path_at_pos(0, 0)
+            selection.select_path(path)
             self.on_buttonRemoveSelected_clicked('blah')
-        
+
     def on_Exit_activate(self,*_):
         '''When we File/Exit, remove all from grid and stop GTK'''
         self.RemoveAllMonitorings()
-        gtk.main_quit()
+        Gtk.main_quit()
 
     def on_Open_activate(self,*_):
         '''Shows File/Open dialog and restores state of grid and gnuplot/meters'''
-        self.filew = gtk.FileChooserDialog(
-            action=gtk.FILE_CHOOSER_ACTION_OPEN,
+        self.filew = Gtk.FileChooserDialog(
+            action=Gtk.FileChooserAction.OPEN,
             buttons=(
-                gtk.STOCK_CANCEL,
-                gtk.RESPONSE_CANCEL,
-                gtk.STOCK_OPEN,
-                gtk.RESPONSE_OK))
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OPEN,
+                Gtk.ResponseType.OK))
         self.filew.connect("destroy", lambda x: self.filew.destroy())
-        filt = gtk.FileFilter()
+        filt = Gtk.FileFilter()
         filt.set_name("All .mon files")
         filt.add_pattern("*.mon")
         self.filew.add_filter(filt)
         response = self.filew.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             openFilename = os.path.relpath(self.filew.get_filename())
         self.filew.destroy()
-        if response != gtk.RESPONSE_OK:
+        if response != Gtk.ResponseType.OK:
             return
         # First, clear any stuff we have open right now
         self.RemoveAllMonitorings()
@@ -701,13 +707,12 @@ class PeekPoker:
         # And now spawn meters and gnuplots:
         # First, un-select all grid lines
         selection = self.treeviewMonitored.get_selection()
-        for i in xrange(0,len(self.listOfMonitoredStore)):
-            selection.unselect_path(i)
+        selection.unselect_all()
         def PlotOrMeter(self, container, action):
             # Then, for each gnuplot/meter, select the line
             for x,y,w,h,actualVariable in container:
                 model = self.listOfMonitoredStore
-                idx, it = 0, model.get_iter_root()
+                idx, it = 0, model.get_iter_first()
                 while it:
                     row = model[model.get_path(it)]
                     if row[0] + "[" + str(row[1]) + "]" == actualVariable:
@@ -724,26 +729,26 @@ class PeekPoker:
         if g_wmctrlIsMissing:
             self.ShowError("Missing dependency:", "wmctrl is not installed in your machine, Save As is disabled...")
             return
-        self.filew = gtk.FileChooserDialog(
-            action=gtk.FILE_CHOOSER_ACTION_SAVE,
+        self.filew = Gtk.FileChooserDialog(
+            action=Gtk.FileChooserAction.SAVE,
             buttons=(
-                gtk.STOCK_CANCEL,
-                gtk.RESPONSE_CANCEL,
-                gtk.STOCK_SAVE_AS,
-                gtk.RESPONSE_OK))
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_SAVE_AS,
+                Gtk.ResponseType.OK))
         self.filew.connect("destroy", lambda _: self.filew.destroy())
         self.filew.set_current_name("variables.mon")
         response = self.filew.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             saveFilename = os.path.relpath(self.filew.get_filename())
         self.filew.destroy()
-        if response != gtk.RESPONSE_OK:
+        if response != Gtk.ResponseType.OK:
             return
 
         # Serialize variables as tupples of 4 things:
         # (variableName, offset, noOfElements, ASN1type)
         model = self.listOfMonitoredStore
-        it = model.get_iter_root()
+        it = model.get_iter_first()
         serializeList = []
         elements = {}
         while it:
@@ -777,7 +782,7 @@ class PeekPoker:
             data = line.strip().split()
             for prefix, container in actionList:
                 if data[7].startswith(prefix):
-                    x,y,w,h = map(int, data[2:6])
+                    x,y,w,h = list(map(int, data[2:6]))
                     actualVariable = data[7][len(prefix):]
                     # format: the 4 dimensions and the name
                     container.append((x,y,w,h,actualVariable))
@@ -790,7 +795,9 @@ class PeekPoker:
     def __init__(self):
         '''Creates the GTK Window with the controls, and populates it via objdump.'''
         self.gladefile = os.path.abspath(os.path.dirname(sys.argv[0])) + "/PeekPoke.glade"  
-        self.wTree = gtk.glade.XML(self.gladefile)
+        self.wTree = Gtk.Builder()
+        self.wTree.add_from_file(self.gladefile)
+        #self.wTree = gtk.glade.XML(self.gladefile)
         # Use Python's ability to set fields at runtime,
         # to populate the class with control attributes
         for s in (  "entryVariable","entryOffset","entrySeconds", 
@@ -803,7 +810,7 @@ class PeekPoker:
                     "buttonUnplotSelected", "buttonUnmeterSelected",
                     "buttonChooseFilename",
                     "checkbuttonStoreMonitorings"):
-            setattr(self, s, self.wTree.get_widget(s))    
+            setattr(self, s, self.wTree.get_object(s))    
         dic = { 
             "on_buttonAddToList_clicked" : self.on_buttonAddToList_clicked,
             "on_buttonPoke_clicked" : self.on_buttonPoke_clicked,
@@ -818,8 +825,8 @@ class PeekPoker:
             "on_buttonUnmeterSelected_clicked" : self.on_buttonUnmeterSelected_clicked,
             "on_buttonChooseFilename_clicked": self.on_buttonChooseFilename_clicked
         }
-        self.wTree.signal_autoconnect(dic)
-        self.window = self.wTree.get_widget("MainWindow")
+        self.wTree.connect_signals(dic)
+        self.window = self.wTree.get_object("MainWindow")
         if (self.window):
             self.window.connect("destroy", self.on_Exit_activate)
             self.window.connect("delete-event", self.on_Exit_activate)
@@ -831,7 +838,7 @@ class PeekPoker:
         self.actualOffsetToFullNameMap = {}
         # Create the two Stores: one for the auto-completion variable name entry,
         # and one for the grid.
-        listOfVariablesControl = gtk.ListStore(gobject.TYPE_STRING)
+        listOfVariablesControl = Gtk.ListStore(GObject.TYPE_STRING)
         objdump = self.DetectELF(sys.argv[1])
         for line in os.popen("%s -t \"%s\"" % (objdump,sys.argv[1])).readlines():
             # example data:
@@ -856,17 +863,17 @@ class PeekPoker:
         for name in sorted(self.symbolTable.keys()):
             listOfVariablesControl.append([name])
         self.hexVariables = []
-        completion = gtk.EntryCompletion()
+        completion = Gtk.EntryCompletion()
         completion.set_model(listOfVariablesControl)
         completion.set_text_column(0)
         self.entryVariable.set_completion(completion)
-        self.cell = gtk.CellRendererText()
+        self.cell = Gtk.CellRendererText()
 
         # The Grid (TM)
-        self.listOfMonitoredStore = gtk.ListStore(str,int,str)
-        self.column1 = gtk.TreeViewColumn('VariableName(offset)')
-        self.column2 = gtk.TreeViewColumn('ElementIndex')
-        self.column3 = gtk.TreeViewColumn('Value')
+        self.listOfMonitoredStore = Gtk.ListStore(str,int,str)
+        self.column1 = Gtk.TreeViewColumn('VariableName(offset)')
+        self.column2 = Gtk.TreeViewColumn('ElementIndex')
+        self.column3 = Gtk.TreeViewColumn('Value')
         self.column1.set_resizable(True)
         self.column2.set_resizable(True)
         self.column3.set_resizable(True)
@@ -883,7 +890,7 @@ class PeekPoker:
         self.column1.set_sort_column_id(0)
         self.treeviewMonitored.set_reorderable(True)
         self.treeviewMonitored.set_model(self.listOfMonitoredStore)
-        self.tag = gobject.timeout_add(100, self.idleFunc)
+        self.tag = GObject.timeout_add(100, self.idleFunc)
 
 def which(program):
     '''Helper function, checks if binary is in PATH'''
@@ -910,42 +917,39 @@ if __name__ == "__main__":
     for f in ('ps','file','objdump'):
         where = which(f)
         if None == where:
-            print "Missing dependency: please install '%s' in your PATH" % f
+            print("Missing dependency: please install '%s' in your PATH" % f)
             sys.exit(1)
     # ESA request: make wmctrl optional (disable SaveAs if missing)
     global g_wmctrlIsMissing
     g_wmctrlIsMissing = False
     if which('wmctrl') == None:
-        print "WARNING: wmctrl is missing, SaveAs functionality disabled...\n"
+        print("WARNING: wmctrl is missing, SaveAs functionality disabled...\n")
         g_wmctrlIsMissing = True
     global g_gnuplotIsMissing
     g_gnuplotIsMissing = False
     if which('gnuplot') == None:
-        print "WARNING: gnuplot is missing, plot functionality disabled...\n"
+        print("WARNING: gnuplot is missing, plot functionality disabled...\n")
         g_gnuplotIsMissing = True
     global g_Debug
     g_Debug = "-g" in sys.argv
     if g_Debug:
         sys.argv.remove("-g")
     if len(sys.argv) != 2:
-        print "Usage:", sys.argv[0], "<leonBinary>"
+        print("Usage:", sys.argv[0], "<leonBinary>")
         sys.exit(1)
-    try:
-        # The grid must be updated from another thread,
-        # so we need the workarounds described in section 2 of this:
-        # http://faq.pygtk.org/index.py?req=show&file=faq20.006.htp
-        gtk.gdk.threads_init()
-        hwg = PeekPoker()
-        poll_taste_probe_console = Poll_taste_probe_console()
-        poll_taste_probe_console.msgQname = str(os.geteuid()) + "_taste_probe_console_PI_Python_queue"
-        poll_taste_probe_console.window = hwg
-        poll_taste_probe_console.start()
-        hwg.poll_taste_probe_console = poll_taste_probe_console
-        gtk.gdk.threads_enter()
-        gtk.main()
-        gtk.gdk.threads_leave()
-    except:
-        pass
+    # The grid must be updated from another thread,
+    # so we need the workarounds described in section 2 of this:
+    # http://faq.pyGtk.org/index.py?req=show&file=faq20.006.htp
+    Gdk.threads_init()
+    hwg = PeekPoker()
+    poll_taste_probe_console = Poll_taste_probe_console()
+    poll_taste_probe_console.msgQname = str(os.geteuid()) + "_taste_probe_console_PI_Python_queue"
+    poll_taste_probe_console.window = hwg
+    poll_taste_probe_console.start()
+    hwg.poll_taste_probe_console = poll_taste_probe_console
+    Gdk.threads_enter()
+    Gtk.main()
+    Gdk.threads_leave()
     poll_taste_probe_console._bDie = True
     inform("Waiting for msgQ thread to die...")
     poll_taste_probe_console.join()

@@ -1,0 +1,8 @@
+{% comment %}
+{% endcomment %}
+{% for document in document.documents %}
+    {% include "mscdocument.tmplt" %}
+{% endfor %}
+{% for chart in document.charts %}
+    {% include "mscchart.tmplt" %}
+{% endfor %}

@@ -70,3 +70,9 @@
 [submodule "TASTE-Linux-Runtime"]
 	path = TASTE-Linux-Runtime
 	url = https://github.com/n7space/TASTE-Linux-Runtime.git
+[submodule "TASTE-SAMV71-Runtime"]
+	path = TASTE-SAMV71-Runtime
+	url = https://github.com/n7space/TASTE-SAMV71-Runtime.git
+[submodule "TASTE-SAMV71-Drivers"]
+	path = TASTE-SAMV71-Drivers
+	url = https://github.com/n7space/TASTE-SAMV71-Drivers.git

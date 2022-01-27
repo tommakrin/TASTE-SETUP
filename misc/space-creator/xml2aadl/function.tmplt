@@ -130,17 +130,24 @@ PROPERTIES
 {% for attr in func.attributes %}
    {% if attr.name == "language" %}
    Source_Language => ({{ attr.value }});
-   {% elif attr.name == "is_type" %}
-   TASTE::Is_Component_Type => {% if attr.value == "YES" %}true{% else %}false{% endif %};
+   {% elif attr.name == "is_type" and attr.value == "YES" %}
+   TASTE::Is_Component_Type => true;
+     {% for attr2 in func.attributes %}
+       {% if attr2.name == "type_language" %}
+   Source_Language => ({{ attr2.value }});
+       {% endif %}
+     {% endfor %}
    {% elif attr.name == "instance_of" and attr.value != "" %}
    TASTE_IV_Properties::is_instance_of => "{{ attr.value }}";
+   {% elif attr.name == "FPGA_Configurations" and attr.value != "" %}
+   TASTE_IV_Properties::FPGA_Configurations => "{{ attr.value }}";
    {% else %}
-   -- unsupported property found: name: "{{ attr.name }}"  value: "{{ attr.value }}"
+   -- ignored property: {{ attr.name }} = {{ attr.value }}
    {% endif %}
 {% endfor %}
 {% for prop in func.properties %}
   {% if prop.name != "Taste::coordinates" and prop.name != "Taste::InnerCoordinates" and prop.name != "Taste::RootCoordinates" %}
-   {{ prop.name }} => {{prop.value}};
+   {{ prop.name }} => {{ prop.value }};
   {% endif %}
 {% endfor %}
 END {{ func.name }};

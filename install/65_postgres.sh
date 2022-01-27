@@ -1,4 +1,11 @@
 #!/bin/bash
+if [ -z $INSTALL_POSTGRESQL ]
+then
+    echo [-] TASTE uses sqlite by default for SQL databases
+    echo [-] If you want to use postgresql instead, run this script again like this:
+    echo     INSTALL_POSTGRESQL=1 install/65_postgres.sh
+    exit 0
+fi
 echo "[-] Checking for a local PostgreSQL installation..."
 CONF_FILE=$(/bin/ls /etc/postgresql/*/main/pg_hba.conf 2>/dev/null | head -1)
 if [ -z "${CONF_FILE}" ] ; then

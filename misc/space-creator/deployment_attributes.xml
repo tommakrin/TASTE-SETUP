@@ -7,4 +7,20 @@
             <String/>
         </Type>
     </Attr>
+   <Attr label="Extra Compiler flags" name="cflags" visible="true" optional="true">
+        <Scopes>
+            <Function/>
+        </Scopes>
+        <Type>
+            <String/>
+        </Type>
+    </Attr>
+   <Attr label="Extra linker flags" name="ldflags" visible="true" optional="true">
+        <Scopes>
+            <Function/>
+        </Scopes>
+        <Type>
+            <String/>
+        </Type>
+    </Attr>
 </Attrs>

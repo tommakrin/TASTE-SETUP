@@ -40,12 +40,22 @@
             "app": "taste-edit-code",
             "appArgs": [
                 "$attr_language",
+                "$attr_type_language",
                 "$attr_name"
             ],
             "appCwd": "$PRJ_FOLDER",
             "conditions": [
                 {
                     "attributes": [
+                    ],
+                    "itemType": "Function"
+                },
+                {
+                    "attributes": [
+                        {
+                            "title": "instance_of",
+                            "value": ""
+                        }
                     ],
                     "itemType": "Function"
                 }
