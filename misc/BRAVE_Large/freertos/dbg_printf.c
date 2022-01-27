@@ -114,6 +114,8 @@ static int prints(const char *string, int width, int flags)
         }
     }
     for ( ; *string ; ++string) {
+        if (*string == '\n')
+            uart_write_byte(UART_INST, '\r');
         uart_write_byte(UART_INST, *string);
         ++pc;
     }
