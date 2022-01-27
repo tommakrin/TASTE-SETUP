@@ -2,7 +2,7 @@
 # TASTE User Code Editor
 # Depending on the implementation language, launch the corresponding code editor
 # Script (c) Maxime Perrotin / ESA 2021
-# Supported languages: C, Ada, SDL
+# Supported languages: C, Ada, SDL, C++, GUI (Python)
 # Logging with colors (only in a terminal)
 SPACECREATOR=spacecreator.AppImage
 
@@ -20,39 +20,74 @@ ERROR="${REDCOLORON}[ERROR]${COLOROFF}"
 
 taste-xml-to-aadl || exit 1
 
-
-if [[ $1 != "C" && $1 != "Ada" && $1 != "SDL" && $1 != "CPP" && $1 != "GUI" && "$1" != "Blackbox_Device" && "$1" != "Slim" ]]
+# Space Creator uses 2 attributes to set the language depending if it is
+# a normal function ($1) or a function type ($2). The other argument will be
+# an empty string, which has to be skipped. We use the shift operator for that.
+LANG=$1
+if [[ $LANG == "" ]]
 then
-    echo  -e "${ERROR} First argument must be C, CPP, Ada, SDL, GUI or Blackbox_C"
+    shift
+    LANG=$1
+    FNAME=$2
+else
+    FNAME=$3
+fi
+
+if [[ $LANG != "C" && $LANG != "Ada" && $LANG != "SDL" && $LANG != "CPP" && $LANG != "GUI" && "$LANG" != "Blackbox_Device" && "$LANG" != "QGenC" && "$LANG" != "QGenAda" && "$LANG" != "Simulink" && "$LANG" != "Slim" ]]
+then
+    echo  -e "${ERROR} First argument must be C, CPP, Ada, SDL, GUI, Blackbox_C or Slim, and not \"$LANG\""
     exit 1
+fi
+
+# Simulink functions source and wrappers are in SIMULINK directory,
+# in upper case.
+if [[ "$LANG" == "Simulink" ]]
+then
+    LANG=$(echo ${LANG^^})
 fi
 
 # Check if the project works with kazoo. If so, use the makefile rule to edit the code
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
-    # Text source code can be edited directly from within space creator
-    cd work/"${2,,}"/"$1"
-    if [[ $1 == "C" ]]
+    FOLDER=work/"${FNAME,,}"/"$LANG"
+    if [ ! -d "${FOLDER}" ]
     then
-        $SPACECREATOR -pid $PPID src/"${2,,}".c
-    elif [[ $1 == "Ada" ]]
-    then
-        $SPACECREATOR -pid $PPID src/"${2,,}".adb
-    elif [[ $1 == "CPP" ]]
-    then
-        $SPACECREATOR -pid $PPID src/"${2,,}".cc
-    elif [[ $1 == "GUI" ]]
-    then
-        $SPACECREATOR -pid $PPID src/UserWidgets.py
-    elif [[ $1 == "Slim" ]]
-    then
-        touch "${2,,}".slim
-        $SPACECREATOR -pid $PPID "${2,,}".slim;
-    else
-        make edit
+        echo -e "${ERROR} Folder missing: ${FOLDER} (skeleton generation failed?!)"
+        exit 1
     fi
-    exit 0
-else
-    echo -e "${ERROR} Code skeleton generation failed"
-fi
 
+    # Text source code can be edited directly from within space creator
+    cd "${FOLDER}"
+    if [[ $LANG == "C" ]]
+    then
+        SOURCE_FILE=src/"${FNAME,,}".c
+    elif [[ $LANG == "Ada" ]]
+    then
+        SOURCE_FILE=src/"${FNAME,,}".adb
+    elif [[ $LANG == "CPP" ]]
+    then
+        SOURCE_FILE=src/"${FNAME,,}".cc
+    elif [[ $LANG == "Slim" ]]
+    then
+        SOURCE_FILE=src/"${FNAME,,}".slim
+    elif [[ $LANG == "GUI" ]]
+    then
+        SOURCE_FILE=src/UserWidgets.py
+    else
+        make edit || exit 1
+        exit 0
+    fi
+
+    # Check that source code actually exists, then edit in Qt Creator
+    if [ ! -f "${SOURCE_FILE}" ]
+    then
+        echo -e "${ERROR} File missing: ${SOURCE_FILE} (skeleton generation failed?!)"
+        exit 1
+    else
+        $SPACECREATOR -pid $PPID ${SOURCE_FILE}
+        exit 0
+    fi
+else
+    echo -e "${ERROR} Missing Makefile or project not supported by Kazoo"
+    exit 1 
+fi
