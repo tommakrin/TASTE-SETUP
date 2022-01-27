@@ -17,6 +17,8 @@
    </Board>
    <Board name="ZynQ ZC706 RTEMS POHIC" type="ocarina_processors_arm::zynqzc706.rtems_posix" namespace="ocarina_processors_arm">
    </Board>
+   <Board name="BRAVE_Large FreeRTOS" type="ocarina_processors_arm::brave_large.freertos" namespace="ocarina_processors_arm">
+   </Board>
    <Board name="Linux ARM Runtime" type="ocarina_processors_arm::aarch64.linux" namespace="ocarina_processors_aarch64">
       <Port name="eth0" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
       <Port name="eth1" namespace="ocarina_drivers" bus_namespace="ocarina_buses" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
