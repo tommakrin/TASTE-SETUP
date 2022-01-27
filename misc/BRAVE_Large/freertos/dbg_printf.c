@@ -250,6 +250,8 @@ static int simple_vsprintf(const char *format, va_list ap)
         }
         else {
 out:
+            if (*format == '\n')
+                uart_write_byte(UART_INST, '\r');
             uart_write_byte(UART_INST, *format);
             ++pc;
         }
