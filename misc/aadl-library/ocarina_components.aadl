@@ -2399,7 +2399,7 @@ end zynq_qemu;
 processor brave_large extends arm
 properties
     Deployment::Execution_Platform => BRAVE_Large_FREERTOS;
-end zynq_qemu;
+end brave_large;
 
 processor implementation zynqzc706.rtems_posix
 properties
