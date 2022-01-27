@@ -29,6 +29,10 @@ def install_rpi_posix():
     """$ sudo apt install gcc-arm-linux-gnueabihf"""
     os.system("xterm -e sudo apt install -y gcc-arm-linux-gnueabihf gnat-8-arm-linux-gnueabihf g++-arm-linux-gnueabihf")
 
+def install_armnoneeabi_gcc_freertos():
+    """$ sudo apt install gcc-arm-none-eabi"""
+    os.system("xterm -e sudo apt install -y gcc-arm-none-eabi")
+
 def install_zynq7000_rtems():
     """ $ /home/taste/tool-src/add-ons/install-zynqrtems-5.1.sh """
     os.system("xterm -e /home/taste/tool-src/add-ons/install-zynqrtems-5.1.sh")
@@ -54,6 +58,10 @@ def check_msp430_freertos():
         raise NotImplementedError(install_msp430_gcc_freertos)
     if not os.path.isdir("/opt/FreeRTOSv10.2.1"):
         raise NotImplementedError()
+
+def check_brave_large_freertos():
+    if not os.path.isfile("/usr/bin/arm-none-eabi-gcc"):
+        raise NotImplementedError(install_armnoneeabi_gcc_freertos)
 
 def check_gnat2020_arm():
     if not os.path.isdir("/opt/GNAT/gnat-arm-2020/bin/"):
@@ -92,6 +100,7 @@ PLATFORMS = { "crazyflie_v2_gnat"            : lambda: True,
               "msp430fr5969_freertos"        : check_msp430_freertos,
               "x86_generic_linux"            : lambda: True,
               "zynqzc706_rtems_posix"        : check_zynq7000_rtems,
+              "brave_large_freertos"         : check_brave_large_freertos,
              }
 
 
