@@ -21,6 +21,8 @@
  */
 #pragma once
 
+#include "config.h"
+
 static inline void setTimerCtrlReg(uint32_t value);
 static inline uint32_t getTimerCtrlReg();
 
