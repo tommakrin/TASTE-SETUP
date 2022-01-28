@@ -1,9 +1,14 @@
 #!/bin/bash
-/etc/init.d/postgresql start 
+# The following line is commented since TASTE now uses SQLite by default
+#/etc/init.d/postgresql start 
 source ~/.bashrc
 set -e
 export GIT_SSL_NO_VERIFY=true 
 export TASTE_IN_DOCKER=1
+# For Space Creator to run these 2 variables need to be set
+# (otherwise there is a libfuse error when running AppImages in Docker)
+export NO_CLEANUP=1
+export APPIMAGE_EXTRACT_AND_RUN=1
 rm -rf *
 git fetch || exit 1
 git checkout -f "${CI_COMMIT_SHA}" || exit 1
