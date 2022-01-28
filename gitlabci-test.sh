@@ -9,6 +9,9 @@ export TASTE_IN_DOCKER=1
 # (otherwise there is a libfuse error when running AppImages in Docker)
 export NO_CLEANUP=1
 export APPIMAGE_EXTRACT_AND_RUN=1
+# In addition, Space Creator needs an X server
+Xvfb :1 &
+export DISPLAY=:1.0
 rm -rf *
 git fetch || exit 1
 git checkout -f "${CI_COMMIT_SHA}" || exit 1
