@@ -74,6 +74,10 @@ echo "[-] Setting up the PATH to Ellidiss tools"
 #    PATH_CMD='export PATH=$PATH:'"${REAL_ELLIDISS}"
 #    UpdatePATH
 
+echo "[-] Installing BRAVE Large FreeRTOS runtime"
+mkdir -p  ${PREFIX}/share/BRAVE_Large_FreeRTOS/
+cp -a BRAVE_Large/freertos/ ${PREFIX}/share/BRAVE_Large_FreeRTOS/
+
 # 64-bits version
 REAL_ELLIDISS=$(realpath "${DIR}/../ellidiss-GUI/TASTE-linux64/bin")
 PATH_CMD='export PATH='"${REAL_ELLIDISS}"':$PATH'
