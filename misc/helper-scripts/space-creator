@@ -148,6 +148,7 @@ generate_pro_file() {
 CONFIG -= qt
 CONFIG += generateC
 
+DISTFILES +=  \$(HOME)/tool-inst/share/taste-types/taste-types.asn
 DISTFILES += $PROJECT_NAME.asn
 DISTFILES += $PROJECT_NAME.acn
 DISTFILES += $PROJECT_NAME.msc
