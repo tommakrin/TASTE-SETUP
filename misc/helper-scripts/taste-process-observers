@@ -148,8 +148,6 @@ Properties_Ads_Init = '''{name}_State => {name}.Ctxt'''
 Properties_Ads_GSER_Image = ''' & GSER.Image (Full_State.{name}_State)'''
 
 Properties_Adb = '''with Text_IO; use Text_IO;
-with iterators_types;
-use iterators_types;
 
 {withes}
 
