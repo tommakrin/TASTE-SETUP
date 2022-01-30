@@ -394,7 +394,7 @@ def initialize():
     # user can fill in the parameters and send it to the system
     def quickEvent(item : QListWidgetItem):
         instance = item.data(Qt.UserRole).replace('-', '_')
-        name     = item.data(Qt.UserRole + 1)
+        name     = item.data(Qt.UserRole + 1).replace('-', '_')
         direction = item.data(Qt.UserRole + 2) # in or out
         gser      = item.data(Qt.UserRole + 3) # prefilled GSER string if "in"
         # Create a GSER string of an Observable-Event to pre-fill
@@ -655,6 +655,37 @@ def initialize():
             proc = root_ast.processes[0]
         except IndexError:
             raise IOError(f'Could not parse SDL model of function {f}')
+        if proc.instance_of_name is not None:
+            LOG.info(f'Parsing process type: {proc.instance_of_name}')
+            # If this is an instance we need to parse the type
+            # The type can either be in the project folders, or in the
+            # shared types folder. We have to look in both.
+            name = proc.instance_of_name.lower()
+            pr_files = []
+            full_path = f'../{name}/SDL/src/{name}.pr'
+            if not os.path.isfile(full_path):
+                home = os.getenv('HOME') or '/home/taste'
+                shared_path = os.getenv('TASTE_SHARED_TYPES') or \
+                        f'{home}/.local/share/QtProject/QtCreator/shared_types'
+                full_path = f'{shared_path}/{proc.instance_of_name}'\
+                             '/work/{name}/SDL/src/{name}.pr'
+                if not os.pas.isfile(full_path):
+                    LOG.error('Process type definition not found: {name}.pr')
+                    LOG.error('... cannot display the SDL model')
+                    sys.exit(1)
+                pr_files.append(f'{shared_path}/{proc.instance_of_name}'\
+                             '/work/{name}/SDL/src/system_structure.pr')
+            else:
+                pr_files.append(f'../{name}/SDL/src/system_structure.pr')
+
+            pr_files.append(full_path)
+            ast = opengeode.parse(pr_files)
+            try:
+                root_ast = ast[0]
+                proc = root_ast.process_types[0]  # render the type
+            except IndexError:
+                raise IOError(f'Could not parse SDL model of function {f}')
+
         graph = opengeode.Statechart.create_dot_graph(proc, basic=True)
         # Flatten the model to have the nested states names in process.mapping
         opengeode.Helper.flatten(proc, sep='.')
