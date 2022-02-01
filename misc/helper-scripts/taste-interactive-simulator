@@ -402,17 +402,39 @@ def initialize():
         # the default values will be within allowed constraints.
         evt = foo = ASN1_CTYPES.Observable_Event()
         if direction == 'out':
-            Observable_Event['editor'].getVariable(dest=evt)
-            evt.kind.Set(ASN1_CTYPES.DV.output_event_PRESENT)
-            evt.output_event.source.Set(ASN1_CTYPES.DV.env)
-            evt.output_event.dest.Set(ASN1_CTYPES.DV.env)
-            evt.output_event.event.kind.Set(
-                getattr(ASN1_CTYPES.DV, f'{instance}_PRESENT'))
-            getattr(evt.output_event.event, instance).kind.Set(
-                    getattr(ASN1_CTYPES.DV,
-                        f'{instance.title()}_Event_msg_out_PRESENT'))
-            getattr(foo.output_event.event, instance).msg_out.kind.Set(
-            getattr(ASN1_CTYPES.DV, f'msg_out_{name}_PRESENT'))
+            innerType = f'{instance.title()}_Event_msg_out_{name.lower()}'
+            innerTypeInst = getattr(ASN1_CTYPES, innerType)()
+            # Call initialize function from asn1scc to get a valid value
+            # for the event content
+            innerTypeInst.Initialise()
+            innerGSER = innerTypeInst.GSER()
+            # form the full event string
+            gser = f'output-event : {{source env, dest env, event {instance.replace("_", "-").lower()}: msg-out: {name.lower()}: {innerGSER}}}'
+            vn.valueNotationToCTypes(
+                    gser,
+                    evt,
+                    ASN1_AST["Observable-Event"].type,
+                    ASN1_CTYPES,
+                    ASN1_AST)
+            evt.Reset()
+
+            # We cannot set the value via ctypes because we have no way
+            # to set a proper default GSER value. We must set the columns
+            # in the editor and let the user fill the parameter properly
+            # (he has to do it anyway)
+            #root = Observable_Event['editor'].treeItem
+            #breakpoint()
+            #Observable_Event['editor'].getVariable(dest=evt)
+            #evt.kind.Set(ASN1_CTYPES.DV.output_event_PRESENT)
+            #evt.output_event.source.Set(ASN1_CTYPES.DV.env)
+            #evt.output_event.dest.Set(ASN1_CTYPES.DV.env)
+            #evt.output_event.event.kind.Set(
+            #    getattr(ASN1_CTYPES.DV, f'{instance}_PRESENT'))
+            #getattr(evt.output_event.event, instance).kind.Set(
+            #        getattr(ASN1_CTYPES.DV,
+            #            f'{instance.title()}_Event_msg_out_PRESENT'))
+            #getattr(foo.output_event.event, instance).msg_out.kind.Set(
+            #   getattr(ASN1_CTYPES.DV, f'msg_out_{name}_PRESENT'))
         else:
             # IN events are already GSER pre-filled
             vn.valueNotationToCTypes(
@@ -772,6 +794,11 @@ def initialize():
     # stop the MSC
     msc_handler.startStop()
 
+# Set a cache folder to speed up the SDL parsing
+os.environ['PROJECT_CACHE'] = './cache'
+
+# Set this flag for asn2dataModel (DMT) to emit data for inner ASN.1 types
+os.environ['ASN1_INTERNAL_TYPES_EXPORT'] = '1'
 
 initialize()
 # out events's effect is to create a corresponding input event in the receivers's queue
