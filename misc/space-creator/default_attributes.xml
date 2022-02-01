@@ -60,6 +60,7 @@
                 <Entry value="Ada"/>
                 <Entry value="CPP"/>
                 <Entry value="SDL"/>
+                <Entry value="Slim"/>
             </Enumeration>
         </Type>
     </Attr>
