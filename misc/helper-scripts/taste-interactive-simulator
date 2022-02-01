@@ -409,7 +409,9 @@ def initialize():
             innerTypeInst.Initialise()
             innerGSER = innerTypeInst.GSER()
             # form the full event string
-            gser = f'output-event : {{source env, dest env, event {instance.replace("_", "-").lower()}: msg-out: {name.lower()}: {innerGSER}}}'
+            gser = f'output-event : {{source env, dest env, event {instance.lower()}: msg-out: {name.lower()}: {innerGSER}}}'
+            gser = gser.replace('_', '-')
+            LOG.debug (f'Event : {gser}')
             vn.valueNotationToCTypes(
                     gser,
                     evt,
@@ -417,24 +419,6 @@ def initialize():
                     ASN1_CTYPES,
                     ASN1_AST)
             evt.Reset()
-
-            # We cannot set the value via ctypes because we have no way
-            # to set a proper default GSER value. We must set the columns
-            # in the editor and let the user fill the parameter properly
-            # (he has to do it anyway)
-            #root = Observable_Event['editor'].treeItem
-            #breakpoint()
-            #Observable_Event['editor'].getVariable(dest=evt)
-            #evt.kind.Set(ASN1_CTYPES.DV.output_event_PRESENT)
-            #evt.output_event.source.Set(ASN1_CTYPES.DV.env)
-            #evt.output_event.dest.Set(ASN1_CTYPES.DV.env)
-            #evt.output_event.event.kind.Set(
-            #    getattr(ASN1_CTYPES.DV, f'{instance}_PRESENT'))
-            #getattr(evt.output_event.event, instance).kind.Set(
-            #        getattr(ASN1_CTYPES.DV,
-            #            f'{instance.title()}_Event_msg_out_PRESENT'))
-            #getattr(foo.output_event.event, instance).msg_out.kind.Set(
-            #   getattr(ASN1_CTYPES.DV, f'msg_out_{name}_PRESENT'))
         else:
             # IN events are already GSER pre-filled
             vn.valueNotationToCTypes(
