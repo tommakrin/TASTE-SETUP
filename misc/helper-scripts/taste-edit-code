@@ -46,6 +46,13 @@ then
     LANG=$(echo ${LANG^^})
 fi
 
+# SLIM function and function type blocks are in slim directory,
+# in lower case.
+if [[ "$LANG" == "Slim" ]]
+then
+    LANG=$(echo ${LANG,,})
+fi
+
 # Check if the project works with kazoo. If so, use the makefile rule to edit the code
 if [[ -f Makefile && $(grep KAZOO Makefile) != "" ]]
 then
@@ -67,9 +74,10 @@ then
     elif [[ $LANG == "CPP" ]]
     then
         SOURCE_FILE=src/"${FNAME,,}".cc
-    elif [[ $LANG == "Slim" ]]
+    elif [[ $LANG == "slim" ]]
     then
         SOURCE_FILE=src/"${FNAME,,}".slim
+        touch "${SOURCE_FILE}"
     elif [[ $LANG == "GUI" ]]
     then
         SOURCE_FILE=src/UserWidgets.py
