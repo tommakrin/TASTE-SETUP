@@ -19,10 +19,6 @@
  * see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-// #include <bsp.h>
-// #include <leon.h>
-// #include <ambapp.h>
-// #include <rtems/score/types.h>
 
 #include "uart.h"
 #include "dbg_printf.h"
@@ -31,51 +27,6 @@
 #define _DEBUG
 
 #ifdef _DEBUG
-// typedef volatile LEON3_UART_Regs_Map UART;
-
-// A version of putc I wrote for leon3's serial ports.
-// I tested it on my ML509 - works fine.
-// void uart_write_byte(UART_INST, unsigned char c)
-// {
-//     static int initialized = 0;
-//     static int foundRequestedPort = 0;
-//     static UART *pUART = NULL;
-
-//     if (!initialized) {
-//         struct ambapp_apb_info serialPortsInfo[LEON3_APBUARTS];
-
-//         initialized = 1;
-//         if (SERIAL_PORT_INDEX_TO_PRINT_TO >= ambapp_find_apbslvs_next( // LCOV_EXCL_LINE LCOV_EXCL_BR_LINE
-//                 &ambapp_plb, VENDOR_GAISLER, GAISLER_APBUART, serialPortsInfo,
-//                 0, LEON3_APBUARTS)) {
-//             // Oops, our available serial ports don't go that high...
-//             return; // LCOV_EXCL_LINE LCOV_EXCL_BR_LINE
-//         }
-//         foundRequestedPort = 1;
-//         pUART = (UART *) serialPortsInfo[SERIAL_PORT_INDEX_TO_PRINT_TO].start;
-//         uint32_t ctrlMask = pUART->ctrl;
-
-//         // Enable TX, RX
-//         ctrlMask |= LEON_REG_UART_CTRL_TE | LEON_REG_UART_CTRL_RE;
-//         ctrlMask &=
-//             LEON_REG_UART_CTRL_LB    // no loopback
-//             | LEON_REG_UART_CTRL_FL  // no flow control
-//             | LEON_REG_UART_CTRL_PS  // no parity selected...
-//             | LEON_REG_UART_CTRL_PE; // ...because we don't want parity bits
-//         pUART->ctrl |= ctrlMask;
-//         pUART->status = 0;
-//     }
-
-//     if (!foundRequestedPort) // If we never managed to find the requested UART  // LCOV_EXCL_LINE LCOV_EXCL_BR_LINE
-//         return; // (the SERIAL_PORT_INDEX_TO_PRINT_TO one) // LCOV_EXCL_LINE LCOV_EXCL_BR_LINE
-//                 // then just return and print nothing.
-
-//     if (c == '\n')
-//         uart_write_byte(UART_INST, '\r');
-//     while(!(pUART->status & LEON_REG_UART_STATUS_THE))
-//         ;                           // wait until slot is empty...
-//     pUART->data = (unsigned int) c; // ...and then transmit!
-// }
 
 // This is a BSD-licensed implementation of printf, supporting only %d, %u, %x,
 // %X, %c and %s.  It is offered without guarantees of correctness - it works
