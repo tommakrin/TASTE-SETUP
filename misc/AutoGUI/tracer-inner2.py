@@ -226,10 +226,16 @@ def Message(kind, timestamp, message, messageData, sender, receiver):
         try:
             _, val = messageData[0]
         except IndexError:
-            print(f'[?] Parsing error: {messageData}, please report this line if it happens again')
-        timerValueInMs = val.split()[1]
-        g_completeMessages.append(
-                (message, sender, f'#set {timerValueInMs}', g_messageId, g_messageId, timestamp))
+            print(f'[!] Parsing error: "set {message}" "{messageData}", please report this line if it happens again:')
+        else:
+            timerValueInMs = val.split()[1]
+            g_completeMessages.append(
+                (message,
+                 sender,
+                 f'#set {timerValueInMs}',
+                 g_messageId,
+                 g_messageId,
+                 timestamp))
         g_instances[sender].append(len(g_completeMessages) - 1)
     elif kind == 'RESET':
         g_completeMessages.append(
