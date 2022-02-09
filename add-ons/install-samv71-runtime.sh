@@ -24,6 +24,8 @@ cp -r SAMV71-BSP "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp -r src/BrokerLock "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp -r src/Init "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 cp -r src/Hal "${PREFIX}"/include/TASTE-SAMV71-Runtime/
+cp -r src/hwas "${PREFIX}"/include/TASTE-SAMV71-Runtime/
+cp -r src/Xdmac "${PREFIX}"/include/TASTE-SAMV71-Runtime/
 
 echo "Installing TASTE-SAMV71-Drivers"
 
