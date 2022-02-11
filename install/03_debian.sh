@@ -5,7 +5,7 @@ if [ "${ARCH}" == "x86_64" ] ; then
         sudo dpkg --add-architecture i386
     }
 fi
-sudo apt-get update --yes
+sudo apt update --yes
 if [ "${ARCH}" == "x86_64" ] ; then
     sudo apt-get install --no-install-recommends -y --force-yes libc6:i386 libgcc1:i386 libxft2:i386 libxss1:i386 libcairo2:i386 libc6-dev-i386 
 fi
